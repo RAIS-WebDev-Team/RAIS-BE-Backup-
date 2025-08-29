@@ -1,0 +1,995 @@
+/* Light Mode (Default) */
+:root {
+    --rais-bg-light: #f8f9fa;
+    --rais-border-color: #dee2e6;
+    --rais-button-maroon: #811F1D;
+    --rais-card-bg: #ffffff;
+    --rais-dark-green: #00332c;
+    --rais-light-gray: #f8f9fa;
+    --rais-primary-green: #004d40;
+    --rais-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    --rais-text-dark: #212529;
+    --rais-text-light: #6c757d;
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #3BA43B, #0C470C);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #45b945, #0a3a0a);
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+[id$='-table-body'] tr {
+    cursor: pointer;
+}
+
+[id$='-table-body'] tr:not(.selected):hover td {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+[id$='-table-body'] tr.selected td {
+    background-color: var(--rais-dark-green);
+    color: white;
+}
+
+body {
+    background-color: var(--rais-light-gray);
+    color: var(--rais-text-dark);
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Dark Mode Styles */
+body.dark-mode {
+    --rais-bg-light: #2c3034;
+    --rais-border-color: #495057;
+    --rais-card-bg: #212529;
+    --rais-light-gray: #343a40;
+    --rais-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    --rais-text-dark: #ffffff;
+    --rais-text-light: #adb5bd;
+}
+
+body.dark-mode .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+body.dark-mode .btn-outline-dark {
+    border-color: var(--rais-text-dark);
+    color: var(--rais-text-dark);
+}
+
+body.dark-mode .btn-outline-dark:hover {
+    background-color: var(--rais-text-dark);
+    color: var(--rais-card-bg);
+}
+
+body.dark-mode .card {
+    background-color: var(--rais-card-bg);
+    border-color: var(--rais-border-color);
+    color: var(--rais-text-dark);
+}
+
+body.dark-mode .card .card-title,
+body.dark-mode .card .text-muted {
+    color: var(--rais-text-dark) !important;
+}
+
+body.dark-mode .chat-input-area .form-control {
+    border-color: var(--rais-dark-green);
+}
+
+body.dark-mode .chat-log-item {
+    background-color: var(--rais-light-gray);
+}
+
+body.dark-mode .content-card {
+    background-color: var(--rais-bg-light);
+    border-color: var(--rais-light-gray);
+    color: var(--rais-text-dark);
+}
+
+body.dark-mode .content-card h2,
+body.dark-mode .content-card .text-muted {
+    color: var(--rais-text-dark) !important;
+}
+
+body.dark-mode .cover-photo {
+    background-image: url('../img/logo1.png');
+    /* NOTE: Ensure this path is correct */
+    background-color: #343a40;
+}
+
+body.dark-mode .dynamic-section {
+    background-color: var(--rais-light-gray);
+    border-color: var(--rais-border-color) !important;
+}
+
+body.dark-mode .edit-profile-btn {
+    color: white;
+    border-color: white;
+}
+
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+    background-color: var(--rais-light-gray);
+    border-color: var(--rais-border-color);
+    color: var(--rais-text-dark);
+}
+
+body.dark-mode .form-control::placeholder {
+    color: var(--rais-text-light);
+}
+
+body.dark-mode .form-control:focus,
+body.dark-mode .form-select:focus {
+    background-color: var(--rais-light-gray);
+    color: var(--rais-text-dark);
+}
+
+body.dark-mode .form-text {
+    color: var(--rais-text-light);
+}
+
+body.dark-mode .header-logo-img.dark-mode-logo {
+    display: block;
+}
+
+body.dark-mode .header-logo-img.light-mode-logo {
+    display: none;
+}
+
+body.dark-mode .input-group .btn-outline-secondary {
+    border-color: var(--rais-border-color);
+    color: var(--rais-text-light);
+}
+
+body.dark-mode .input-group .btn-outline-secondary:hover {
+    background-color: var(--rais-primary-green);
+    color: #fff;
+}
+
+body.dark-mode .modal-content {
+    background-color: var(--rais-card-bg);
+    color: var(--rais-text-dark);
+}
+
+body.dark-mode .modal-footer {
+    border-top-color: var(--rais-border-color);
+}
+
+body.dark-mode .modal-header {
+    border-bottom-color: var(--rais-border-color);
+}
+
+body.dark-mode .nav-pills .nav-link {
+    color: var(--rais-text-light);
+}
+
+body.dark-mode .nav-pills .nav-link.active {
+    color: #fff;
+}
+
+body.dark-mode .table {
+    --bs-table-bg: transparent;
+    --bs-table-border-color: var(--rais-border-color);
+    --bs-table-color: var(--rais-text-dark);
+    --bs-table-hover-bg: var(--rais-dark-green);
+}
+
+body.dark-mode [id$='-table-body'] tr:not(.selected):hover td {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode [id$='-table-body'] tr.selected td {
+    background-color: var(--rais-primary-green);
+    color: white;
+}
+
+.card {
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.chat-area-panel {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.chat-container-admin {
+    background-color: var(--rais-card-bg);
+    border-radius: 12px;
+    box-shadow: var(--rais-shadow);
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden;
+    transition: background-color 0.3s;
+}
+
+.chat-header-panel {
+    background-color: var(--rais-bg-light);
+    border-bottom: 1px solid var(--rais-border-color);
+    color: var(--rais-text-dark);
+    font-weight: 600;
+    padding: 15px;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.chat-input-area {
+    background-color: var(--rais-bg-light);
+    border-top: 1px solid var(--rais-border-color);
+    padding: 15px;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.chat-input-area .btn {
+    background-color: var(--rais-button-maroon);
+    border-radius: 20px;
+    color: white;
+}
+
+.chat-input-area .form-control {
+    background-color: var(--rais-light-gray);
+    border-color: var(--rais-border-color);
+    border-radius: 20px;
+    color: var(--rais-text-dark);
+}
+
+.chat-input-area .form-control::placeholder {
+    color: var(--rais-text-light);
+    opacity: 0.7;
+}
+
+.chat-log-item strong {
+    color: #28a745;
+}
+
+.chat-message-bubble {
+    border-radius: 18px;
+    margin-bottom: 10px;
+    max-width: 70%;
+    padding: 10px 15px;
+    word-wrap: break-word;
+}
+
+.chat-message-bubble.admin {
+    align-self: flex-end;
+    background-color: var(--rais-light-gray);
+    border-bottom-right-radius: 2px;
+    color: var(--rais-text-dark);
+}
+
+.chat-message-bubble.user {
+    align-self: flex-start;
+    background-color: var(--rais-primary-green);
+    border-bottom-left-radius: 2px;
+    color: white;
+}
+
+.chat-message-bubble .sender-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 2px;
+    opacity: 0.8;
+}
+
+.chat-message-bubble .timestamp {
+    display: block;
+    font-size: 0.7rem;
+    margin-top: 5px;
+    opacity: 0.6;
+    text-align: right;
+}
+
+.chat-messages {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.content-area {
+    flex-grow: 1;
+    height: 100vh;
+    margin-left: 70px;
+    overflow-y: auto;
+}
+
+.content-card {
+    background-color: var(--rais-card-bg);
+    border-radius: 12px;
+    box-shadow: var(--rais-shadow);
+    margin-bottom: 20px;
+    padding: 30px;
+}
+
+.content-card h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.content-nav {
+    margin-bottom: 20px;
+}
+
+.content-nav .nav-link {
+    border-radius: 20px;
+    color: var(--rais-text-light);
+    font-weight: 500;
+    margin: 0 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.content-nav .nav-link.active {
+    background-color: var(--rais-button-maroon);
+    color: white;
+}
+
+.content-section {
+    display: none;
+}
+
+.content-section.active {
+    display: block;
+}
+
+.conversation-item {
+    align-items: center;
+    border-bottom: 1px solid var(--rais-border-color);
+    cursor: pointer;
+    display: flex;
+    padding: 10px 15px;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.conversation-item .details {
+    flex-grow: 1;
+}
+
+.conversation-item .name {
+    color: var(--rais-text-dark);
+    font-weight: 600;
+}
+
+.conversation-item img {
+    border-radius: 50%;
+    height: 40px;
+    margin-right: 10px;
+    object-fit: cover;
+    width: 40px;
+}
+
+.conversation-item:hover,
+.conversation-item.active {
+    background-color: var(--rais-bg-light);
+}
+
+.conversation-list-panel {
+    border-right: 1px solid var(--rais-border-color);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    transition: border-color 0.3s;
+    width: 300px;
+}
+
+.conversation-search {
+    border-bottom: 1px solid var(--rais-border-color);
+    padding: 15px;
+}
+
+.cover-photo {
+    height: 250px;
+    /* ADJUSTED: Reduced height */
+    background-image: url('../img/logo2.png');
+    /* NOTE: Ensure this path is correct */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 12px 12px 0 0;
+    background-color: var(--rais-light-gray);
+}
+
+.edit-profile-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    border-color: var(--rais-text-dark);
+    color: var(--rais-text-dark);
+}
+
+.edit-profile-btn:hover {
+    background-color: var(--rais-text-dark);
+    color: var(--rais-card-bg);
+}
+
+.fab-container {
+    bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: fixed;
+    right: 30px;
+    z-index: 1050;
+}
+
+.fab-container .btn:not(:disabled) {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.fab-container .btn:not(:disabled):hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-4px) scale(1.05);
+}
+
+.header {
+    align-items: center;
+    background-color: var(--rais-bg-light);
+    box-shadow: var(--rais-shadow);
+    display: flex;
+    height: 60px;
+    justify-content: space-between;
+    padding: 0 25px;
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+}
+
+.header-brand {
+    gap: 10px;
+}
+
+.header-logo-img {
+    height: 70px;
+    object-fit: contain;
+    width: auto;
+}
+
+.header-logo-img.dark-mode-logo {
+    display: none;
+}
+
+.header-logo-img.light-mode-logo {
+    display: block;
+}
+
+.header-title {
+    color: var(--rais-text-dark);
+    font-size: 1.1rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.highlight {
+    color: #3BA43B;
+    font-weight: bold;
+    text-decoration: underline;
+    text-underline-offset: 8px;
+}
+
+.info-list i {
+    color: var(--rais-primary-green);
+    margin-right: 10px;
+    width: 20px;
+    /* Ensures alignment */
+    text-align: center;
+}
+
+.info-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rais-border-color);
+}
+
+.info-list li:last-child {
+    border-bottom: none;
+}
+
+input:checked+.slider {
+    background-color: var(--rais-primary-green);
+}
+
+input:checked+.slider:before {
+    transform: translateX(24px);
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: calc(100vh - 60px);
+    padding: 30px;
+}
+
+.main-content h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.main-wrapper {
+    display: flex;
+    height: 100vh;
+}
+
+.modal-content,
+.modal-header,
+.modal-footer,
+.form-control,
+.form-select,
+.form-text,
+.dynamic-section,
+.input-group .btn-outline-secondary {
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+#partner-logo-preview {
+    border-radius: .25rem;
+    max-height: 100px;
+    max-width: 100px;
+    object-fit: contain;
+}
+
+.profile-header {
+    background-color: var(--rais-card-bg);
+    border-radius: 12px;
+    box-shadow: var(--rais-shadow);
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.profile-info {
+    display: flex;
+    align-items: flex-end;
+    position: relative;
+    margin-top: -75px;
+    /* ADJUSTED: Precisely half the profile picture height */
+    padding-left: 30px;
+    /* ADDED: Give picture space from the edge */
+    padding-bottom: 20px;
+}
+
+.profile-name {
+    margin-left: 20px;
+    margin-bottom: 15px;
+    /* ADJUSTED: Aligns text better with the picture */
+}
+
+.profile-name h2 {
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+.profile-name p {
+    color: var(--rais-text-light);
+}
+
+.profile-picture {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid var(--rais-card-bg);
+    object-fit: cover;
+    background-color: var(--rais-card-bg);
+}
+
+.service-card,
+.blog-card {
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+.service-card-img,
+.blog-card-img {
+    height: 200px;
+    object-fit: cover;
+}
+
+.service-card.selected,
+.blog-card.selected {
+    border-color: var(--rais-primary-green);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.service-card:hover,
+.blog-card:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+}
+
+
+/* === CORRECTED SIDEBAR STYLES START HERE === */
+
+.sidebar {
+    background-color: var(--rais-primary-green);
+    box-shadow: var(--rais-shadow);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    height: 100vh;
+    /* overflow: hidden; */ /* <<< CHANGE 1: This property was preventing scrolling and has been removed. */
+    padding: 30px 0;
+    position: fixed;
+    top: 0;
+    transition: width 0.3s ease-in-out;
+    width: 70px;
+    z-index: 1031;
+}
+
+.sidebar .footer-text {
+    color: #bbb;
+    font-size: 0.8rem;
+    opacity: 0;
+    padding: 15px 0;
+    text-align: center;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.sidebar .logo {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 30px;
+    opacity: 0;
+    text-align: center;
+    transition: opacity 0.3s ease-in-out;
+    white-space: nowrap;
+}
+
+.sidebar .nav {
+    flex-grow: 1;
+    overflow-y: auto;   /* <<< CHANGE 2: Allows vertical scrolling only for the nav links. */
+    overflow-x: hidden; /* <<< CHANGE 3: Prevents horizontal scrolling. */
+}
+
+.sidebar .nav-link {
+    align-items: center;
+    color: white;
+    display: flex;
+    font-weight: 500;
+    gap: 15px;
+    padding: 15px 30px;
+    transition: background-color 0.3s ease;
+    white-space: nowrap;
+}
+
+.sidebar .nav-link i {
+    font-size: 1.2rem;
+    min-width: 20px;
+    text-align: center;
+}
+
+.sidebar .nav-link span {
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out 0.2s;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    background-color: var(--rais-dark-green);
+}
+
+.sidebar:hover {
+    width: 280px;
+}
+
+.sidebar:hover .footer-text {
+    opacity: 1;
+}
+
+.sidebar:hover .logo {
+    opacity: 1;
+}
+
+.sidebar:hover .nav-link span {
+    opacity: 1;
+}
+
+/* === END OF CORRECTED SIDEBAR STYLES === */
+
+
+.slider {
+    background-color: #ccc;
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: .4s;
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.slider:before {
+    background-color: #fff;
+    bottom: 4px;
+    content: "";
+    height: 16px;
+    left: 4px;
+    position: absolute;
+    transition: .4s;
+    width: 16px;
+}
+
+.table .btn {
+    font-size: 0.85rem;
+}
+
+.table td,
+.table th {
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.table-responsive {
+    margin-top: 15px;
+}
+
+.theme-switch {
+    display: inline-block;
+    height: 24px;
+    position: relative;
+    width: 48px;
+}
+
+.theme-switch input {
+    display: none;
+}
+
+.theme-switch-wrapper {
+    align-items: center;
+    display: flex;
+}
+
+.theme-switch-wrapper i {
+    color: var(--rais-text-dark);
+    font-size: 1rem;
+}
+
+.theme-switch-wrapper .bi-moon-fill {
+    margin-left: 8px;
+}
+
+.theme-switch-wrapper .bi-sun-fill {
+    margin-right: 8px;
+}
+
+.user-status {
+    align-items: center;
+    display: flex;
+    gap: 15px;
+}
+
+.user-status .badge {
+    background-color: var(--rais-button-maroon);
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 5px 15px;
+}
+
+.user-status .btn {
+    font-size: 1.5rem;
+    padding: 0;
+}
+
+.user-status .btn .bi-power {
+    color: red;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #backToConversations {
+        color: var(--rais-primary-green);
+        padding: 0;
+    }
+
+    body {
+        overflow: auto;
+        padding-bottom: 50px;
+        padding-top: 60px;
+    }
+
+    .chat-area-panel {
+        display: none;
+        height: 100%;
+    }
+
+    .chat-container-admin {
+        flex-direction: column;
+        flex-grow: 1;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .chat-container-admin.view-active .chat-area-panel {
+        display: flex;
+    }
+
+    .chat-container-admin.view-active .conversation-list-panel {
+        display: none;
+    }
+
+    .content-area {
+        height: auto;
+        margin-left: 0;
+        overflow-y: visible;
+    }
+
+    .content-nav {
+        border-bottom: 1px solid var(--rais-border-color);
+    }
+
+    .content-nav .nav-link {
+        border-radius: 5px;
+        margin: 2px 0;
+    }
+
+    .conversation-list-panel {
+        border-bottom: 1px solid var(--rais-border-color);
+        border-right: none;
+        display: block;
+        height: 100%;
+        width: 100%;
+    }
+
+    .header {
+        left: 0;
+        position: fixed;
+        right: 0;
+        top: 0;
+        z-index: 1030;
+    }
+
+    .header-logo-img {
+        height: 70px;
+        max-width: 150px;
+        width: auto;
+    }
+
+    .header-title {
+        display: none;
+    }
+
+    .main-content {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 110px);
+        padding: 15px;
+    }
+
+    .main-content h1 {
+        flex-shrink: 0;
+    }
+
+    .main-wrapper {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .sidebar {
+        align-items: center;
+        bottom: 0;
+        flex-direction: row;
+        height: 50px;
+        justify-content: space-around;
+        left: 0;
+        padding: 0;
+        position: fixed;
+        top: auto;
+        transition: none;
+        width: 100%;
+        z-index: 1029;
+    }
+
+    .sidebar .logo,
+    .sidebar .profile-section,
+    .sidebar .footer-text {
+        display: none;
+    }
+
+    .sidebar .nav {
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+        flex-grow: 1;
+        height: 100%;
+        justify-content: space-around;
+    }
+
+    .sidebar .nav-link {
+        align-items: center;
+        flex: 1;
+        flex-direction: row;
+        gap: 0;
+        height: 100%;
+        justify-content: center;
+        padding: 0 10px;
+    }
+
+    .sidebar .nav-link i {
+        font-size: 1.5rem;
+        margin-bottom: 0;
+    }
+
+    .sidebar .nav-link span,
+    .sidebar:hover .nav-link span {
+        display: none;
+    }
+
+    .sidebar:hover {
+        width: 100%;
+    }
+    
+}
+
+/* === STYLES FOR CONTENT MANAGEMENT PAGE (FINAL V3) === */
+
+/* 1. Custom Floating Action Button (FAB) Colors */
+.fab-container .btn-info {
+    background-color: #808080 !important;
+    border-color: #808080 !important;
+}
+.fab-container .btn-warning {
+    background-color: #74D4FF !important;
+    border-color: #74D4FF !important;
+}
+.fab-container .btn-danger {
+    background-color: #FB2C36 !important;
+    border-color: #FB2C36 !important;
+}
+.fab-container .btn-primary {
+    background-color: #7B282C !important;
+    border-color: #7B282C !important;
+}
+
+/* 2. Custom Color & Hover for Mobile Navigation Dropdown Button */
+#contentNavDropdown.btn-outline-primary {
+    background-color: #7B282C !important;
+    border-color: #7B282C !important;
+    color: white !important;
+}
+#contentNavDropdown.btn-outline-primary:hover {
+    background-color: #6a2226 !important;
+    border-color: #6a2226 !important;
+    color: white !important;
+}
+
+/* 
+  THIS IS THE NEW FIX: 
+  Styles the items INSIDE the dropdown menu for both hover and active states.
+  It uses your theme's --rais-button-maroon variable.
+*/
+.content-nav .dropdown-menu .dropdown-item:hover,
+.content-nav .dropdown-menu .dropdown-item.active {
+    background-color: var(--rais-button-maroon) !important;
+    color: white !important;
+}
+
+/* 3. Adjust FAB position on mobile to avoid the bottom navbar */
+@media (max-width: 786px) {
+    .fab-container {
+        bottom: 70px !important; 
+        right: 20px !important;
+    }
+}
