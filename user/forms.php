@@ -574,19 +574,20 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
                 display: none;
             }
 
-            .sidebar .nav {
+           .sidebar .nav {
                 display: flex;
                 flex-direction: row;
                 align-items: center;
-                flex-grow: 1;
                 height: 100%;
+                width: 100%;
+                justify-content: space-around;
             }
 
             .sidebar .nav-link {
-                flex-direction: row;
+                flex: 1;
                 justify-content: center;
                 align-items: center;
-                padding: 0 20px;
+                padding: 0 5px;
                 gap: 0;
                 height: 100%;
             }
@@ -604,7 +605,6 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
             .sidebar:hover .nav-link span {
                 display: none;
             }
-
             .floating-btn {
                 bottom: 80px;
                 right: 15px;

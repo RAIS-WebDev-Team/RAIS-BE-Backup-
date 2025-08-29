@@ -378,7 +378,13 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
         .btn-submit {
             background-color: var(--rais-button-maroon);
             color: white;
-            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-submit:hover {
+            background-color: var(--rais-primary-green);
+            border-color: var(--rais-primary-green);
+            color: white;
         }
 
         #confirmation-view {
@@ -674,8 +680,7 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
                 align-items: center;
                 padding: 0;
                 transition: none;
-                overflow-x: auto;
-                overflow-y: hidden;
+                overflow: hidden;
             }
 
             .sidebar:hover {
@@ -692,13 +697,16 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
                 flex-direction: row;
                 align-items: center;
                 height: 100%;
+                width: 100%;
+                justify-content: space-around;
             }
 
             .sidebar .nav-link {
                 justify-content: center;
-                padding: 0 20px;
+                padding: 0 5px;
                 gap: 0;
                 height: 100%;
+                flex: 1;
             }
 
             .sidebar .nav-link i {
@@ -830,7 +838,9 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
                             </div>
 
                             <div id="details-entry-view" style="display: none;">
-                                <button id="back-to-calendar" class="btn btn-sm btn-link mb-3 ps-0">&lt; Back</button>
+                                <div>
+                                    <button id="back-to-calendar" class="btn btn-sm btn-submit mb-3">&lt; Back</button>
+                                </div>
                                 <h4>Enter Your Details</h4>
                                 <p><strong>Selected:</strong> <span id="details-date-display"></span> at <span
                                         id="details-time-display"></span></p>
@@ -848,7 +858,7 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
                                         <textarea id="notes" name="notes" class="form-control" rows="3"></textarea>
                                     </div>
                                     <p class="small text-muted">By proceeding, you agree to our Terms of Use and Privacy Notice.</p>
-                                    <button type="submit" class="btn btn-submit">Schedule Event</button>
+                                    <button type="submit" class="btn btn-submit w-100">Schedule Event</button>
                                 </form>
                             </div>
                         </div>
@@ -1173,3 +1183,4 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
 </body>
 
 </html>
+

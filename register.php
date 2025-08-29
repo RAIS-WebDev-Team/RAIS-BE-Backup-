@@ -94,16 +94,16 @@ $page_title = "Register - RAIS Create";
     }
     
     .form-check-input:checked {
-        background-color: #0C470C;
-        border-color: #106210;
+      background-color: #0C470C;
+      border-color: #106210;
     }
 
     .form-check-input:focus {
-        box-shadow: 0 0 0 0.25rem rgba(12, 71, 12, 0.5);
+      box-shadow: 0 0 0 0.25rem rgba(12, 71, 12, 0.5);
     }
     
     .form-check-label {
-        cursor: pointer;
+      cursor: pointer;
     }
 
     /* --- Button Styles --- */
@@ -115,14 +115,20 @@ $page_title = "Register - RAIS Create";
       transition: all 0.3s ease;
       border: none;
     }
+    
+    /* Style for a disabled button */
+    .btn-register:disabled {
+        background-color: #555;
+        cursor: not-allowed;
+    }
 
-    .btn-register:hover {
+    .btn-register:hover:not(:disabled) {
       background-color: #106210;
       transform: translateY(-3px);
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
     
-    .btn-register:active {
+    .btn-register:active:not(:disabled) {
       transform: translateY(0);
       box-shadow: none;
     }
@@ -151,6 +157,16 @@ $page_title = "Register - RAIS Create";
     .register-form a:hover {
       color: #fff;
     }
+    
+    .terms-link {
+        color: #fff;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+    .terms-link:hover {
+        color: #a5d6a7;
+    }
+
 
     /* --- Logo Style & Animation --- */
     .logo-img {
@@ -185,7 +201,7 @@ $page_title = "Register - RAIS Create";
 
             <div class="row">
               <div class="col-md-6">
-                <form method="post" action="signup.php">
+                <form method="post" action="signup.php" id="registerForm">
                 <input type="text" name="fName"class="form-control mb-3" placeholder="First Name" required/>
               </div>
               <div class="col-md-6">
@@ -201,10 +217,12 @@ $page_title = "Register - RAIS Create";
             
             <div class="form-check mb-3">
               <input class="form-check-input" type="checkbox" id="termsCheck">
-              <label class="form-check-label" for="termsCheck">I agree to the Terms & Conditions</label>
+              <label class="form-check-label" for="termsCheck">
+                  I agree to the <a href="#" class="terms-link" data-bs-toggle="modal" data-bs-target="#termsModal">Terms & Conditions</a>
+              </label>
             </div>
             
-            <button class="btn w-100 fw-bold btn-register" type="submit" name="create">Create Account</button>
+            <button class="btn w-100 fw-bold btn-register" type="submit" name="create" disabled>Create Account</button>
             </form>
             <div class="mt-3 text-center">
               <a href="login.php" class="text-white text-decoration-none fs-6">Already have an account? Login</a>
@@ -216,8 +234,61 @@ $page_title = "Register - RAIS Create";
 
     <a href="index.php" class="btn mt-4 text-white fs-6 btn-home">Home</a>
   </div>
+  
+  <!-- Terms & Conditions Modal -->
+  <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content text-dark">
+        <div class="modal-header">
+          <h5 class="modal-title" id="termsModalLabel">Terms & Conditions</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Please read these Terms and Conditions ("Terms", "Terms and Conditions") carefully before using the RAIS Create website (the "Service") operated by RAIS ("us", "we", or "our").</p>
+          <p>Your access to and use of the Service is conditioned on your acceptance of and compliance with these Terms. These Terms apply to all visitors, users and others who access or use the Service.</p>
+          <p>By accessing or using the Service you agree to be bound by these Terms. If you disagree with any part of the terms then you may not access the Service.</p>
+
+          <h6>1. Accounts</h6>
+          <p>When you create an account with us, you must provide us with information that is accurate, complete, and current at all times. Failure to do so constitutes a breach of the Terms, which may result in immediate termination of your account on our Service.</p>
+          <p>You are responsible for safeguarding the password that you use to access the Service and for any activities or actions under your password, whether your password is with our Service or a third-party service.</p>
+          
+          <h6>2. Intellectual Property</h6>
+          <p>The Service and its original content, features and functionality are and will remain the exclusive property of RAIS and its licensors. The Service is protected by copyright, trademark, and other laws of both the Philippines and foreign countries. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of RAIS.</p>
+          
+          <h6>3. Links To Other Web Sites</h6>
+          <p>Our Service may contain links to third-party web sites or services that are not owned or controlled by RAIS.</p>
+          <p>RAIS has no control over, and assumes no responsibility for, the content, privacy policies, or practices of any third party web sites or services. You further acknowledge and agree that RAIS shall not be responsible or liable, directly or indirectly, for any damage or loss caused or alleged to be caused by or in connection with use of or reliance on any such content, goods or services available on or through any such web sites or services.</p>
+          
+          <h6>4. Termination</h6>
+          <p>We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms.</p>
+          <p>Upon termination, your right to use the Service will immediately cease. If you wish to terminate your account, you may simply discontinue using the Service.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const termsCheckbox = document.getElementById('termsCheck');
+      const registerButton = document.querySelector('.btn-register');
+
+      // Initially disable the button
+      registerButton.disabled = true;
+
+      // Add a listener to the checkbox
+      termsCheckbox.addEventListener('change', function() {
+        if (termsCheckbox.checked) {
+          registerButton.disabled = false;
+        } else {
+          registerButton.disabled = true;
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>

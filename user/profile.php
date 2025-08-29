@@ -301,11 +301,37 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
             }
             .sidebar:hover { width: 100%; }
             .sidebar .logo, .sidebar .footer-text { display: none; }
-            .sidebar .nav { display: flex; flex-direction: row; align-items: center; flex-grow: 1; height: 100%; }
-            .sidebar .nav-link { justify-content: center; padding: 0 20px; gap: 0; height: 100%; }
-            .sidebar .nav-link i { font-size: 1.5rem; margin-bottom: 0; }
-            .sidebar .nav-link span, .sidebar:hover .nav-link span { display: none; }
+            .sidebar .nav {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                height: 100%;
+                width: 100%;
+                justify-content: space-around;
+            }
 
+            .sidebar .nav-link {
+                flex: 1;
+                justify-content: center;
+                align-items: center;
+                padding: 0 5px;
+                gap: 0;
+                height: 100%;
+            }
+
+            .sidebar .nav-link:hover {
+                background-color: var(--rais-dark-green);
+            }
+
+            .sidebar .nav-link i {
+                font-size: 1.5rem;
+                margin-bottom: 0;
+            }
+
+            .sidebar .nav-link span,
+            .sidebar:hover .nav-link span {
+                display: none;
+            }
             .floating-btn { bottom: 80px; right: 15px; }
             .chat-toggle-btn { bottom: 80px; right: 85px; }
             .chat-container { display: none !important; }
