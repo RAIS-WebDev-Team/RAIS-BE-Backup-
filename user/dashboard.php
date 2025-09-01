@@ -522,7 +522,10 @@ $step4_active = $socialLinksAdded ? 'active' : '';
         .dark-mode .tour-help-btn:hover { background-color: #2c2c2c; }
         .dark-mode .quick-actions-card .logo-only-img { filter: brightness(0.9); }
         .dark-mode ::-webkit-scrollbar-track { background: #2c2c2c; }
-        .dark-mode .welcome-tour-modal .modal-header h5, .dark-mode .welcome-tour-modal .modal-body p {
+        .dark-mode .welcome-tour-modal .modal-header h5 {
+            color: black;
+        }
+        .dark-mode .welcome-tour-modal .modal-body p {
             color: #EAEAEA;
         }
         .dark-mode .welcome-tour-modal .modal-footer .btn-secondary {
@@ -1100,4 +1103,3 @@ $step4_active = $socialLinksAdded ? 'active' : '';
     </script>
 </body>
 </html>
-

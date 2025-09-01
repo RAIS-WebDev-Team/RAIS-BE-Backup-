@@ -38,6 +38,11 @@
             grid-template-rows: auto 1fr auto;
             min-height: 100vh;
         }
+         /* Scrollbar */
+    ::-webkit-scrollbar { width: 12px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #3BA43B, #0C470C); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #45b945, #0a3a0a); }
 
         /* --- Header --- */
         header {

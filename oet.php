@@ -148,7 +148,7 @@
 </head>
 
 <body>
-    <a href="index.html" class="btn-back" aria-label="Go Back">
+    <a href="logout.php" class="btn-back" aria-label="Go Back">
         <i class="bi-arrow-left-short"></i>
     </a>
 

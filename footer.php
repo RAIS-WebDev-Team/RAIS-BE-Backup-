@@ -397,7 +397,7 @@
             <a href="https://www.instagram.com/romancis.ca/" target="_blank"><i class="bi bi-instagram"></i></a>
             <a href="https://www.linkedin.com/company/roman-associates-immigration-services-ltd/" target="_blank"><i
                     class="bi bi-linkedin"></i></a>
-            <a href="mailto:assessment@romancis.ca" target="_blank"><i class="bi bi-envelope-fill"></i></a>
+            <a href="https://www.tiktok.com/@romancanadianimmigration" target="_blank"><i class="bi bi-tiktok"></i></a>
         </div>
          <p class="text-center mt-4 mb-0">© <?php echo date("Y"); ?> Roman & Associates Immigration Services LTD. All Rights Reserved.</p>
     </footer>

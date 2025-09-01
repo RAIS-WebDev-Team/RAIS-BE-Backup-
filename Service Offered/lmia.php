@@ -371,7 +371,7 @@ echo <<<HTML
         An LMIA is a document in Canada that evaluates the effect of hiring a foreign worker on the local job
         market. A positive LMIA shows a need for a foreign worker because no local candidates are available.
       </p>
-      <a href="../form.html" class="btn hero-btn">Apply Now</a>
+      <a href="../application-form.php" class="btn hero-btn">Apply Now</a>
     </div>
   </header>
 

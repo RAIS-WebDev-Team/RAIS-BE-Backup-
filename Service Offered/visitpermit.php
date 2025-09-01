@@ -285,7 +285,7 @@ echo <<<HTML
       <h1>Visit Permit</h1>
       <p>A tourist visa lets individuals visit a country for leisure or family visits, typically requiring a valid
         passport, financial proof, and return tickets. It does not permit work during the stay.</p>
-      <a href="../form.html" class="btn hero-btn">Apply Now</a>
+      <a href="../application-form.php" class="btn hero-btn">Apply Now</a>
     </div>
   </header>
   <main>

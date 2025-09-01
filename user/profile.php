@@ -103,9 +103,18 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
             align-items: center;
             gap: 15px;
             white-space: nowrap;
+            transition: background-color 0.3s ease;
         }
         .sidebar .nav-link.active, .sidebar .nav-link:hover { background-color: var(--rais-dark-green); }
-        .sidebar .nav-link i { font-size: 1.2rem; min-width: 20px; text-align: center; }
+        .sidebar .nav-link i {
+            font-size: 1.2rem;
+            min-width: 20px;
+            text-align: center;
+            transition: transform 0.2s ease-in-out;
+        }
+        .sidebar .nav-link:hover i {
+            transform: scale(1.1);
+        }
         .sidebar .nav-link span { opacity: 0; transition: opacity 0.1s ease-in-out 0.2s; }
         .sidebar:hover .nav-link span { opacity: 1; }
         .sidebar .footer-text {
@@ -279,8 +288,27 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
         .dark-mode .form-control::placeholder {
             color: #888;
         }
+        .dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
         .dark-mode .chat-footer .btn i, .dark-mode .chat-footer-fullscreen .btn i {
             color: #EAEAEA;
+        }
+        .dark-mode .sidebar .nav-link {
+            color: white;
+        }
+        .dark-mode .sidebar .nav-link:hover {
+            color: white;
+        }
+        .dark-mode .sidebar .nav-link:hover i {
+            transform: none;
+        }
+        .dark-mode .floating-btn {
+            color: white;
+        }
+        .dark-mode .floating-btn:hover {
+            background-color: var(--rais-button-maroon);
+            color: white;
         }
         .dark-mode .btn-close {
             filter: invert(1) grayscale(100%) brightness(200%);
@@ -389,7 +417,7 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
                             <p><strong>Email:</strong> <?php echo htmlspecialchars($userProfile['email']); ?></p>
                             <p><strong>Contact:</strong> <?php echo htmlspecialchars($userProfile['phone']); ?></p>
                             <p><strong>Location:</strong> <?php echo htmlspecialchars($userProfile['address']); ?></p>
-                            <p><strong>Birthday:</strong> <?php echo htmlspecialchars(date("F j, Y", strtotime($userProfile['birthday']))); ?></p>
+                            <p><strong>Birthday:</strong> <?php echo !empty($userProfile['birthday']) ? htmlspecialchars(date("F j, Y", strtotime($userProfile['birthday']))) : 'Not set'; ?></p>
                             <?php if (!empty($userProfile['facebook'])): ?>
                                 <p><strong>Facebook:</strong> <a href="<?php echo htmlspecialchars($userProfile['facebook']); ?>" target="_blank"><?php echo htmlspecialchars($userProfile['facebook']); ?></a></p>
                             <?php endif; ?>

@@ -22,6 +22,11 @@
             --light-gray: #E0E0E0;
             --font-family: 'Poppins', sans-serif;
         }
+         /* Scrollbar */
+    ::-webkit-scrollbar { width: 12px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #3BA43B, #0C470C); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #45b945, #0a3a0a); }
 
         html {
             height: 100%;

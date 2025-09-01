@@ -288,7 +288,7 @@ echo <<<HTML
       <p>A work permit allows individuals to work legally in a specific country, often requiring employer
         sponsorship or meeting eligibility criteria. For caregivers, additional requirements may include
         qualifications and a positive Labour Market Impact Assessment (LMIA).</p>
-      <a href="../form.html" class="btn hero-btn">Apply Now</a>
+      <a href="../application-form.php" class="btn hero-btn">Apply Now</a>
     </div>
   </header>
 

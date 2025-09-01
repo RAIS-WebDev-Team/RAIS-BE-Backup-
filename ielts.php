@@ -125,7 +125,7 @@
 </head>
 
 <body class="text-black">
-  <a href="index.html" class="btn-back" aria-label="Go Back">
+  <a href="index.php" class="btn-back" aria-label="Go Back">
     <i class="bi-arrow-left-short"></i>
   </a>
 

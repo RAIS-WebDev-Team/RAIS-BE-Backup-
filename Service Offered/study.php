@@ -291,7 +291,7 @@ echo <<<HTML
         <p>A study permit allows individuals to study legally in a country, requiring proof of enrollment and
           financial stability. In some countries, like the Philippines, it is also necessary for obtaining a
           driver’s license.</p>
-        <a href="../form.html" class="btn hero-btn">Apply Now</a>
+        <a href="../application-form.php" class="btn hero-btn">Apply Now</a>
       </div>
     </header>
     <section class="py-5 my-5 mt-5" id="info">

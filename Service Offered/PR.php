@@ -287,7 +287,7 @@ echo <<<HTML
       <p>Permanent Residency allows foreign nationals to live, work, and study in Canada indefinitely,
         with access to most social benefits enjoyed by citizens. It is a step toward becoming a Canadian citizen
         and provides stability for you and your family.</p>
-      <a href="../form.html" class="btn hero-btn">Apply Now</a>
+      <a href="../application-form.php" class="btn hero-btn">Apply Now</a>
     </div>
   </header>
 
