@@ -922,13 +922,13 @@ $step4_active = $socialLinksAdded ? 'active' : '';
             let highlightedElement = null;
             const tourSteps = [
                 { title: "Welcome to RAIS!", content: "This tour helps you get familiar with your new dashboard. Let's explore!", targetSelector: null },
-                { title: "Your Profile & Quick Actions", content: "Top-left: your info and quick links.", targetSelector: ".user-info-card" },
-                { title: "Your Progress Journey", content: "Track your immigration progress here.", targetSelector: ".progress-steps" },
-                { title: "Important Resources", content: "Below: map, service offerings. '+' adds more content.", targetSelector: ".contents-grid" },
-                { title: "Sidebar Navigation", content: "Left sidebar: navigate to Documents, Forms, Notifications, and Settings.", targetSelector: ".sidebar" },
-                { title: "Need Help? Chat with us!", content: "Click the chatbox at the bottom right for live support.", targetSelector: ".chat-toggle-btn" },
-                { title: "Ready to Book Your Flight?", content: "The floating '+' button: shortcut to book your flight to Canada!", targetSelector: ".floating-btn" },
-                { title: "Tour Complete!", content: "You're all set! Enjoy your RAIS dashboard.", targetSelector: null }
+                { title: "Your Profile & Quick Actions", content: "Your infos are displayed here, you can modify your profile in the profile tab.", targetSelector: ".user-info-card" },
+                { title: "Your Progress Journey", content: "Track your progress here.", targetSelector: ".progress-steps" },
+                { title: "Important Resources", content: "You may visit other pages here.", targetSelector: ".contents-grid" },
+                { title: "Sidebar Navigation", content: "Navigate to other tabs such as Book Consultation, Documents, etc...", targetSelector: ".sidebar" },
+                { title: "Need Help? Chat with us!", content: "This chatbox may be used for raising your questions and concerns.", targetSelector: ".chat-toggle-btn" },
+                { title: "Ready to Book Your Flight?", content: "You may plan your flight using our book flight button.", targetSelector: ".floating-btn" },
+                { title: "Tour Complete!", content: "You're all set! Tara Canada na!.", targetSelector: null }
             ];
 
             const tourTitle = document.getElementById('welcomeTourModalLabel');

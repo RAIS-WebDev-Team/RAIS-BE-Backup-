@@ -601,11 +601,11 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
 
             <!-- Main Content -->
             <main class="main-content">
-                <h1>Book Flight</h1>
+                <h1>Let us help you plan your trip!</h1>
                 <div class="row g-4 justify-content-center">
                     <div class="col-12 col-lg-8">
                         <div class="content-card flight-form-card">
-                            <h5 class="mb-4">Fill out the form to book your flight to Canada.</h5>
+                            <h5 class="mb-4">Fill out the form to plan your flight.</h5>
                             <form>
                                 <div class="row g-3 mb-3">
                                     <div class="col-12 col-md-6">
@@ -626,12 +626,12 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
                                     <input type="date" class="form-control" id="departureDate" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="departureCity" class="form-label">Departure City</label>
-                                    <input type="text" class="form-control" id="departureCity" required>
+                                    <label for="departureCity" class="form-label">Departure Location</label>
+                                    <input type="text" class="form-control" placeholder="Manila Airport" id="departureCity"  required >
                                 </div>
                                 <div class="mb-3">
-                                    <label for="destinationCity" class="form-label">Destination City in Canada</label>
-                                    <input type="text" class="form-control" id="destinationCity" value="Vancouver" required>
+                                    <label for="destinationCity" class="form-label">Destination</label>
+                                    <input type="text" class="form-control" placeholder="Vancouver, Canada" id="destinationCity" required>
                                 </div>
                                 <div class="d-grid mt-4">
                                     <button type="submit" class="btn btn-primary">Book Now</button>
