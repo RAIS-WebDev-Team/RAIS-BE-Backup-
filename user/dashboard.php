@@ -247,6 +247,10 @@ $step4_active = $socialLinksAdded ? 'active' : '';
             color: var(--rais-text-dark);
             white-space: nowrap;
         }
+        .header-date-mobile {
+            font-weight: 500;
+            color: var(--rais-text-dark);
+        }
         .user-status { display: flex; align-items: center; gap: 10px; }
         .user-status .badge {
             background-color: var(--rais-button-maroon);
@@ -511,6 +515,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
         .dark-mode .header { box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
         .dark-mode .header-title, .dark-mode .profile-name, .dark-mode .card-title,
         .dark-mode .step-circle, .dark-mode .user-status .me-3, .dark-mode .chat-title-fullscreen { color: #EAEAEA !important; }
+        .dark-mode .header-date-mobile { color: #EAEAEA; }
         .dark-mode .contact-info, .dark-mode .step-label, .dark-mode .card-text, .dark-mode .text-muted { color: #B0B0B0 !important; }
         .dark-mode .social-links a { color: #EAEAEA; }
         .dark-mode .social-links a:hover i { color: var(--rais-highlight-light-green); }
@@ -660,8 +665,15 @@ $step4_active = $socialLinksAdded ? 'active' : '';
                     <img src="../img/logo1.png" alt="RAIS Logo Dark" class="header-logo-img dark-mode-logo" onerror="this.style.display='none'">
                     <span class="header-title">Roman & Associates Immigration Services</span>
                 </div>
+
+                <!-- This div will be automatically centered by space-between on the parent in mobile view -->
+                <div class="header-date-mobile d-lg-none">
+                    <?= date('M j, Y') ?>
+                </div>
+                
                 <div class="user-status d-flex align-items-center gap-2">
-                    <div class="me-3" style="font-weight: 500;"><?= date('F j, Y') ?></div>
+                     <!-- This date is for desktop only -->
+                    <div class="me-3 d-none d-lg-block" style="font-weight: 500;"><?= date('F j, Y') ?></div>
                     <button class="tour-help-btn" id="tourToggleButton"><i class="bi bi-question-circle"></i></button>
                     <a href="#" class="btn btn-link power-btn" data-bs-toggle="modal" data-bs-target="#logoutModal"><i class="bi bi-power"></i></a>
                     <span class="badge"><?php echo htmlspecialchars($userProfile['firstName']); ?></span>
@@ -1103,3 +1115,4 @@ $step4_active = $socialLinksAdded ? 'active' : '';
     </script>
 </body>
 </html>
+
