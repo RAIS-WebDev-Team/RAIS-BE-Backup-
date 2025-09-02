@@ -1,4 +1,11 @@
 <?php
+// Check if the animation has been played
+if (!isset($_GET['animation']) || $_GET['animation'] !== 'done') {
+    // If not, redirect to the animation page
+    header('Location: animation.php');
+    exit;
+}
+
 // Data for the page - this can be fetched from a database in a real application
 $page_title = "RAIS HOME";
 
