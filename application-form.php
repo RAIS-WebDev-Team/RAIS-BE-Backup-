@@ -100,6 +100,13 @@ $page_title = "Application Form";
       color: #fff;
       transform: translateY(-2px);
     }
+    
+    .btn-outline-secondary {
+        border-radius: 2rem;
+        padding: 0.75rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
 
     .btn-back {
       position: absolute;
@@ -207,7 +214,7 @@ $page_title = "Application Form";
       <span>Canada? Interest Check</span>
     </div>
 
-    <form class="p-4 p-md-5" id="interestForm">
+    <form class="p-4 p-md-5" id="interestForm" novalidate>
 
       <div class="intro-text-container">
         <p class="intro-text">We are licensed Canadian immigration firm with a main office based in Vancouver Island British Columbia, Canada. We provide consultancy visas: temporary resident visa, family sponsorship, caregiver pathway, and LMIA application.</p>
@@ -298,32 +305,19 @@ $page_title = "Application Form";
       </div>
 
       <div class="d-flex justify-content-center align-items-center gap-3 mt-5">
-        <button type="button" class="btn btn-custom" id="submitBtn">
-          Submit
-        </button>
+        <button type="button" class="btn btn-outline-secondary" id="clearBtn">Clear</button>
+        <button type="button" class="btn btn-custom" id="submitBtn">Submit</button>
       </div>
 
     </form>
   </div>
 </div>
 
-<!-- Validation Alert Modal -->
-<div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="validationModalLabel">Incomplete Form</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="validationModalBody">
-        <!-- Error message will be inserted here -->
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- Modals -->
+<div class="modal fade" id="validationModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="validationModalLabel">Incomplete Form</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="validationModalBody"></div><div class="modal-footer"><button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button></div></div></div></div>
+<div class="modal fade" id="confirmationModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Confirm Submission</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><p>Are you sure you want to submit this application?</p></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-primary" id="confirmSubmitBtn">Confirm & Submit</button></div></div></div></div>
+<div class="modal fade" id="resultModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="resultModalLabel"></h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="resultModalBody"></div><div class="modal-footer"><button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button></div></div></div></div>
+
 
 <div id="footer-placeholder">
     <?php include 'footer.php'; ?>
@@ -333,18 +327,25 @@ $page_title = "Application Form";
   
   <script>
     document.addEventListener("DOMContentLoaded", function() {
+        // Modals
         const validationModal = new bootstrap.Modal(document.getElementById('validationModal'));
-        const validationModalTitle = document.getElementById('validationModalLabel');
-        const validationModalBody = document.getElementById('validationModalBody');
-        const submitBtn = document.getElementById('submitBtn');
+        const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+        const resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+        const resultModalLabel = document.getElementById('resultModalLabel');
+        const resultModalBody = document.getElementById('resultModalBody');
+
+        // Form and Buttons
         const form = document.getElementById('interestForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const confirmSubmitBtn = document.getElementById('confirmSubmitBtn');
 
-        function showValidationModal(title, body) {
-            validationModalTitle.textContent = title;
-            validationModalBody.innerHTML = body; // Use innerHTML to render list items
-            validationModal.show();
-        }
+        // Clear button functionality
+        clearBtn.addEventListener('click', () => {
+            form.reset();
+        });
 
+        // Submit button validation
         submitBtn.addEventListener('click', () => {
             const requiredInputs = form.querySelectorAll('input[required]');
             let unfilledFields = [];
@@ -356,28 +357,65 @@ $page_title = "Application Form";
                 }
             });
             
-            const interestPathwayChecked = form.querySelectorAll('input[name="interestPathway[]"]:checked').length > 0;
-            if (!interestPathwayChecked) {
+            if (form.querySelectorAll('input[name="interestPathway[]"]:checked').length === 0) {
                 unfilledFields.push('Interest Pathway');
             }
 
-            const findUsChecked = form.querySelectorAll('input[name="findUs[]"]:checked').length > 0;
-            if (!findUsChecked) {
+            if (form.querySelectorAll('input[name="findUs[]"]:checked').length === 0) {
                 unfilledFields.push('Where did you find us?');
             }
 
             if (unfilledFields.length > 0) {
-                let errorList = '<ul>';
-                unfilledFields.forEach(field => {
-                    errorList += `<li>${field}</li>`;
-                });
-                errorList += '</ul>';
-                showValidationModal('Missing Information', 'Please fill out the following required fields:<br>' + errorList);
+                let errorList = '<ul>' + unfilledFields.map(field => `<li>${field}</li>`).join('') + '</ul>';
+                document.getElementById('validationModalLabel').textContent = 'Missing Information';
+                document.getElementById('validationModalBody').innerHTML = 'Please fill out the following required fields:<br>' + errorList;
+                validationModal.show();
             } else {
-                console.log('Form submitted!');
-                // You can add your form submission logic here, e.g., using fetch() or form.submit()
-                // form.submit(); 
-                alert('Form submitted successfully!'); // Placeholder for actual submission
+                confirmationModal.show();
+            }
+        });
+
+        // Confirmation modal submit action
+        confirmSubmitBtn.addEventListener('click', async () => {
+            confirmationModal.hide();
+            
+            // Show loading state
+            resultModalLabel.textContent = 'Submitting...';
+            resultModalBody.innerHTML = '<div class="d-flex justify-content-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+            resultModal.show();
+
+            // Gather form data
+            const formData = new FormData(form);
+            const data = {
+                email: formData.get('email'),
+                fullName: formData.get('fullName'),
+                phone: formData.get('phone'),
+                address: formData.get('address'),
+                interestPathway: formData.getAll('interestPathway[]'),
+                findUs: formData.getAll('findUs[]'),
+                facebookLink: formData.get('facebookLink'),
+            };
+
+            try {
+                const response = await fetch('submit-application.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    resultModalLabel.textContent = 'Success!';
+                    resultModalBody.textContent = result.message;
+                    form.reset();
+                } else {
+                    resultModalLabel.textContent = 'Submission Failed';
+                    resultModalBody.textContent = result.message || 'Could not submit the form. Please try again later.';
+                }
+            } catch (error) {
+                resultModalLabel.textContent = 'Error';
+                resultModalBody.textContent = 'An unexpected error occurred. Please check your connection and try again.';
             }
         });
     });

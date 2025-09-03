@@ -331,6 +331,20 @@ $step4_active = $socialLinksAdded ? 'active' : '';
             transition: transform 0.5s ease-out;
             cursor: grab;
         }
+        .tara-canada-label {
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin-top: 20px;
+            color: var(--rais-dark-green);
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            animation: pulse 2.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.9; }
+        }
         .progress-steps {
             position: relative;
             background-color: var(--rais-card-bg);
@@ -509,9 +523,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
         .dark-mode #full-screen-chat, .dark-mode .chat-footer-fullscreen {
             background-color: #1e1e1e; color: #EAEAEA; border: 1px solid #2c2c2c;
         }
-        .dark-mode .modal-content {
-            background-color: #1e1e1e;
-        }
+        .dark-mode .modal-content { background-color: #1e1e1e; }
         .dark-mode .header { box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
         .dark-mode .header-title, .dark-mode .profile-name, .dark-mode .card-title,
         .dark-mode .step-circle, .dark-mode .user-status .me-3, .dark-mode .chat-title-fullscreen { color: #EAEAEA !important; }
@@ -526,46 +538,19 @@ $step4_active = $socialLinksAdded ? 'active' : '';
         .dark-mode .tour-help-btn { color: #EAEAEA; border-color: var(--rais-highlight-light-green); }
         .dark-mode .tour-help-btn:hover { background-color: #2c2c2c; }
         .dark-mode .quick-actions-card .logo-only-img { filter: brightness(0.9); }
+        .dark-mode .tara-canada-label { color: #EAEAEA; text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5); }
         .dark-mode ::-webkit-scrollbar-track { background: #2c2c2c; }
-        .dark-mode .welcome-tour-modal .modal-header h5 {
-            color: black;
-        }
-        .dark-mode .welcome-tour-modal .modal-body p {
-            color: #EAEAEA;
-        }
-        .dark-mode .welcome-tour-modal .modal-footer .btn-secondary {
-            background-color: #333;
-            color: #EAEAEA;
-            border: 1px solid #444;
-        }
-        .dark-mode .welcome-tour-modal .modal-header .step-indicator {
-            background-color: #333;
-            color: #EAEAEA;
-        }
-        .dark-mode .welcome-tour-modal .modal-header .step-indicator.active {
-            background-color: var(--rais-primary-green);
-            color: white;
-        }
-        .dark-mode .chat-body {
-            background-color: #121212;
-        }
-        .dark-mode .chat-body .text-muted, .dark-mode .chat-body-fullscreen .text-muted {
-            color: #EAEAEA !important;
-        }
-        .dark-mode .form-control {
-            background-color: #2a2a2a;
-            color: #EAEAEA;
-            border-color: #3c3c3c;
-        }
-        .dark-mode .form-control::placeholder {
-            color: #888;
-        }
-        .dark-mode .chat-footer .btn i, .dark-mode .chat-footer-fullscreen .btn i {
-            color: #EAEAEA;
-        }
-        .dark-mode .btn-close {
-            filter: invert(1) grayscale(100%) brightness(200%);
-        }
+        .dark-mode .welcome-tour-modal .modal-header h5 { color: black; }
+        .dark-mode .welcome-tour-modal .modal-body p { color: #EAEAEA; }
+        .dark-mode .welcome-tour-modal .modal-footer .btn-secondary { background-color: #333; color: #EAEAEA; border: 1px solid #444; }
+        .dark-mode .welcome-tour-modal .modal-header .step-indicator { background-color: #333; color: #EAEAEA; }
+        .dark-mode .welcome-tour-modal .modal-header .step-indicator.active { background-color: var(--rais-primary-green); color: white; }
+        .dark-mode .chat-body { background-color: #121212; }
+        .dark-mode .chat-body .text-muted, .dark-mode .chat-body-fullscreen .text-muted { color: #EAEAEA !important; }
+        .dark-mode .form-control { background-color: #2a2a2a; color: #EAEAEA; border-color: #3c3c3c; }
+        .dark-mode .form-control::placeholder { color: #888; }
+        .dark-mode .chat-footer .btn i, .dark-mode .chat-footer-fullscreen .btn i { color: #EAEAEA; }
+        .dark-mode .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
 
 
         @media (max-width: 992px) {
@@ -582,13 +567,8 @@ $step4_active = $socialLinksAdded ? 'active' : '';
                 overflow-x: auto;
                 overflow-y: hidden;
             }
-            .sidebar::-webkit-scrollbar {
-                height: 4px;
-            }
-            .sidebar::-webkit-scrollbar-thumb {
-                background: var(--rais-dark-green);
-                border-radius: 2px;
-            }
+            .sidebar::-webkit-scrollbar { height: 4px; }
+            .sidebar::-webkit-scrollbar-thumb { background: var(--rais-dark-green); border-radius: 2px; }
             .sidebar:hover { width: 100%; }
             .sidebar.tour-highlight { border-radius: 15px 15px 0 0; }
             .sidebar .logo, .sidebar .profile-section, .sidebar .footer-text { display: none; }
@@ -704,6 +684,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
                         <div class="quick-actions-card h-100 d-flex flex-column justify-content-center">
                             <img src="../img/logoulit.png" alt="RAIS Logo" class="logo-only-img img-fluid light-mode-logo" id="interactive-logo" onerror="this.onerror=null;this.src='https://placehold.co/200x200/FFFFFF/004d40?text=RAIS';">
                             <img src="../img/logowhite.png" alt="RAIS Logo Dark" class="logo-only-img img-fluid dark-mode-logo" id="interactive-logo-dark" onerror="this.onerror=null;this.src='https://placehold.co/200x200/1e1e1e/EAEAEA?text=RAIS';">
+                            <h3 class="tara-canada-label">TARA CANADA!</h3>
                         </div>
                     </div>
                 </div>
@@ -840,7 +821,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
                     </div>
                     <div class="modal-title-container">
                         <i class="bi bi-compass fs-4 me-2" style="color: var(--rais-primary-green);"></i>
-                        <h5 class="modal-title" id="welcomeTourModalLabel">Welcome</h5>
+                        <h5 class="modal-title" id="welcomeTourModalLabel">Welcome </h5>
                     </div>
                 </div>
                 <div class="modal-body">
@@ -1115,4 +1096,3 @@ $step4_active = $socialLinksAdded ? 'active' : '';
     </script>
 </body>
 </html>
-

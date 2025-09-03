@@ -40,7 +40,7 @@
 <body>
     <div id="splash-screen">
         <video id="animation-video" autoplay muted playsinline>
-            <source src="vids/intro.mp4" type="video/mp4">
+            <source src="vids/intro4.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
     </div>

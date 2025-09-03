@@ -16,6 +16,38 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 // Get the logged-in user's ID from the session.
 $userId = $_SESSION['id'];
 
+$success_message = '';
+$error_message = '';
+
+// Handle form submission to book a flight
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $departureDate = trim($_POST['departureDate']);
+    $departureLocation = trim($_POST['departureLocation']);
+    $destination = trim($_POST['destination']);
+
+    if (empty($departureDate) || empty($departureLocation) || empty($destination)) {
+        $error_message = "Please fill in all the required flight details.";
+    } else {
+        // Prepare an insert statement
+        $sql = "INSERT INTO flights (user_id, departure_date, departureLocation, destination) VALUES (?, ?, ?, ?)";
+        
+        if ($stmt = $conn->prepare($sql)) {
+            // Bind variables to the prepared statement as parameters
+            $stmt->bind_param("isss", $userId, $departureDate, $departureLocation, $destination);
+            
+            // Attempt to execute the prepared statement
+            if ($stmt->execute()) {
+                $success_message = "Flight booking request submitted successfully! We will contact you with the details shortly.";
+            } else {
+                $error_message = "Oops! Something went wrong. Please try again later.";
+            }
+
+            // Close statement
+            $stmt->close();
+        }
+    }
+}
+
 // --- FETCH USER DATA & SETTINGS FROM DATABASE ---
 $stmt = $conn->prepare("SELECT firstName, lastName, email, dark_mode FROM users WHERE id = ?");
 $stmt->bind_param("i", $userId);
@@ -601,12 +633,24 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
 
             <!-- Main Content -->
             <main class="main-content">
-                <h1>Let us help you plan your trip!</h1>
+                <h1>Let us help you plan your trip, <?php echo htmlspecialchars($userProfile['firstName']); ?>!</h1>
                 <div class="row g-4 justify-content-center">
                     <div class="col-12 col-lg-8">
                         <div class="content-card flight-form-card">
                             <h5 class="mb-4">Fill out the form to plan your flight.</h5>
-                            <form>
+                            
+                            <?php if (!empty($success_message)): ?>
+                                <div class="alert alert-success" role="alert">
+                                    <?php echo $success_message; ?>
+                                </div>
+                            <?php endif; ?>
+                            <?php if (!empty($error_message)): ?>
+                                <div class="alert alert-danger" role="alert">
+                                    <?php echo $error_message; ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                                 <div class="row g-3 mb-3">
                                     <div class="col-12 col-md-6">
                                         <label for="firstName" class="form-label">First Name</label>
@@ -623,15 +667,15 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
                                 </div>
                                 <div class="mb-3">
                                     <label for="departureDate" class="form-label">Departure Date</label>
-                                    <input type="date" class="form-control" id="departureDate" required>
+                                    <input type="date" class="form-control" id="departureDate" name="departureDate" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="departureCity" class="form-label">Departure Location</label>
-                                    <input type="text" class="form-control" placeholder="Manila Airport" id="departureCity"  required >
+                                    <label for="departureLocation" class="form-label">Departure Location</label>
+                                    <input type="text" class="form-control" placeholder="Manila Airport" id="departureLocation" name="departureLocation"  required >
                                 </div>
                                 <div class="mb-3">
-                                    <label for="destinationCity" class="form-label">Destination</label>
-                                    <input type="text" class="form-control" placeholder="Vancouver, Canada" id="destinationCity" required>
+                                    <label for="destination" class="form-label">Destination</label>
+                                    <input type="text" class="form-control" placeholder="Vancouver, Canada" id="destination" name="destination" required>
                                 </div>
                                 <div class="d-grid mt-4">
                                     <button type="submit" class="btn btn-primary">Book Now</button>
@@ -754,3 +798,4 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
 </body>
 
 </html>
+

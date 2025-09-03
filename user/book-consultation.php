@@ -17,7 +17,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 $userId = $_SESSION['id'];
 
 // --- FETCH USER DATA & SETTINGS FROM DATABASE ---
-$stmt = $conn->prepare("SELECT firstName, lastName, email, dark_mode FROM users WHERE id = ?");
+$stmt = $conn->prepare("SELECT firstName, lastName, email, facebook, dark_mode FROM users WHERE id = ?");
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -27,7 +27,7 @@ $conn->close();
 
 // If no user is found, handle it gracefully.
 if (!$userProfile) {
-    $userProfile = ['firstName' => 'Guest', 'lastName' => '', 'email' => '', 'dark_mode' => false];
+    $userProfile = ['firstName' => 'Guest', 'lastName' => '', 'email' => '', 'facebook' => '', 'dark_mode' => false];
 }
 
 $darkModeEnabled = (bool)$userProfile['dark_mode'];
@@ -847,11 +847,15 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
                                 <form id="booking-form">
                                     <div class="mb-3">
                                         <label for="name" class="form-label">Name *</label>
-                                        <input type="text" id="name" name="name" class="form-control" value="<?= htmlspecialchars($userProfile['firstName'] . ' ' . $userProfile['lastName']) ?>" required>
+                                        <input type="text" id="name" name="name" class="form-control" value="<?= htmlspecialchars($userProfile['firstName'] . ' ' . $userProfile['lastName']) ?>" required readonly>
                                     </div>
                                     <div class="mb-3">
                                         <label for="email" class="form-label">Email *</label>
-                                        <input type="email" id="email" name="email" class="form-control" value="<?= htmlspecialchars($userProfile['email']) ?>" required>
+                                        <input type="email" id="email" name="email" class="form-control" value="<?= htmlspecialchars($userProfile['email']) ?>" required readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="facebookLink" class="form-label">Facebook Profile Link *</label>
+                                        <input type="url" id="facebookLink" name="facebookLink" class="form-control" value="<?= htmlspecialchars($userProfile['facebook'] ?? '') ?>" placeholder="https://www.facebook.com/yourprofile" required>
                                     </div>
                                     <div class="mb-3">
                                         <label for="notes" class="form-label">Additional Notes</label>
@@ -875,7 +879,7 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
                             <p><strong>With:</strong> Roman & Associates</p>
                             <p><strong>Date:</strong> <span id="confirm-date"></span></p>
                             <p><strong>Time:</strong> <span id="confirm-time"></span></p>
-                            <p>A confirmation email with the Zoom link has been sent to <strong id="confirm-email"></strong>.</p>
+                            <p>The Zoom meeting link will be sent to your Messenger. You will see the status of your booking in <a href="notifications.php">Notifications</a> once it's approved.</p>
                         </div>
                     </div>
                     <br>
@@ -1149,14 +1153,44 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
 
             bookingForm.addEventListener('submit', function (e) {
                 e.preventDefault();
-                const email = document.getElementById('email').value;
+                
+                const notes = document.getElementById('notes').value;
+                const facebookLink = document.getElementById('facebookLink').value;
 
-                document.getElementById('confirm-date').textContent = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).format(selectedDate);
-                document.getElementById('confirm-time').textContent = selectedTime;
-                document.getElementById('confirm-email').textContent = email;
+                // Format date to YYYY-MM-DD for backend
+                const year = selectedDate.getFullYear();
+                const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                const day = String(selectedDate.getDate()).padStart(2, '0');
+                const formattedDate = `${year}-${month}-${day}`;
 
-                bookingView.style.display = 'none';
-                confirmationView.style.display = 'block';
+                const bookingData = {
+                    date: formattedDate,
+                    time: selectedTime,
+                    notes: notes,
+                    facebookLink: facebookLink
+                };
+
+                fetch('process-consultation.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bookingData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('confirm-date').textContent = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).format(selectedDate);
+                        document.getElementById('confirm-time').textContent = selectedTime;
+                        
+                        bookingView.style.display = 'none';
+                        confirmationView.style.display = 'block';
+                    } else {
+                        alert('Booking failed: ' + (data.message || 'Please try again.'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An unexpected error occurred. Please try again.');
+                });
             });
 
             document.getElementById('book-another').addEventListener('click', () => {
