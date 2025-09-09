@@ -61,6 +61,11 @@ $conn->close();
             color: var(--rais-text-dark);
             overflow: hidden; /* Prevent body scroll */
         }
+          ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #0C470C, #3BA43B); border-radius: 6px; }
+        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(to bottom, #023621, #2a7c2a); }
+
 
         .main-wrapper {
             display: flex;
@@ -336,7 +341,7 @@ $conn->close();
             overflow-y: auto;
             background-color: var(--rais-bg-light);
             display: flex;
-            flex-direction: column-reverse;
+            flex-direction: column;
             height: 350px;
         }
 
@@ -415,7 +420,7 @@ $conn->close();
             overflow-y: auto;
             padding: 1rem;
             display: flex;
-            flex-direction: column-reverse;
+            flex-direction: column;
         }
 
         .chat-footer-fullscreen {
@@ -423,6 +428,45 @@ $conn->close();
             border-top: 1px solid var(--rais-light-gray);
             background-color: white;
             flex-shrink: 0;
+        }
+
+        .chat-message-bubble {
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            margin-bottom: 0.5rem;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        .chat-message-bubble .sender-name {
+            font-weight: 600;
+            font-size: 0.8rem;
+            margin-bottom: 0.25rem;
+        }
+        .chat-message-bubble .timestamp {
+            font-size: 0.7rem;
+            color: #888;
+            display: block;
+            text-align: right;
+            margin-top: 0.25rem;
+        }
+        .dark-mode .chat-message-bubble .timestamp {
+             color: #bbb;
+        }
+        .chat-message-bubble.user {
+            background-color: var(--rais-primary-green);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 0.25rem;
+        }
+        .chat-message-bubble.admin {
+            background-color: var(--rais-light-gray);
+            color: var(--rais-text-dark);
+            align-self: flex-start;
+            border-bottom-left-radius: 0.25rem;
+        }
+        .dark-mode .chat-message-bubble.admin {
+             background-color: #333;
+             color: #EAEAEA;
         }
 
         /* Dark Mode Styles */
@@ -746,13 +790,19 @@ $conn->close();
                 year: 'numeric'
             });
             
+            const currentUserId = <?php echo json_encode($_SESSION['id']); ?>;
             const mainWrapper = document.querySelector('.main-wrapper');
             const floatingBtn = document.querySelector('.floating-btn');
             const chatToggleBtn = document.querySelector('.chat-toggle-btn');
             const popupChatContainer = document.getElementById('chatContainer');
             const fullScreenChat = document.getElementById('full-screen-chat');
+            const chatBodyPopup = document.querySelector('#chatContainer .chat-body');
+            const chatBodyFullscreen = document.querySelector('#full-screen-chat .chat-body-fullscreen');
+            const messageInputs = document.querySelectorAll('.message-input');
+            const sendButtons = document.querySelectorAll('#send-button-popup, #send-button-fullscreen');
+            let messagePollingInterval;
 
-            function toggleChat() {
+            function originalToggleChat() {
                 if (window.innerWidth <= 992) {
                     const isChatVisible = fullScreenChat.style.display === 'flex';
                     if (isChatVisible) {
@@ -772,14 +822,105 @@ $conn->close();
             }
             
             // Make toggleChat globally accessible
-            window.toggleChat = toggleChat;
+            window.toggleChat = function() {
+                originalToggleChat();
+                const isChatVisible = popupChatContainer.classList.contains('show') || fullScreenChat.style.display === 'flex';
+                
+                if (isChatVisible && !messagePollingInterval) {
+                     fetchMessages(); 
+                     messagePollingInterval = setInterval(fetchMessages, 5000); 
+                } else if (!isChatVisible && messagePollingInterval) {
+                    clearInterval(messagePollingInterval);
+                    messagePollingInterval = null;
+                }
+            };
+
             if(document.getElementById('backToDashboardBtn')) {
-                document.getElementById('backToDashboardBtn').addEventListener('click', toggleChat);
+                document.getElementById('backToDashboardBtn').addEventListener('click', window.toggleChat);
             }
+            
+            function renderMessages(messages) {
+                const messageHtml = messages.map(msg => {
+                    const isUser = msg.sender_id == currentUserId;
+                    const senderName = isUser ? "You" : "RAIS Support";
+                    const bubbleClass = isUser ? 'user' : 'admin';
+                    const formattedTimestamp = new Date(msg.timestamp.replace(' ', 'T') + 'Z').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                    return `
+                        <div class="chat-message-bubble ${bubbleClass}">
+                            <div class="sender-name">${senderName}</div>
+                            <div class="chat-message-content">${msg.message}</div>
+                            <span class="timestamp">${formattedTimestamp}</span>
+                        </div>
+                    `;
+                }).join('');
+
+                const welcomeMessage = '<div class="text-center text-muted small mb-2">This is the start of your conversation.</div>';
+                
+                chatBodyPopup.innerHTML = welcomeMessage + messageHtml;
+                chatBodyFullscreen.innerHTML = welcomeMessage + messageHtml;
+
+                chatBodyPopup.scrollTop = chatBodyPopup.scrollHeight;
+                chatBodyFullscreen.scrollTop = chatBodyFullscreen.scrollHeight;
+            }
+
+            async function fetchMessages() {
+                try {
+                    const response = await fetch('chat_handler.php?action=getMessages');
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const data = await response.json();
+                    if (data.status === 'success') {
+                        renderMessages(data.messages);
+                    } else {
+                        console.error('Failed to fetch messages:', data.message);
+                    }
+                } catch (error) {
+                    console.error('Error fetching messages:', error);
+                }
+            }
+
+            async function sendMessage() {
+                const input = Array.from(messageInputs).find(i => i.value.trim() !== '');
+                if (!input) return;
+
+                const message = input.value.trim();
+                const formData = new FormData();
+                formData.append('action', 'sendMessage');
+                formData.append('message', message);
+
+                try {
+                    const response = await fetch('chat_handler.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const data = await response.json();
+
+                    if (data.status === 'success') {
+                        messageInputs.forEach(i => i.value = '');
+                        fetchMessages(); 
+                    } else {
+                        console.error('Failed to send message:', data.message);
+                        alert('Failed to send message: ' + data.message);
+                    }
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                    alert('An error occurred while sending your message.');
+                }
+            }
+
+            sendButtons.forEach(button => button.addEventListener('click', sendMessage));
+            messageInputs.forEach(input => {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                });
+            });
         });
     </script>
 
 </body>
 
 </html>
-

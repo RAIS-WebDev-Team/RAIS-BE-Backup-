@@ -61,6 +61,11 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
             overflow: hidden;
         }
         .main-wrapper { display: flex; height: 100vh; }
+          ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #0C470C, #3BA43B); border-radius: 6px; }
+        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(to bottom, #023621, #2a7c2a); }
+
         .sidebar {
             background-color: var(--rais-primary-green);
             width: 70px;
@@ -226,12 +231,51 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
         .chat-body {
             padding: 1rem; flex-grow: 1; overflow-y: auto;
             background-color: var(--rais-bg-light); display: flex;
-            flex-direction: column-reverse; height: 350px;
+            flex-direction: column; height: 350px;
         }
         .chat-footer { padding: 1rem; border-top: 1px solid var(--rais-light-gray); }
         
         .chat-footer .btn i, .chat-footer-fullscreen .btn i {
             color: var(--rais-text-dark);
+        }
+        
+        .chat-message-bubble {
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            margin-bottom: 0.5rem;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        .chat-message-bubble .sender-name {
+            font-weight: 600;
+            font-size: 0.8rem;
+            margin-bottom: 0.25rem;
+        }
+        .chat-message-bubble .timestamp {
+            font-size: 0.7rem;
+            color: #888;
+            display: block;
+            text-align: right;
+            margin-top: 0.25rem;
+        }
+        .dark-mode .chat-message-bubble .timestamp {
+             color: #bbb;
+        }
+        .chat-message-bubble.user {
+            background-color: var(--rais-primary-green);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 0.25rem;
+        }
+        .chat-message-bubble.admin {
+            background-color: var(--rais-light-gray);
+            color: var(--rais-text-dark);
+            align-self: flex-start;
+            border-bottom-left-radius: 0.25rem;
+        }
+        .dark-mode .chat-message-bubble.admin {
+             background-color: #333;
+             color: #EAEAEA;
         }
 
         .chat-toggle-btn {
@@ -258,7 +302,7 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
         .chat-title-fullscreen { font-weight: 600; font-size: 1.2rem; }
         .chat-body-fullscreen {
             flex-grow: 1; overflow-y: auto; padding: 1rem;
-            display: flex; flex-direction: column-reverse;
+            display: flex; flex-direction: column;
         }
         .chat-footer-fullscreen {
             padding: 1rem; border-top: 1px solid var(--rais-light-gray);
@@ -393,7 +437,7 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
                     <span class="header-title">Roman & Associates Immigration Services</span>
                 </div>
                 <div class="user-status d-flex align-items-center gap-2">
-                    <div class="me-3" style="font-weight: 500;"><?= date('F j, Y') ?></div>
+                    <div id="headerDate" class="me-3" style="font-weight: 500;"></div>
                     <a href="#" class="btn btn-link power-btn" data-bs-toggle="modal" data-bs-target="#logoutModal"><i class="bi bi-power"></i></a>
                     <span class="badge"><?php echo htmlspecialchars($userProfile['firstName']); ?></span>
                 </div>
@@ -554,6 +598,7 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('headerDate').textContent = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
             const editProfileBtn = document.getElementById('editProfileBtn');
             const cancelEditBtn = document.getElementById('cancelEditBtn');
             const profileView = document.getElementById('profile-view');
@@ -583,13 +628,19 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
                 }
             });
 
+            // --- CHAT LOGIC ---
             const mainWrapper = document.querySelector('.main-wrapper');
             const floatingBtn = document.querySelector('.floating-btn');
             const chatToggleBtn = document.querySelector('.chat-toggle-btn');
             const popupChatContainer = document.getElementById('chatContainer');
             const fullScreenChat = document.getElementById('full-screen-chat');
+            const chatBodyPopup = document.querySelector('#chatContainer .chat-body');
+            const chatBodyFullscreen = document.querySelector('#full-screen-chat .chat-body-fullscreen');
+            const messageInputs = document.querySelectorAll('.message-input');
+            const sendButtons = [document.getElementById('send-button-popup'), document.getElementById('send-button-fullscreen')];
+            let messagePollingInterval;
 
-            window.toggleChat = function() {
+            function originalToggleChat() {
                 if (window.innerWidth <= 992) {
                     const isChatVisible = fullScreenChat.style.display === 'flex';
                     if (isChatVisible) {
@@ -609,10 +660,103 @@ $darkModeEnabled = (bool)$userProfile['dark_mode'];
             }
             
             if(document.getElementById('backToDashboardBtn')) {
-                document.getElementById('backToDashboardBtn').addEventListener('click', toggleChat);
+                document.getElementById('backToDashboardBtn').addEventListener('click', originalToggleChat);
             }
+
+            function renderMessages(messages) {
+                const currentUserId = <?php echo json_encode($_SESSION['id']); ?>;
+                const messageHtml = messages.map(msg => {
+                    const isUser = msg.sender_id == currentUserId;
+                    const senderName = isUser ? "You" : "RAIS Support";
+                    const bubbleClass = isUser ? 'user' : 'admin';
+                    const formattedTimestamp = new Date(msg.timestamp.replace(' ', 'T') + 'Z').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                    return `
+                        <div class="chat-message-bubble ${bubbleClass}">
+                            <div class="sender-name">${senderName}</div>
+                            <div class="chat-message-content">${msg.message}</div>
+                            <span class="timestamp">${formattedTimestamp}</span>
+                        </div>
+                    `;
+                }).join('');
+
+                const welcomeMessage = '<div class="text-center text-muted small mb-2">This is the start of your conversation.</div>';
+                
+                chatBodyPopup.innerHTML = welcomeMessage + messageHtml;
+                chatBodyFullscreen.innerHTML = welcomeMessage + messageHtml;
+
+                chatBodyPopup.scrollTop = chatBodyPopup.scrollHeight;
+                chatBodyFullscreen.scrollTop = chatBodyFullscreen.scrollHeight;
+            }
+
+            async function fetchMessages() {
+                try {
+                    const response = await fetch('chat_handler.php?action=getMessages');
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const data = await response.json();
+                    if (data.status === 'success') {
+                        renderMessages(data.messages);
+                    } else {
+                        console.error('Failed to fetch messages:', data.message);
+                    }
+                } catch (error) {
+                    console.error('Error fetching messages:', error);
+                }
+            }
+
+            async function sendMessage() {
+                const input = Array.from(messageInputs).find(i => i.value.trim() !== '');
+                if (!input) return;
+
+                const message = input.value.trim();
+                const formData = new FormData();
+                formData.append('action', 'sendMessage');
+                formData.append('message', message);
+
+                try {
+                    const response = await fetch('chat_handler.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const data = await response.json();
+
+                    if (data.status === 'success') {
+                        messageInputs.forEach(i => i.value = '');
+                        fetchMessages(); 
+                    } else {
+                        console.error('Failed to send message:', data.message);
+                        alert('Failed to send message: ' + data.message);
+                    }
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                    alert('An error occurred while sending your message.');
+                }
+            }
+
+            sendButtons.forEach(button => button.addEventListener('click', sendMessage));
+            messageInputs.forEach(input => {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                });
+            });
+            
+            window.toggleChat = function() {
+                originalToggleChat(); 
+                const isChatVisible = popupChatContainer.classList.contains('show') || fullScreenChat.style.display === 'flex';
+                
+                if (isChatVisible && !messagePollingInterval) {
+                     fetchMessages(); 
+                     messagePollingInterval = setInterval(fetchMessages, 5000); 
+                } else if (!isChatVisible && messagePollingInterval) {
+                    clearInterval(messagePollingInterval);
+                    messagePollingInterval = null;
+                }
+            };
         });
     </script>
 </body>
 </html>
-

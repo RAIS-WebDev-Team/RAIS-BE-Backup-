@@ -278,6 +278,10 @@ $conn->close();
             if (action === 'cancel') newStatus = 'Cancelled';
             if (action === 'delete') actionType = 'delete_document';
 
+            // Show a loading state on the button
+            this.disabled = true;
+            this.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...`;
+
             fetch('update_document_status.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -285,11 +289,25 @@ $conn->close();
             })
             .then(res => res.json())
             .then(data => {
-                if (data.success) { window.location.reload(); } 
-                else { alert('Action failed: ' + data.message); }
+                actionConfirmModal.hide();
+                if (data.success) { 
+                    window.location.reload(); 
+                } else { 
+                    // Log the error message to the console instead of using alert()
+                    console.error('Action failed:', data.message);
+                    // You could implement a more user-friendly error display here, like another modal
+                }
             })
-            .catch(err => console.error('Fetch error:', err));
-            actionConfirmModal.hide();
+            .catch(err => {
+                actionConfirmModal.hide();
+                console.error('Fetch error:', err);
+            })
+            .finally(() => {
+                // Re-enable the button in case of an error where the page doesn't reload
+                const btn = document.getElementById('confirmActionBtn');
+                btn.disabled = false;
+                btn.textContent = 'Confirm';
+            });
         });
 
         // --- Event Listeners & Initial Renders ---
@@ -304,4 +322,3 @@ $conn->close();
     </script>
 </body>
 </html>
-
