@@ -37,8 +37,8 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 $userId = $_SESSION['id'];
 
 // --- FETCH USER DATA & PROGRESS STATUS FROM DATABASE ---
-// Fetch the new, more specific progress tracking columns, including `has_seen_tour`.
-$stmt = $conn->prepare("SELECT firstName, lastName, phone, birthday, profileImage, facebook, instagram, gmail, dark_mode, profile_picture_uploaded, birthday_added, social_links_added, has_seen_tour FROM users WHERE id = ?");
+// Fetch the user's primary email and other specific progress tracking columns.
+$stmt = $conn->prepare("SELECT firstName, lastName, email, phone, birthday, profileImage, facebook, instagram, gmail, dark_mode, profile_picture_uploaded, birthday_added, social_links_added, has_seen_tour FROM users WHERE id = ?");
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -55,7 +55,7 @@ if (!$dbUserData) {
     $dbUserProfile = [
         'firstName' => 'User', 'lastName' => 'Not Found', 'phone' => '', 
         'birthday' => '', 'profileImage' => null, 'facebook' => '', 
-        'instagram' => '', 'gmail' => ''
+        'instagram' => '', 'gmail' => '', 'email' => ''
     ];
     $darkModeEnabled = false;
     $profilePictureUploaded = false;
@@ -76,6 +76,7 @@ if (!$dbUserData) {
 $userProfile = [
     'firstName' => $dbUserProfile['firstName'],
     'lastName' => $dbUserProfile['lastName'],
+    'email' => $dbUserProfile['email'],
     'contact' => $dbUserProfile['phone'],
     'birthday' => $dbUserProfile['birthday'],
     'profileImage' => $dbUserProfile['profileImage'] ? '../' . $dbUserProfile['profileImage'] . '?v=' . time() : null,
@@ -181,7 +182,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
             align-items: center;
             gap: 15px;
             white-space: nowrap;
-            transition: background-color 0.3s ease;
+            transition: background-color: 0.3s ease;
         }
         .sidebar .nav-link.active,
         .sidebar .nav-link:hover { background-color: var(--rais-dark-green); }
@@ -201,7 +202,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
             align-items: center;
             gap: 15px;
             white-space: nowrap;
-            transition: background-color 0.3s ease;
+            transition: background-color: 0.3s ease;
             margin-top: auto;
         }
         .profile-section:hover { background-color: var(--rais-dark-green); }
@@ -278,7 +279,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
             justify-content: center;
             cursor: pointer;
             margin-right: 10px;
-            transition: background-color 0.2s, color 0.2s;
+            transition: background-color: 0.2s, color 0.2s;
         }
         .tour-help-btn i { transition: transform 0.2s ease-in-out; }
         .tour-help-btn:hover { background-color: var(--rais-light-gray); color: var(--rais-primary-green); }
@@ -363,7 +364,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
             width: 60px; height: 60px; line-height: 60px;
             border-radius: 50%; background-color: var(--rais-progress-bg);
             font-weight: 600; font-size: 1.2rem; color: var(--rais-text-dark);
-            margin-bottom: 10px; transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+            margin-bottom: 10px; transition: background-color: 0.3s ease-in-out, color 0.3s ease-in-out;
         }
         .step-circle.active { background-color: var(--rais-primary-green); color: white; }
         .step-label { font-size: 0.8rem; color: var(--rais-text-light); white-space: nowrap; }
@@ -385,7 +386,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
             border-radius: 50%; width: 60px; height: 60px;
             display: flex; align-items: center; justify-content: center;
             font-size: 2rem; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            text-decoration: none; transition: background-color 0.2s;
+            text-decoration: none; transition: background-color: 0.2s;
             z-index: 1030;
         }
         .floating-btn:hover { background-color: var(--rais-dark-green); }
@@ -460,7 +461,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
             border-radius: 50%; width: 60px; height: 60px;
             display: flex; align-items: center; justify-content: center;
             font-size: 1.5rem; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            cursor: pointer; transition: background-color 0.2s;
+            cursor: pointer; transition: background-color: 0.2s;
             z-index: 1030;
         }
         .tour-overlay {
@@ -502,7 +503,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
             background-color: var(--rais-light-gray); color: var(--rais-text-dark);
             display: flex; justify-content: center; align-items: center;
             font-weight: 600; font-size: 0.9rem; z-index: 1;
-            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+            transition: background-color: 0.3s ease-in-out, color 0.3s ease-in-out;
         }
         .welcome-tour-modal .modal-header .step-indicator.active { background-color: var(--rais-primary-green); color: white; }
         .welcome-tour-modal .modal-header h5 {
@@ -880,6 +881,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
 
     <script>
         // Pass initial data from PHP to JavaScript
@@ -1203,16 +1205,36 @@ $step4_active = $socialLinksAdded ? 'active' : '';
             document.getElementById('dashboardBirthday').textContent = `Birthday: ${profileData.birthday ? new Date(profileData.birthday).toLocaleDateString() : 'MM/DD/YYYY'}`;
 
             const socialLinksContainer = document.getElementById('dashboardSocialLinks');
-            socialLinksContainer.innerHTML = '';
+            let socialHTML = '';
             if (profileData.social.facebook) {
-                socialLinksContainer.innerHTML += `<a href="${profileData.social.facebook}" target="_blank" title="Facebook"><i class="bi bi-facebook fs-5"></i></a>`;
+                socialHTML += `<a href="${profileData.social.facebook}" target="_blank" title="Facebook"><i class="bi bi-facebook fs-5"></i></a>`;
             }
             if (profileData.social.instagram) {
-                socialLinksContainer.innerHTML += `<a href="${profileData.social.instagram}" target="_blank" title="Instagram"><i class="bi bi-instagram fs-5"></i></a>`;
+                socialHTML += `<a href="${profileData.social.instagram}" target="_blank" title="Instagram"><i class="bi bi-instagram fs-5"></i></a>`;
             }
-            if (profileData.social.gmail) {
-                socialLinksContainer.innerHTML += `<a href="mailto:${profileData.social.gmail}" title="Gmail"><i class="bi bi-envelope-fill fs-5"></i></a>`;
+            if (profileData.email) {
+                socialHTML += `
+                    <span class="d-inline-flex align-items-center">
+                        <a href="#" title="Email" id="emailLink" class="me-2"><i class="bi bi-envelope-fill fs-5"></i></a>
+                        <span id="emailAddress" class="text-muted" style="display: none; font-size: 0.9rem;">${profileData.email}</span>
+                    </span>
+                `;
             }
+            socialLinksContainer.innerHTML = socialHTML;
+
+            // Add the event listener for the new email icon toggle
+            const emailLink = document.getElementById('emailLink');
+            if (emailLink) {
+                emailLink.addEventListener('click', function(event) {
+                    event.preventDefault(); // Prevent the default mailto: action
+                    const emailAddressSpan = document.getElementById('emailAddress');
+                    if (emailAddressSpan) {
+                        const isVisible = emailAddressSpan.style.display !== 'none';
+                        emailAddressSpan.style.display = isVisible ? 'none' : 'inline';
+                    }
+                });
+            }
+
 
             const dashboardProfileImageContainer = document.getElementById('dashboardProfileImageContainer');
             if (profileData.profileImage) {
@@ -1224,3 +1246,4 @@ $step4_active = $socialLinksAdded ? 'active' : '';
     </script>
 </body>
 </html>
+

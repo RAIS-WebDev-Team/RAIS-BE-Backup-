@@ -4,11 +4,12 @@
 session_start();
 include_once '../config.php';
 
-// Check if user is logged in and is an admin.
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header("location: ../login.php");
+// Security Check: Ensure user is logged in and is an Admin
+if (!isset($_SESSION['loggedin']) || strpos($_SESSION['role'], 'Admin') === false) {
+    header("Location: ../login.php");
     exit;
 }
+
 
 // Page-specific data
 $page_title = "RAIS Admin - Booking Management";
@@ -354,4 +355,3 @@ $conn->close();
     </script>
 </body>
 </html>
-

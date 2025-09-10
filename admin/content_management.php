@@ -1,4 +1,13 @@
 <?php
+session_start();
+require_once '../config.php';
+
+// Security Check: Ensure user is logged in and is an Admin
+if (!isset($_SESSION['loggedin']) || strpos($_SESSION['role'], 'Admin') === false) {
+    header("Location: ../login.php");
+    exit;
+}
+
 // Page-specific data
 $page_title = "RAIS Admin - Content Management";
 $active_page = "content_management";
@@ -25,7 +34,7 @@ $footerData = [
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($page_title); ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="icon" href="../img/logoulit.png" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
@@ -298,7 +307,7 @@ $footerData = [
     <template id="about-card-template"><div class="p-3 border rounded mb-3 dynamic-about-card"><div class="d-flex justify-content-between align-items-center mb-2"><h6 class="mb-0 text-muted">Tabbed Card</h6><button type="button" class="btn-close remove-about-card-btn"></button></div><div class="row"><div class="col-md-6 mb-2"><label class="form-label small">Tab Title</label><input type="text" class="form-control card-tab-title" placeholder="e.g., Mission"></div><div class="col-md-6 mb-2"><label class="form-label small">Card Title</label><input type="text" class="form-control card-title" placeholder="e.g., Mission Statement"></div></div><div class="mb-2"><label class="form-label small">Card Content</label><textarea class="form-control card-content" rows="4"></textarea></div></div></template>
 
     <!-- SCRIPTS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="togglemodeScript.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -780,7 +789,7 @@ $footerData = [
                 confirmationModal.hide();
             };
             
-            // 📌 FIX: Manually set the z-index to ensure it appears on top
+            // 東 FIX: Manually set the z-index to ensure it appears on top
             confirmationModalEl.style.zIndex = "1060";
             confirmationModal.show();
         });
@@ -950,7 +959,7 @@ $footerData = [
             confirmationModal.hide();
         };
         
-        // 📌 FIX: Manually set the z-index to ensure it appears on top of the blog modal
+        // 東 FIX: Manually set the z-index to ensure it appears on top of the blog modal
         confirmationModalEl.style.zIndex = "1060";
         confirmationModal.show();
     });
@@ -971,7 +980,7 @@ $footerData = [
         confirmationModal.show();
     });
 
-    // 📌 CHANGE: Revamped preview logic for the new card-based layout
+    // 東 CHANGE: Revamped preview logic for the new card-based layout
     previewBlogBtn.addEventListener('click', () => {
         if (selectedBlogId === null) return;
         const blog = blogsData.find(b => b.id === selectedBlogId);

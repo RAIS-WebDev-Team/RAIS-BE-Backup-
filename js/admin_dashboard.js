@@ -1,38 +1,63 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
 
-    // --- FUNCTION 1: REFRESH THE SUMMARY CARDS ---
-    function updateUserCounts() {
-        fetch('/RAIS-Global/admin/get_active_users.php')
-            .then(response => response.json())
-            .then(data => {
-                const activeCountElement = document.getElementById('activeUserCount');
-                const inactiveCountElement = document.getElementById('inactiveUserCount');
+    const activeUserCountEl = document.getElementById('activeUserCount');
+    const inactiveUserCountEl = document.getElementById('inactiveUserCount');
 
-                if (activeCountElement) {
-                    activeCountElement.textContent = data.active_users;
-                }
-                if (inactiveCountElement) {
-                    inactiveCountElement.textContent = data.inactive_users;
-                }
-            })
-            .catch(error => console.error('Error fetching user counts:', error));
+    /**
+     * Fetches the latest active/inactive user counts from the server
+     * and updates the numbers displayed on the dashboard.
+     */
+    async function updateUserCounts() {
+        // Only proceed if the elements exist on the page
+        if (!activeUserCountEl || !inactiveUserCountEl) {
+            return;
+        }
+
+        try {
+            // NOTE: This path assumes your admin folder is at the root of the project.
+            // Adjust '/admin/get_user_counts.php' if your folder structure is different.
+            const response = await fetch('../admin/get_user_counts.php');
+            if (!response.ok) {
+                throw new Error(`Network response was not ok (${response.status})`);
+            }
+            const data = await response.json();
+
+            // Update the text content of the elements
+            activeUserCountEl.textContent = data.active_users;
+            inactiveUserCountEl.textContent = data.inactive_users;
+
+        } catch (error) {
+            console.error('Failed to fetch user counts:', error);
+        }
     }
 
-    // --- FUNCTION 2: REFRESH THE USER TABLE ---
-    function refreshUserTable() {
-        const userTableBody = document.getElementById('userTableBody');
-        fetch('/RAIS-Global/admin/get_user_table.php')
-            .then(response => response.text())
-            .then(html => {
-                if (userTableBody) {
-                    userTableBody.innerHTML = html;
-                }
-            })
-            .catch(error => console.error('Error refreshing user table:', error));
+    /**
+     * Periodically pings the server to update the current admin's 
+     * 'last_activity' timestamp, keeping their session marked as active.
+     */
+    async function updateUserActivity() {
+         try {
+            // NOTE: Adjust path if needed.
+            const response = await fetch('../admin/update_activity.php');
+             if (!response.ok) {
+                throw new Error(`Activity update failed (${response.status})`);
+            }
+            await response.json(); // Consume the JSON response to complete the request
+         } catch(error) {
+             console.error('Failed to update user activity:', error);
+         }
     }
 
-    // --- START THE AUTO-REFRESH INTERVALS ---
-    // Change the intervals at the bottom of the file
-    setInterval(updateUserCounts, 7000); // 7000 milliseconds = 7 seconds
-    setInterval(refreshUserTable, 7000); // Let's make this one fast too for consistency
+    // --- SET TIMERS ---
+
+    // Update the user counts on the dashboard every 5 seconds (5000 milliseconds)
+    setInterval(updateUserCounts, 5000);
+
+    // Update this user's own "last seen" time every 10 seconds (10000 milliseconds)
+    setInterval(updateUserActivity, 10000);
+
+    // --- INITIAL CALLS ---
+    // Run the functions once immediately on page load without waiting for the timers
+    updateUserCounts();
+    updateUserActivity();
 });

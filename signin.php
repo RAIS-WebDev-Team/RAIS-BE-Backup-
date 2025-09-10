@@ -1,74 +1,62 @@
 <?php
-// signin.php - Handles user authentication for different roles
-
-// Start the session to store user login state.
-// This must be at the very top of the script.
 session_start();
+include 'config.php';
 
-// Include the database configuration file.
-include 'config.php'; 
-
-// Check if the form was submitted by checking for the 'login' post variable
 if (isset($_POST['login'])) {
-    // Sanitize the email input to prevent SQL injection.
     $email = $conn->real_escape_string($_POST['email']);
     $password = $_POST['password'];
 
-    // Prepare a statement to select the user and their role from the database by email.
-    // We now also select the 'role' column.
-    $stmt = $conn->prepare("SELECT id, password, role FROM users WHERE email = ?");
+    $stmt = $conn->prepare("SELECT id, password, role, firstName, lastName, profileImage FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
 
-    // Check if a user with that email exists.
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
+        $is_password_correct = false;
 
-        // Verify that the submitted password matches the hashed password in the database.
-        if (password_verify($password, $user['password'])) {
-            // Password is correct.
-            
-            // Regenerate the session ID to prevent session fixation attacks.
+        // Check password based on role
+        if (strpos($user['role'], 'Admin') !== false) {
+            if ($password === $user['password']) { // Plain text for Admins
+                $is_password_correct = true;
+            }
+        } else {
+            if (password_verify($password, $user['password'])) { // Hashed for others
+                $is_password_correct = true;
+            }
+        }
+
+        if ($is_password_correct) {
             session_regenerate_id();
-            
-            // Store user data in the session, including the role.
             $_SESSION['loggedin'] = true;
             $_SESSION['id'] = $user['id'];
             $_SESSION['email'] = $email;
-            $_SESSION['role'] = $user['role']; // Store the user's role
-            
-            // === ROLE-BASED REDIRECTION ===
-            // Check the user's role and redirect accordingly.
-            if ($user['role'] === 'Super Admin') {
-                // Redirect admin user to the admin dashboard.
-                header("Location: admin/admin.php");
-                exit(); // Stop script execution after redirect
-            } else {
-                // Redirect all other users (e.g., 'client') to the user dashboard.
-                header("Location: user/dashboard.php");
-                exit(); // Stop script execution after redirect
-            }
+            $_SESSION['role'] = $user['role'];
+            $_SESSION['firstName'] = $user['firstName'];
+            $_SESSION['lastName'] = $user['lastName'];
+            $_SESSION['profileImage'] = $user['profileImage'];
 
-        } else {
-            // Invalid password
-            // Store an error message in the session
-            $_SESSION['login_error'] = "Invalid email or password.";
-            // Redirect back to the login page
-            header("Location: login.php");
+            // Set status to Active and update timestamps
+            $update_stmt = $conn->prepare("UPDATE users SET last_login = NOW(), last_activity = NOW(), status = 'Active' WHERE id = ?");
+            $update_stmt->bind_param("i", $user['id']);
+            $update_stmt->execute();
+            $update_stmt->close();
+
+            // Redirect based on role
+            if (strpos($user['role'], 'Admin') !== false) {
+                header("Location: admin/admin.php");
+            } else {
+                header("Location: user/dashboard.php");
+            }
             exit();
         }
-    } else {
-        // Invalid email
-        // Store an error message in the session
-        $_SESSION['login_error'] = "Invalid email or password.";
-        // Redirect back to the login page
-        header("Location: login.php");
-        exit();
     }
-    // Close the statement
-    $stmt->close();
+
+    // If login fails
+    $_SESSION['login_error'] = "Invalid email or password.";
+    header("Location: login.php");
+    exit();
 }
-// Close the database connection
 $conn->close();
 ?>
+

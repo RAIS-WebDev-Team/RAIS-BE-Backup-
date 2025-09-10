@@ -1,10 +1,16 @@
 <?php
+session_start();
+require_once '../config.php';
+
+// Security Check: Ensure user is logged in and is an Admin
+if (!isset($_SESSION['loggedin']) || strpos($_SESSION['role'], 'Admin') === false) {
+    header("Location: ../login.php");
+    exit;
+}
+
 // Page-specific data
 $page_title = "RAIS Admin - Application Management";
 $active_page = "application_management";
-
-// Include database connection
-require_once '../config.php';
 
 // --- FETCH CLIENT APPLICATIONS ---
 $clientApplications = [];

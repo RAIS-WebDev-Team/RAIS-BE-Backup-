@@ -1,4 +1,20 @@
 <?php
+session_start();
+require_once '../config.php';
+
+// Security Check: Ensure user is logged in and is an Admin
+if (!isset($_SESSION['loggedin']) || strpos($_SESSION['role'], 'Admin') === false) {
+    // For AJAX requests, it's better to send a JSON error response
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'message' => 'Unauthorized access.']);
+        exit;
+    }
+    // For direct page access, redirect to login
+    header("Location: ../login.php");
+    exit;
+}
+
 // Page-specific data
 $page_title = "RAIS Admin - Chat Management";
 $active_page = "chat_management"; // For highlighting the active link in the sidebar
