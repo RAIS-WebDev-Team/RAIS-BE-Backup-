@@ -14,7 +14,7 @@ $active_threshold = 300; // Users active in the last 300 seconds (5 minutes)
 
 // Fetch all users from the database, filtering for clients and getting profile images
 $users = [];
-$sql_users = "SELECT id, firstName, lastName, email, last_activity, profileImage FROM users WHERE role LIKE '%Client%' ORDER BY id ASC";
+$sql_users = "SELECT id, firstName, lastName, email, last_activity, last_login, profileImage FROM users WHERE role LIKE '%Client%' ORDER BY id ASC";
 if ($result = $conn->query($sql_users)) {
     while ($row = $result->fetch_assoc()) {
         $users[] = $row;
@@ -99,7 +99,7 @@ $conn->close();
                                                     echo $is_online ? '<span class="badge bg-success">Online</span>' : '<span class="badge bg-secondary">Offline</span>';
                                                 ?>
                                             </td>
-                                            <td><?php echo $user['last_activity'] ? date('M j, Y, g:i a', strtotime($user['last_activity'])) : 'Never'; ?></td>
+                                            <td><?php echo $user['last_login'] ? date('M j, Y, g:i a', strtotime($user['last_login'])) : 'Never'; ?></td>
                                             <td>
                                                 <button class="btn btn-sm btn-outline-primary edit-user-btn" 
                                                         data-bs-toggle="modal" 
@@ -280,4 +280,3 @@ $conn->close();
     </script>
 </body>
 </html>
-

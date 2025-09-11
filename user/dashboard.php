@@ -961,7 +961,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
                 `;
             }).join('');
 
-            const welcomeMessage = '<div class="text-center text-muted small mb-2">This is the start of your conversation.</div>';
+            const welcomeMessage = '<div class="text-center text-muted small mb-2">This is RAIS how may i help you today?</div>';
             
             chatBodyPopup.innerHTML = welcomeMessage + messageHtml;
             chatBodyFullscreen.innerHTML = welcomeMessage + messageHtml;

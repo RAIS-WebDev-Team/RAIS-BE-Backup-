@@ -16,15 +16,36 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 // Get the logged-in user's ID from the session.
 $userId = $_SESSION['id'];
 
-// --- FETCH USER SETTINGS FROM DATABASE ---
-$stmt = $conn->prepare("SELECT firstName, dark_mode FROM users WHERE id = ?");
+// --- FETCH USER SETTINGS AND ACCOUNT DATA FROM DATABASE ---
+$stmt = $conn->prepare("SELECT firstName, lastName, email, dark_mode FROM users WHERE id = ?");
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 $darkModeEnabled = $user ? (bool)$user['dark_mode'] : false;
 $stmt->close();
+
+// Fetch transactions for the user
+$transactions = [];
+$stmt = $conn->prepare("SELECT transaction_date, description, charges, payments, due_date FROM statement_of_account WHERE user_id = ? ORDER BY transaction_date DESC");
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$result = $stmt->get_result();
+while ($row = $result->fetch_assoc()) {
+    $transactions[] = $row;
+}
+$stmt->close();
 $conn->close();
+
+// Calculate totals
+$totalCharges = 0;
+$totalPayments = 0;
+foreach ($transactions as $t) {
+    $totalCharges += $t['charges'] ?? 0;
+    $totalPayments += $t['payments'] ?? 0;
+}
+$remainingBalance = $totalCharges - $totalPayments;
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -61,7 +82,7 @@ $conn->close();
             color: var(--rais-text-dark);
             overflow: hidden; /* Prevent body scroll */
         }
-          ::-webkit-scrollbar { width: 12px; }
+         ::-webkit-scrollbar { width: 12px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #0C470C, #3BA43B); border-radius: 6px; }
         ::-webkit-scrollbar-thumb:hover { background: linear-gradient(to bottom, #023621, #2a7c2a); }
@@ -669,19 +690,24 @@ $conn->close();
 
             <!-- Main Content -->
             <main class="main-content">
-                <h1>Statement of Account</h1>
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1>Statement of Account</h1>
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#paymentModal">
+                        <i class="bi bi-wallet2 me-2"></i>Pay with Dragonpay
+                    </button>
+                </div>
 
                 <div class="row">
                     <div class="col-md-6 mb-4">
                         <div class="summary-card">
                             <h2>Total Amount Due</h2>
-                            <div class="amount">$0</div>
+                            <div class="amount">$<?php echo number_format($totalCharges, 2); ?></div>
                         </div>
                     </div>
                     <div class="col-md-6 mb-4">
                         <div class="summary-card" style="background-color: var(--rais-button-maroon);">
                             <h2>Remaining Balance</h2>
-                            <div class="amount">$0</div>
+                            <div class="amount">$<?php echo number_format($remainingBalance, 2); ?></div>
                         </div>
                     </div>
                 </div>
@@ -699,7 +725,24 @@ $conn->close();
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Transactions will be dynamically added here -->
+                            <?php
+                                $balance = 0;
+                                // We need to process transactions from oldest to newest to calculate running balance correctly
+                                $reversed_transactions = array_reverse($transactions);
+                                foreach ($reversed_transactions as $t) {
+                                    $charge = $t['charges'] ?? 0;
+                                    $payment = $t['payments'] ?? 0;
+                                    $balance += $charge - $payment;
+                                    echo "<tr>";
+                                    echo "<td>" . date('M j, Y', strtotime($t['transaction_date'])) . "</td>";
+                                    echo "<td>" . htmlspecialchars($t['description']) . "</td>";
+                                    echo "<td>$" . ($charge > 0 ? number_format($charge, 2) : '-') . "</td>";
+                                    echo "<td>$" . ($payment > 0 ? number_format($payment, 2) : '-') . "</td>";
+                                    echo "<td>$" . number_format($balance, 2) . "</td>";
+                                    echo "<td>" . ($t['due_date'] ? date('M j, Y', strtotime($t['due_date'])) : 'N/A') . "</td>";
+                                    echo "</tr>";
+                                }
+                            ?>
                         </tbody>
                     </table>
                 </div>
@@ -778,6 +821,38 @@ $conn->close();
       </div>
     </div>
 
+    <!-- Dragonpay Payment Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="paymentModalLabel">Pay with Dragonpay</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form action="dragonpay_request.php" method="POST">
+            <div class="modal-body">
+                <p>Enter the amount you wish to pay. Your remaining balance is <strong>$<?php echo number_format($remainingBalance, 2); ?></strong>.</p>
+                <div class="mb-3">
+                    <label for="paymentAmount" class="form-label">Amount (PHP)</label>
+                    <div class="input-group">
+                        <span class="input-group-text">₱</span>
+                        <input type="number" class="form-control" id="paymentAmount" name="amount" min="1" step="0.01" value="<?php echo max(0, $remainingBalance); ?>" required>
+                    </div>
+                </div>
+                <input type="hidden" name="description" value="Payment for RAIS Services">
+                <input type="hidden" name="email" value="<?php echo htmlspecialchars($user['email']); ?>">
+                <input type="hidden" name="name" value="<?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?>">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Proceed to Payment</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -855,7 +930,7 @@ $conn->close();
                     `;
                 }).join('');
 
-                const welcomeMessage = '<div class="text-center text-muted small mb-2">This is the start of your conversation.</div>';
+                const welcomeMessage = '<div class="text-center text-muted small mb-2">This is RAIS how may i help you today?</div>';
                 
                 chatBodyPopup.innerHTML = welcomeMessage + messageHtml;
                 chatBodyFullscreen.innerHTML = welcomeMessage + messageHtml;
