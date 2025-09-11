@@ -13,20 +13,13 @@ if (isset($_POST['login'])) {
 
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
-        $is_password_correct = false;
-
-        // Check password based on role
-        if (strpos($user['role'], 'Admin') !== false) {
-            if ($password === $user['password']) { // Plain text for Admins
-                $is_password_correct = true;
-            }
-        } else {
-            if (password_verify($password, $user['password'])) { // Hashed for others
-                $is_password_correct = true;
-            }
-        }
-
-        if ($is_password_correct) {
+        
+        // --- CORRECTED PASSWORD VERIFICATION ---
+        // Use password_verify() for ALL users, regardless of role.
+        // This is the secure and correct way to check passwords.
+        if (password_verify($password, $user['password'])) {
+            
+            // Password is correct, proceed with login
             session_regenerate_id();
             $_SESSION['loggedin'] = true;
             $_SESSION['id'] = $user['id'];
@@ -52,11 +45,10 @@ if (isset($_POST['login'])) {
         }
     }
 
-    // If login fails
+    // If email is not found or password is incorrect
     $_SESSION['login_error'] = "Invalid email or password.";
     header("Location: login.php");
     exit();
 }
 $conn->close();
 ?>
-

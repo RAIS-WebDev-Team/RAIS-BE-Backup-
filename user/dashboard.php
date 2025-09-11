@@ -182,7 +182,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
             align-items: center;
             gap: 15px;
             white-space: nowrap;
-            transition: background-color: 0.3s ease;
+            transition: background-color 0.3s ease;
         }
         .sidebar .nav-link.active,
         .sidebar .nav-link:hover { background-color: var(--rais-dark-green); }
@@ -202,7 +202,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
             align-items: center;
             gap: 15px;
             white-space: nowrap;
-            transition: background-color: 0.3s ease;
+            transition: background-color 0.3s ease;
             margin-top: auto;
         }
         .profile-section:hover { background-color: var(--rais-dark-green); }
@@ -279,7 +279,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
             justify-content: center;
             cursor: pointer;
             margin-right: 10px;
-            transition: background-color: 0.2s, color 0.2s;
+            transition: background-color 0.2s, color 0.2s;
         }
         .tour-help-btn i { transition: transform 0.2s ease-in-out; }
         .tour-help-btn:hover { background-color: var(--rais-light-gray); color: var(--rais-primary-green); }
@@ -364,7 +364,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
             width: 60px; height: 60px; line-height: 60px;
             border-radius: 50%; background-color: var(--rais-progress-bg);
             font-weight: 600; font-size: 1.2rem; color: var(--rais-text-dark);
-            margin-bottom: 10px; transition: background-color: 0.3s ease-in-out, color 0.3s ease-in-out;
+            margin-bottom: 10px; transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
         }
         .step-circle.active { background-color: var(--rais-primary-green); color: white; }
         .step-label { font-size: 0.8rem; color: var(--rais-text-light); white-space: nowrap; }
@@ -386,7 +386,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
             border-radius: 50%; width: 60px; height: 60px;
             display: flex; align-items: center; justify-content: center;
             font-size: 2rem; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            text-decoration: none; transition: background-color: 0.2s;
+            text-decoration: none; transition: background-color 0.2s;
             z-index: 1030;
         }
         .floating-btn:hover { background-color: var(--rais-dark-green); }
@@ -461,7 +461,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
             border-radius: 50%; width: 60px; height: 60px;
             display: flex; align-items: center; justify-content: center;
             font-size: 1.5rem; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            cursor: pointer; transition: background-color: 0.2s;
+            cursor: pointer; transition: background-color 0.2s;
             z-index: 1030;
         }
         .tour-overlay {
@@ -503,7 +503,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
             background-color: var(--rais-light-gray); color: var(--rais-text-dark);
             display: flex; justify-content: center; align-items: center;
             font-weight: 600; font-size: 0.9rem; z-index: 1;
-            transition: background-color: 0.3s ease-in-out, color 0.3s ease-in-out;
+            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
         }
         .welcome-tour-modal .modal-header .step-indicator.active { background-color: var(--rais-primary-green); color: white; }
         .welcome-tour-modal .modal-header h5 {
@@ -549,7 +549,8 @@ $step4_active = $socialLinksAdded ? 'active' : '';
         .dark-mode .modal-content { background-color: #1e1e1e; }
         .dark-mode .header { box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
         .dark-mode .header-title, .dark-mode .profile-name, .dark-mode .card-title,
-        .dark-mode .step-circle, .dark-mode .user-status .me-3, .dark-mode .chat-title-fullscreen { color: #EAEAEA !important; }
+        .dark-mode .step-circle, .dark-mode .user-status .me-3, .dark-mode .chat-title-fullscreen,
+        .dark-mode .welcome-tour-modal .modal-header h5 { color: #EAEAEA !important; }
         .dark-mode .header-date-mobile { color: #EAEAEA; }
         .dark-mode .contact-info, .dark-mode .step-label, .dark-mode .card-text, .dark-mode .text-muted { color: #B0B0B0 !important; }
         .dark-mode .social-links a { color: #EAEAEA; }
@@ -563,7 +564,6 @@ $step4_active = $socialLinksAdded ? 'active' : '';
         .dark-mode .quick-actions-card .logo-only-img { filter: brightness(0.9); }
         .dark-mode .tara-canada-label { color: #EAEAEA; text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5); }
         .dark-mode ::-webkit-scrollbar-track { background: #2c2c2c; }
-        .dark-mode .welcome-tour-modal .modal-header h5 { color: black; }
         .dark-mode .welcome-tour-modal .modal-body p { color: #EAEAEA; }
         .dark-mode .welcome-tour-modal .modal-footer .btn-secondary { background-color: #333; color: #EAEAEA; border: 1px solid #444; }
         .dark-mode .welcome-tour-modal .modal-header .step-indicator { background-color: #333; color: #EAEAEA; }
@@ -1200,7 +1200,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
         function loadProfileData() {
             const profileData = initialProfileData;
 
-            document.getElementById('dashboardProfileName').textContent = `${profileData.firstName || 'FIRST NAME'}, ${profileData.lastName || 'LAST NAME'}`;
+            document.getElementById('dashboardProfileName').textContent = `${profileData.lastName || 'FIRST NAME'}, ${profileData.firstName || 'LAST NAME'}`;
             document.getElementById('dashboardContactNumber').textContent = profileData.contact || '(+63) 987 654 3210';
             document.getElementById('dashboardBirthday').textContent = `Birthday: ${profileData.birthday ? new Date(profileData.birthday).toLocaleDateString() : 'MM/DD/YYYY'}`;
 
@@ -1246,4 +1246,3 @@ $step4_active = $socialLinksAdded ? 'active' : '';
     </script>
 </body>
 </html>
-

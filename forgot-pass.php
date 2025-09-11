@@ -5,7 +5,8 @@
 // -----------------------------------------------------------------
 
 // --- Load Composer's autoloader to use PHPMailer ---
-require 'vendor/autoload.php';
+// Using a simpler relative path to rule out issues with __DIR__
+require_once 'vendor/autoload.php';
 
 // --- Use PHPMailer classes for sending email ---
 use PHPMailer\PHPMailer\PHPMailer;
@@ -49,9 +50,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // --- Check if a database row was actually updated ---
     if ($mysqli->affected_rows) {
 
-        // --- Load Composer's autoloader to use PHPMailer ---
-        require 'vendor/autoload.php';
-
         // --- Create a new PHPMailer instance ---
         $mail = new PHPMailer(true);
 
@@ -75,7 +73,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $mail->isHTML(true);
             $mail->Subject = 'Password Reset Request';
             // Construct the full reset link
-         $reset_link = BASE_URL . "/reset-password.php?token=$token";
+            // NOTE: You need to define BASE_URL somewhere in your project for this to work.
+            // For example: define('BASE_URL', 'http://localhost/sep11');
+            $reset_link = "http://localhost/sep11/reset-password.php?token=$token";
             $mail->Body    = "Click <a href='{$reset_link}'>here</a> to reset your password.";
             $mail->AltBody = "Copy and paste this link into your browser to reset your password: {$reset_link}";
 
@@ -101,7 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale-1.0" />
     <title><?php echo htmlspecialchars($page_title); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -168,3 +168,4 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </body>
 
 </html>
+

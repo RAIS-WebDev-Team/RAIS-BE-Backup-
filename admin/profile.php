@@ -12,7 +12,7 @@ if (!isset($_SESSION['loggedin']) || strpos($_SESSION['role'], 'Admin') === fals
 $page_title = "RAIS Admin - My Profile";
 $active_page = "profile"; 
 
-// Fetch the currently logged-in admin's data from the database
+// --- FETCH ADMIN'S DATA ---
 $admin_id = $_SESSION['id'];
 $stmt = $conn->prepare("SELECT firstName, lastName, role, email, phone, profileImage, address FROM users WHERE id = ?");
 $stmt->bind_param("i", $admin_id);
@@ -20,11 +20,30 @@ $stmt->execute();
 $result = $stmt->get_result();
 $dbAdminData = $result->fetch_assoc();
 $stmt->close();
-$conn->close();
 
 if (!$dbAdminData) {
     die("Error: Admin profile data could not be found.");
 }
+
+// --- FETCH ACTIVITY LOGS ---
+$activityLogs = [];
+$sql_activity = "SELECT u.firstName, u.lastName, u.profileImage, a.action, a.details, a.timestamp
+                 FROM admin_activity_log a
+                 JOIN users u ON a.admin_id = u.id
+                 ORDER BY a.timestamp DESC
+                 LIMIT 15"; // Get the 15 most recent activities
+
+$result_activity = $conn->query($sql_activity);
+if ($result_activity && $result_activity->num_rows > 0) {
+    while ($row = $result_activity->fetch_assoc()) {
+        // Sanitize the path for the profile image
+        if (!empty($row['profileImage']) && strpos($row['profileImage'], '../') === 0) {
+            $row['profileImage'] = substr($row['profileImage'], 3);
+        }
+        $activityLogs[] = $row;
+    }
+}
+$conn->close(); // Close connection after all queries are done
 
 // Format the data for the frontend
 $adminProfileData = [
@@ -58,30 +77,67 @@ $adminProfileData = [
             width: 150px;
             height: 150px;
             border-radius: 50%;
-            /* This is the key property to clip the inner image into a circle */
             overflow: hidden; 
             position: relative;
             background-color: #e9ecef;
             border: 5px solid #fff;
             margin-top: -75px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            /* Flex properties to center the default icon */
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        /* Styles for the image tag when it's present */
         .profile-picture img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        /* Styles for the default icon when no image is present */
         .profile-picture .bi-person-circle {
-            font-size: 8rem; /* Large icon size */
+            font-size: 8rem; 
             color: #adb5bd;
+        }
+
+        /* Styles for the Activity Feed */
+        .activity-feed-list {
+            max-height: 300px; /* Adjusted to show ~4 items before scrolling */
+            overflow-y: auto;  /* Adds a scrollbar ONLY when content overflows */
+            padding-right: 15px; /* Creates space so the scrollbar doesn't overlap content */
+        }
+
+        .activity-item {
+            padding-bottom: 1rem;
+        }
+        
+        .activity-item:not(:last-child) {
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #e9ecef; /* Separator line between items */
+        }
+        
+        body.dark-mode .activity-item:not(:last-child) {
+             border-bottom-color: #444; /* Dark mode separator color */
+        }
+        
+        .activity-item img {
+            object-fit: cover;
+        }
+
+        /* Custom scrollbar for webkit browsers (Chrome, Safari) */
+        .activity-feed-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        .activity-feed-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .activity-feed-list::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 10px;
+            border: 2px solid #fff;
+        }
+        body.dark-mode .activity-feed-list::-webkit-scrollbar-thumb {
+            background-color: #555;
+            border-color: #2a2a35;
         }
     </style>
 </head>
@@ -123,8 +179,39 @@ $adminProfileData = [
                     </div>
                     <div class="col-lg-8">
                         <div class="content-card">
-                            <h5>Activity Feed</h5>
-                            <p>Recent activities and updates will be shown here.</p>
+                            <h5 class="mb-3">Activity Feed</h5>
+                            <div class="activity-feed-list">
+                                <?php if (empty($activityLogs)): ?>
+                                    <p class="text-muted text-center">No recent activity to display.</p>
+                                <?php else: ?>
+                                    <?php foreach ($activityLogs as $log): ?>
+                                        <div class="activity-item d-flex align-items-start">
+                                            <div class="flex-shrink-0">
+                                                <?php if (!empty($log['profileImage'])): ?>
+                                                    <img src="../<?php echo htmlspecialchars($log['profileImage']); ?>" alt="<?php echo htmlspecialchars($log['firstName']); ?>" class="rounded-circle" width="40" height="40">
+                                                <?php else: ?>
+                                                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: 500;">
+                                                        <?php echo strtoupper(substr($log['firstName'], 0, 1)); ?>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <p class="mb-0">
+                                                    <strong><?php echo htmlspecialchars($log['firstName'] . ' ' . $log['lastName']); ?></strong>
+                                                    <?php echo htmlspecialchars(lcfirst($log['details'])); ?>
+                                                </p>
+                                                <small class="text-muted">
+                                                    <?php 
+                                                        // Formatting the date for display
+                                                        $date = new DateTime($log['timestamp']);
+                                                        echo $date->format('F j, Y, g:i a');
+                                                    ?>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -271,14 +358,14 @@ $adminProfileData = [
 
                     if (result.status === 'success') {
                         editProfileModal.hide();
-                        alert('Profile updated successfully!');
+                        // Instead of alert, you can show a more modern toast notification
                         window.location.reload();
                     } else {
-                        alert('Error: ' + result.message);
+                        // Handle errors gracefully
+                        console.error('Error updating profile:', result.message);
                     }
                 } catch (error) {
                     console.error('Error submitting form:', error);
-                    alert('An unexpected error occurred. Please try again.');
                 }
             });
 
@@ -287,3 +374,4 @@ $adminProfileData = [
     </script>
 </body>
 </html>
+

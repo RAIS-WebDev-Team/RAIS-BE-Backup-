@@ -11,20 +11,13 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || strpos($_
 }
 
 // --- LOGIC ---
-// Define "active" as someone seen in the last 15 seconds.
-$active_threshold = 15;
-
-// Get active user count
-$sql_active = "SELECT COUNT(id) AS active_count FROM users WHERE last_activity >= NOW() - INTERVAL ? SECOND";
-$stmt_active = $conn->prepare($sql_active);
-$stmt_active->bind_param("i", $active_threshold);
-$stmt_active->execute();
-$result_active = $stmt_active->get_result();
+// Active users are now defined by their 'Active' status.
+$sql_active = "SELECT COUNT(id) AS active_count FROM users WHERE status = 'Active' AND role LIKE '%Client%'";
+$result_active = $conn->query($sql_active);
 $active_users = $result_active->fetch_assoc()['active_count'];
-$stmt_active->close();
 
-// Get total user count
-$sql_total = "SELECT COUNT(id) AS total_count FROM users";
+// Get total user count for clients only
+$sql_total = "SELECT COUNT(id) AS total_count FROM users WHERE role LIKE '%Client%'";
 $result_total = $conn->query($sql_total);
 $total_users = $result_total->fetch_assoc()['total_count'];
 

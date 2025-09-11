@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 10, 2025 at 06:24 PM
+-- Generation Time: Sep 11, 2025 at 12:17 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -87,6 +87,60 @@ CREATE TABLE `about_main` (
 
 INSERT INTO `about_main` (`id`, `title`, `description`, `media_path`, `media_type`) VALUES
 (1, 'About Roman & Associates Immigration Services ', 'We are a licensed Canadian immigration firm based in Vancouver Island BC, providing expert advice on visas, permits, and sponsorships to help people achieve a brighter future in Canada.', 'uploads/about/1757296952_about_vid.mp4', 'video');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin_access_requests`
+--
+
+CREATE TABLE `admin_access_requests` (
+  `id` int(11) NOT NULL,
+  `admin_user_id` int(11) NOT NULL,
+  `requested_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `status` enum('pending','approved','denied') NOT NULL DEFAULT 'pending',
+  `authorized_by_superadmin_id` int(11) DEFAULT NULL,
+  `authorized_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `admin_access_requests`
+--
+
+INSERT INTO `admin_access_requests` (`id`, `admin_user_id`, `requested_at`, `status`, `authorized_by_superadmin_id`, `authorized_at`) VALUES
+(1, 15, '2025-09-11 10:08:59', 'denied', 12, '2025-09-11 10:13:09'),
+(2, 15, '2025-09-11 10:13:20', 'denied', 12, '2025-09-11 10:13:25'),
+(3, 15, '2025-09-11 10:13:37', 'denied', 12, '2025-09-11 10:13:42'),
+(4, 15, '2025-09-11 10:13:46', 'approved', 12, '2025-09-11 10:13:49');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin_activity_log`
+--
+
+CREATE TABLE `admin_activity_log` (
+  `id` int(11) NOT NULL,
+  `admin_id` int(11) NOT NULL,
+  `action` varchar(255) NOT NULL,
+  `target_id` int(11) DEFAULT NULL,
+  `target_type` varchar(50) DEFAULT NULL,
+  `details` text DEFAULT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `admin_activity_log`
+--
+
+INSERT INTO `admin_activity_log` (`id`, `admin_id`, `action`, `target_id`, `target_type`, `details`, `timestamp`) VALUES
+(1, 12, 'Approved Consultation', 1, 'consultation', 'Approved consultation for user Jessica Sotto.', '2025-09-10 21:30:10'),
+(2, 12, 'Cancelled Consultation', 2, 'consultation', 'Cancelled consultation for user Jessica Sotto.', '2025-09-10 20:15:20'),
+(3, 13, 'Approved Document', 8, 'user_document', 'Approved document \'Jp weekly accomplishments report.pdf\' for user Aespa Karina.', '2025-09-10 04:05:00'),
+(4, 12, 'Updated Profile', 12, 'admin_profile', 'Updated own profile information.', '2025-09-10 01:45:33'),
+(5, 13, 'Approved Application', 3, 'client_application', 'Approved client application for Kim, Chaewon, D.', '2025-09-11 00:12:45'),
+(6, 12, 'Cancelled Application', 1, 'client_application', 'Cancelled client application for Higashikata, Josuke, D.', '2025-09-11 01:05:18'),
+(7, 12, 'Deleted Document', 4, 'user_document', 'Deleted document \'karina.jpg\' for user Aespa Karina.', '2025-09-11 02:22:03');
 
 -- --------------------------------------------------------
 
@@ -381,7 +435,22 @@ INSERT INTO `notifications` (`id`, `user_id`, `message`, `type`, `link`, `is_rea
 (2, 11, 'Your consultation scheduled for September 11, 2025 has been Cancelled.', 'consultation_status', NULL, 0, '2025-09-03 08:49:29'),
 (3, 11, 'Your consultation for September 4, 2025 has been submitted and is now pending review.', 'consultation_status', NULL, 0, '2025-09-03 08:49:47'),
 (4, 6, 'Your document \'Jp weekly accomplishments report.pdf\' has been Approved.', 'document_approved', 'documents.php', 0, '2025-09-09 07:57:13'),
-(5, 11, 'Your document \'chae1.jpg\' has been Approved.', 'document_approved', 'documents.php', 0, '2025-09-10 11:20:58');
+(5, 11, 'Your document \'chae1.jpg\' has been Approved.', 'document_approved', 'documents.php', 0, '2025-09-10 11:20:58'),
+(6, 3, 'Your document \'afs.webp\' has been Approved.', 'document_approved', 'documents.php', 0, '2025-09-11 08:19:22');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `partners`
+--
+
+CREATE TABLE `partners` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `website_link` varchar(2083) NOT NULL,
+  `logo_path` varchar(255) DEFAULT NULL,
+  `background_image_path` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -485,18 +554,20 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `firstName`, `lastName`, `address`, `phone`, `email`, `password`, `profileImage`, `location`, `birthday`, `facebook`, `instagram`, `gmail`, `email_notifications`, `dark_mode`, `documents_uploaded`, `profile_picture_uploaded`, `birthday_added`, `social_links_added`, `has_seen_tour`, `role`, `status`, `last_login`, `last_activity`, `reset_token_hash`, `reset_token_expires_at`) VALUES
-(1, 'John Paul', 'Godoy', 'Darasa, Tanauan City Batangas', '09359306521', 'godoyjp443@gmail.com', '$2y$10$LxDGp8XROe201KZCttcLSOUlAqajOp5/TqhlZk89ReZwLbMjpzFf.', 'uploads/68b15e9bb7f37-cha.jpg', NULL, '2005-02-04', 'https://www.facebook.com/chaepi04', '', '', 1, 1, 0, 1, 1, 1, 1, 'client', 'Inactive', NULL, '2025-09-01 15:54:57', 'a076d34d7b4910555d046e2bcb80ac4ffc78a8d43e8f6ff4634ba8aa97138ee4', '2025-09-03 05:58:06'),
-(2, 'Kim', 'Chaewon', 'Darasa, Tanauan City Batangas', '09359306521', 'kimchae1chi@gmail.com', '$2y$10$YzarQtmz8o0nxRxl5vASierqYIj5.pGSSZ1yNhkgHQ/2gnW4N9vqC', 'uploads/68aea7cdd0f67-cha.jpg', NULL, '2005-08-18', 'https://www.facebook.com/chaepi04', '', 'godoyjp443@gmail.com', 1, 0, 0, 1, 1, 1, 1, 'client', 'Active', '2025-09-10 23:24:14', '2025-09-10 23:24:29', NULL, NULL),
+(1, 'John Paul', 'Godoy', 'Darasa, Tanauan City Batangas', '09359306521', 'godoyjp443@gmail.com', '$2y$10$LxDGp8XROe201KZCttcLSOUlAqajOp5/TqhlZk89ReZwLbMjpzFf.', 'uploads/68b15e9bb7f37-cha.jpg', NULL, '2005-02-04', 'https://www.facebook.com/chaepi04', '', '', 1, 1, 0, 1, 1, 1, 1, 'client', 'Inactive', '2025-09-11 17:39:07', NULL, 'a076d34d7b4910555d046e2bcb80ac4ffc78a8d43e8f6ff4634ba8aa97138ee4', '2025-09-03 05:58:06'),
+(2, 'Kim', 'Chaewon', 'Darasa, Tanauan City Batangas', '09359306521', 'kimchae1chi@gmail.com', '$2y$10$YzarQtmz8o0nxRxl5vASierqYIj5.pGSSZ1yNhkgHQ/2gnW4N9vqC', 'uploads/68aea7cdd0f67-cha.jpg', NULL, '2005-08-18', 'https://www.facebook.com/chaepi04', '', 'godoyjp443@gmail.com', 1, 0, 0, 1, 1, 1, 1, 'client', 'Inactive', '2025-09-11 17:39:27', NULL, NULL, NULL),
 (3, 'Kim', 'Yooyeon', 'Darasa', '09359306521', 'jp04@gmail.com', '$2y$10$hCC3xNl8HBw99lN/6gi5Z.etwr0OC79hXywGdIC5nrq2BfR6m3NQm', 'uploads/68ae93c2840bb-chaewon.jpg', NULL, '2005-02-04', 'https://www.facebook.com/chaepi04', '', '', 1, 1, 0, 1, 1, 1, 1, 'client', 'Inactive', NULL, NULL, NULL, NULL),
 (4, 'Jisoo', 'Hong', 'San Pedro, Santo Tomas, Batangas', '09618225084', 'hongjisoo@gmail.com', '$2y$10$JdXfhvws62So9kLTaB5Q7uyznoRFIbsVKdawmKKGea44eZZlTMUGu', NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 0, 0, 0, 1, 'client', 'Inactive', NULL, '2025-08-28 16:53:00', NULL, NULL),
-(5, 'Matthew', 'Hernandez', 'San Pedro, Santo Tomas, Batangas', '09067664653', 'matthewehernandez0712@gmail.com', '$2y$10$zP6A5R8G.vX7qY.tK.eM4u.iB/n3o.aD/cK/sS/fG/hJ/l', NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 0, 0, 0, 1, 'Super Admin', 'Inactive', NULL, '2025-08-28 16:03:28', NULL, NULL),
-(6, 'Aespa', 'Karina', 'Darasa', '09359306521', 'jjampi72@gmail.com', '$2y$10$dhwlIzGxPVzEkqOSN2TIY.2Qg5Yk9ZqZs/GuFru9TAEqM1pHJ6huK', 'uploads/68b554ed4465f-karina.jpg', NULL, '2005-02-04', 'https://www.facebook.com/chaepi04', 'https://www.facebook.com/chaepi04', 'godoyjp443@gmail.com', 1, 0, 0, 1, 1, 1, 1, 'client', 'Inactive', NULL, NULL, NULL, NULL),
+(5, 'Matthew', 'Hernandez', 'San Pedro, Santo Tomas, Batangas', '09067664653', 'matthewehernandez0712@gmail.com', '$2y$10$vaS5dZNbkVNfkYLlLI8DcOAlAKQB0.qKh.E3XQPAUWYyifnVvvXKq', NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 0, 0, 0, 1, 'Super Admin', 'Inactive', NULL, '2025-08-28 16:03:28', NULL, NULL),
+(6, 'Aespa', 'Karina', 'Darasa', '09359306521', 'jjampi72@gmail.com', '$2y$10$dhwlIzGxPVzEkqOSN2TIY.2Qg5Yk9ZqZs/GuFru9TAEqM1pHJ6huK', 'uploads/68b554ed4465f-karina.jpg', NULL, '2005-02-04', 'https://www.facebook.com/chaepi04', '', 'godoyjp443@gmail.com', 1, 0, 0, 1, 1, 1, 1, 'client', 'Inactive', '2025-09-11 17:35:25', NULL, NULL, NULL),
 (7, 'Kim', 'Minjeong', 'Darasa', '09359306521', 'tzuyoda28@gmail.com', '$2y$10$tQcjHW5jI2bHHeGGOnLlQu8FXeOeCV9OdLzMcEjecfPmb/YwvVz7S', NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 0, 0, 0, 1, 'client', 'Inactive', NULL, NULL, '84af595f8ecd300d186dd864ee0168a33a4d2e1c55de607801ee64f5a6cff69d', '2025-09-03 05:56:50'),
 (8, 'Josu', 'Higa', 'Darasa', '09359306521', 'akizashibal@gmail.com', '$2y$10$XlySF0CzDJqAtqCx6IU2Tu30xcZLbxAQkOo1TTYm0ZxWLsgP4QMcm', NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 0, 0, 0, 1, 'client', 'Inactive', NULL, NULL, NULL, NULL),
 (10, 'Kim', 'Chaewon', '123 Admin Lane', '09000000000', 'aimiyuji180@gmail.com', '$2y$10$nZ8W.X7V.y6U.z5T.a4S.b3R.c2Q.d1P.e0O.f9N.g8M.h7L', NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 0, 0, 0, 1, 'Super Admin', 'Active', NULL, NULL, NULL, NULL),
-(11, 'Jessica ', 'Sotto', 'Darasa', '09359306521', 'jessica@gmail.com', '$2y$10$RkkQMzIgZhwQLWXYLh6yeubpeeLzPE/dBZr6rE1ZCU.0aCLh8IViK', 'uploads/68b7eaa2dcf40-8e0bab69-56d5-4a7b-a7cd-78e25b8da0ef.jpg', NULL, '2025-09-26', 'https://www.facebook.com/chaepi04', 'https://www.facebook.com/chaepi04', 'godoyjp443@gmail.com', 1, 0, 0, 1, 1, 1, 1, 'client', 'Inactive', NULL, '2025-09-09 15:12:29', NULL, NULL),
-(12, 'Jp', 'Godoy', 'Darasa', '09359306521', 'adminjp@gmail.com', 'adminako', 'uploads/profiles/68c16e01912ae-chae1.jpg', NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 0, 0, 0, 1, 'Super Admin', 'Active', '2025-09-10 23:41:16', '2025-09-11 00:23:31', NULL, NULL),
-(13, 'Chae', 'Won', '', '', 'chaewon@gmail.com', 'chaewon04.', 'uploads/profiles/68c18a975561d-cha.jpg', NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 0, 0, 0, 0, 'Super Admin', 'Active', '2025-09-10 23:25:00', '2025-09-10 23:38:25', NULL, NULL);
+(11, 'Jessica ', 'Sotto', 'Darasa', '09359306521', 'jessica@gmail.com', '$2y$10$RkkQMzIgZhwQLWXYLh6yeubpeeLzPE/dBZr6rE1ZCU.0aCLh8IViK', 'uploads/68b7eaa2dcf40-8e0bab69-56d5-4a7b-a7cd-78e25b8da0ef.jpg', NULL, '2025-09-26', 'https://www.facebook.com/chaepi04', 'https://www.facebook.com/chaepi04', 'godoyjp443@gmail.com', 1, 0, 0, 1, 1, 1, 1, 'client', 'Inactive', '2025-09-11 16:51:43', NULL, NULL, NULL),
+(12, 'Jp', 'Godoy', 'Darasa', '09359306521', 'adminjp@gmail.com', 'adminako', 'uploads/profiles/68c16e01912ae-chae1.jpg', NULL, '0000-00-00', 'https://www.facebook.com/chaepi04', 'https://www.facebook.com/chaepi04', 'godoyjp443@gmail.com', 1, 0, 0, 0, 0, 1, 1, 'Super Admin', 'Inactive', '2025-09-11 18:03:55', '2025-09-11 18:10:12', NULL, NULL),
+(13, 'Chae', 'Won', '', '', 'chaewon@gmail.com', 'chaewon04.', 'uploads/profiles/68c18a975561d-cha.jpg', NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 0, 0, 0, 0, 'Super Admin', 'Active', '2025-09-11 16:12:19', '2025-09-11 16:12:19', NULL, NULL),
+(14, 'Marga', 'Dela Rosa', '', '', 'marga@gmail.com', 'itsmarga', NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 0, 0, 0, 0, 'Super Admin', 'Inactive', NULL, NULL, NULL, NULL),
+(15, 'Triples', 'Yooyeon', '', '', 'yooyeon@gmail.com', '$2y$10$Ogi5m0tCHA1x/ayhRg6WGu12KQTfR0snXUcVz8qwqlzgbBoOkZ8t.', 'uploads/profiles/68c29c73c242f-yooyeon.jpg', NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 0, 0, 0, 0, 'Admin', 'Active', '2025-09-11 18:08:16', '2025-09-11 18:08:28', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -519,7 +590,7 @@ CREATE TABLE `user_documents` (
 
 INSERT INTO `user_documents` (`id`, `user_id`, `file_name`, `file_path`, `upload_date`, `status`) VALUES
 (1, 2, 'cha.jpg', '../uploads/68ae9150f3ca9-cha.jpg', '2025-08-27 05:02:09', 'pending'),
-(2, 3, 'afs.webp', '../uploads/68ae96a5e3c80-afs.webp', '2025-08-27 05:24:53', 'pending'),
+(2, 3, 'afs.webp', '../uploads/68ae96a5e3c80-afs.webp', '2025-08-27 05:24:53', 'approved'),
 (3, 3, 'chae.webp', '../uploads/68ae96a5e57d6-chae.webp', '2025-08-27 05:24:53', 'pending'),
 (4, 6, 'karina.jpg', '../uploads/68b6583663021-karina.jpg', '2025-09-02 02:36:38', 'pending'),
 (8, 6, 'Jp weekly accomplishments report.pdf', 'uploads/68b6905b1c6f7-Jpweeklyaccomplishmentsreport.pdf', '2025-09-02 06:36:11', 'approved'),
@@ -562,6 +633,21 @@ ALTER TABLE `about_content_blocks`
 --
 ALTER TABLE `about_main`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `admin_access_requests`
+--
+ALTER TABLE `admin_access_requests`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `admin_user_id` (`admin_user_id`),
+  ADD KEY `authorized_by_superadmin_id` (`authorized_by_superadmin_id`);
+
+--
+-- Indexes for table `admin_activity_log`
+--
+ALTER TABLE `admin_activity_log`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `admin_id` (`admin_id`);
 
 --
 -- Indexes for table `blogs`
@@ -659,6 +745,12 @@ ALTER TABLE `notifications`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `partners`
+--
+ALTER TABLE `partners`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `services`
 --
 ALTER TABLE `services`
@@ -714,6 +806,18 @@ ALTER TABLE `about_content_blocks`
 --
 ALTER TABLE `about_main`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `admin_access_requests`
+--
+ALTER TABLE `admin_access_requests`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `admin_activity_log`
+--
+ALTER TABLE `admin_activity_log`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `blogs`
@@ -797,7 +901,13 @@ ALTER TABLE `hero_media`
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `partners`
+--
+ALTER TABLE `partners`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `services`
@@ -821,7 +931,7 @@ ALTER TABLE `statement_of_account`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `user_documents`
@@ -832,6 +942,19 @@ ALTER TABLE `user_documents`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `admin_access_requests`
+--
+ALTER TABLE `admin_access_requests`
+  ADD CONSTRAINT `admin_access_requests_ibfk_1` FOREIGN KEY (`admin_user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `admin_access_requests_ibfk_2` FOREIGN KEY (`authorized_by_superadmin_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `admin_activity_log`
+--
+ALTER TABLE `admin_activity_log`
+  ADD CONSTRAINT `admin_activity_log_ibfk_1` FOREIGN KEY (`admin_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `blog_sections`

@@ -5,9 +5,10 @@ session_start();
 
 // Check if the user is logged in and has an Admin role.
 // If not, redirect them to the login page.
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || strpos($_SESSION['role'], 'Admin') === false) {
-    header("location: ../login.php");
-    exit; // Stop script execution immediately.
+// Security Check: Ensure user is logged in and has an Admin role
+if (!isset($_SESSION['loggedin']) || strpos($_SESSION['role'], 'Admin') === false) {
+    header("Location: ../login.php");
+    exit;
 }
 
 
@@ -195,7 +196,7 @@ $conn->close();
                                                     echo $is_active ? '<span class="badge bg-success">Online</span>' : '<span class="badge bg-secondary">Offline</span>';
                                                 ?>
                                             </td>
-                                            <td><?php echo $user['last_activity'] ? date('M j, Y, g:i a', strtotime($user['last_activity'])) : 'Never'; ?></td>
+                                            <td><?php echo $user['last_login'] ? date('M j, Y, g:i a', strtotime($user['last_login'])) : 'Never'; ?></td>
                                             <td>
                                                 <button class="btn btn-sm btn-outline-primary edit-user-btn" 
                                                     data-user-id="<?php echo $user['id']; ?>"
@@ -437,3 +438,4 @@ $conn->close();
 
 </body>
 </html>
+
