@@ -38,6 +38,15 @@ $active_page = "chat_management"; // For highlighting the active link in the sid
         rel="stylesheet">
     <link rel="icon" href="../img/logoulit.png" />
     <link rel="stylesheet" href="style.css">
+    <style>
+        #conversationList {
+            max-height: 580px; 
+            overflow-y: auto;
+        }
+        body.dark-mode #backToConversations {
+            color: #ffffff; /* White color for the icon in dark mode */
+        }
+    </style>
 </head>
 
 <body>
@@ -69,7 +78,7 @@ $active_page = "chat_management"; // For highlighting the active link in the sid
                         </div>
                         <div class="chat-messages" id="chatMessages">
                              <div class="h-100 d-flex justify-content-center align-items-center text-muted">
-                                Please select a conversation to view messages.
+                                 Please select a conversation to view messages.
                             </div>
                         </div>
                         <div class="chat-input-area">
@@ -167,9 +176,9 @@ $active_page = "chat_management"; // For highlighting the active link in the sid
             function renderConversationList(convosToRender) {
                 conversationListContainer.innerHTML = '';
                  if (Object.keys(convosToRender).length === 0) {
-                    conversationListContainer.innerHTML = '<div class="text-center p-3 text-muted">No active conversations.</div>';
-                    return;
-                }
+                     conversationListContainer.innerHTML = '<div class="text-center p-3 text-muted">No active conversations.</div>';
+                     return;
+                 }
                 for (const userId in convosToRender) {
                     const convo = convosToRender[userId];
                     const conversationItem = document.createElement('div');
@@ -223,20 +232,20 @@ $active_page = "chat_management"; // For highlighting the active link in the sid
                 
                 if (messages.length === 0) {
                      chatMessagesContainer.innerHTML = '<div class="h-100 d-flex justify-content-center align-items-center text-muted">No messages in this conversation yet.</div>';
-                     return;
+                       return;
                 }
 
                 messages.forEach(message => {
                     const messageBubble = document.createElement('div');
                     const senderType = message.sender_id == 0 ? 'admin' : 'user';
                     const senderName = senderType === 'user' ? `${activeConvo.firstName} ${activeConvo.lastName}` : 'Admin';
-                    const formattedTime = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const formattedDateTime = new Date(message.timestamp).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
 
                     messageBubble.classList.add('chat-message-bubble', senderType);
                     messageBubble.innerHTML = `
                         <div class="sender-name">${senderName}</div>
                         <div class="chat-message-content">${message.message}</div>
-                        <span class="timestamp">${formattedTime}</span>
+                        <span class="timestamp">${formattedDateTime}</span>
                     `;
                     chatMessagesContainer.appendChild(messageBubble);
                 });
@@ -341,3 +350,4 @@ $active_page = "chat_management"; // For highlighting the active link in the sid
 </body>
 
 </html>
+

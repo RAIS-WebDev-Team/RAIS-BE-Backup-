@@ -549,8 +549,8 @@ $step4_active = $socialLinksAdded ? 'active' : '';
         .dark-mode .modal-content { background-color: #1e1e1e; }
         .dark-mode .header { box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
         .dark-mode .header-title, .dark-mode .profile-name, .dark-mode .card-title,
-        .dark-mode .step-circle, .dark-mode .user-status .me-3, .dark-mode .chat-title-fullscreen,
-        .dark-mode .welcome-tour-modal .modal-header h5 { color: #EAEAEA !important; }
+        .dark-mode .step-circle, .dark-mode .user-status .me-3, .dark-mode .chat-title-fullscreen { color: #EAEAEA !important; }
+        .dark-mode .welcome-tour-modal .modal-header h5 { color: black !important; }
         .dark-mode .header-date-mobile { color: #EAEAEA; }
         .dark-mode .contact-info, .dark-mode .step-label, .dark-mode .card-text, .dark-mode .text-muted { color: #B0B0B0 !important; }
         .dark-mode .social-links a { color: #EAEAEA; }
@@ -675,7 +675,7 @@ $step4_active = $socialLinksAdded ? 'active' : '';
                 </div>
                 
                 <div class="user-status d-flex align-items-center gap-2">
-                     <!-- This date is for desktop only -->
+                        <!-- This date is for desktop only -->
                     <div class="me-3 d-none d-lg-block" style="font-weight: 500;"><?= date('F j, Y') ?></div>
                     <button class="tour-help-btn" id="tourToggleButton"><i class="bi bi-question-circle"></i></button>
                     <a href="#" class="btn btn-link power-btn" data-bs-toggle="modal" data-bs-target="#logoutModal"><i class="bi bi-power"></i></a>

@@ -42,6 +42,10 @@ $conn->close();
             object-fit: cover;
             border-radius: 50%;
         }
+        .table-container-scrollable {
+            max-height: 580px; /* Approx height for 10 users + header */
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -61,7 +65,7 @@ $conn->close();
                         </div>
                     </div>
 
-                    <div class="table-responsive">
+                    <div class="table-responsive table-container-scrollable">
                         <table class="table table-hover align-middle">
                             <thead>
                                 <tr>

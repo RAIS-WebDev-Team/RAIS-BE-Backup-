@@ -97,6 +97,10 @@ $conn->close();
         body.dark-mode .table-hover tbody tr:hover td { color: #ffffff; }
         #previewModal .modal-body img { max-width: 100%; height: auto; display: block; margin: auto; }
         #previewModal .modal-body iframe { width: 100%; height: 75vh; border: none; }
+        .table-container-scrollable {
+            max-height: 580px; /* Approx height for 10 rows + header */
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -109,7 +113,7 @@ $conn->close();
 
                 <div class="content-card mb-4" id="clientAppCard">
                     <h2 class="mb-3">Client Applications</h2>
-                    <div class="table-responsive pt-3">
+                    <div class="table-responsive pt-3 table-container-scrollable">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
@@ -133,9 +137,9 @@ $conn->close();
                         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#cancelled-docs">Cancelled</button></li>
                     </ul>
                     <div class="tab-content">
-                        <div class="tab-pane fade show active" id="pending-docs"><div class="table-responsive"><table class="table table-hover"><thead><tr><th>User Name</th><th>File Name</th><th>Submitted</th><th>Actions</th></tr></thead><tbody id="pending-tbody"></tbody></table></div></div>
-                        <div class="tab-pane fade" id="approved-docs"><div class="table-responsive"><table class="table table-hover"><thead><tr><th>User Name</th><th>File Name</th><th>Submitted</th><th>Actions</th></tr></thead><tbody id="approved-tbody"></tbody></table></div></div>
-                        <div class="tab-pane fade" id="cancelled-docs"><div class="table-responsive"><table class="table table-hover"><thead><tr><th>User Name</th><th>File Name</th><th>Submitted</th><th>Actions</th></tr></thead><tbody id="cancelled-tbody"></tbody></table></div></div>
+                        <div class="tab-pane fade show active" id="pending-docs"><div class="table-responsive table-container-scrollable"><table class="table table-hover"><thead><tr><th>User Name</th><th>File Name</th><th>Submitted</th><th>Actions</th></tr></thead><tbody id="pending-tbody"></tbody></table></div></div>
+                        <div class="tab-pane fade" id="approved-docs"><div class="table-responsive table-container-scrollable"><table class="table table-hover"><thead><tr><th>User Name</th><th>File Name</th><th>Submitted</th><th>Actions</th></tr></thead><tbody id="approved-tbody"></tbody></table></div></div>
+                        <div class="tab-pane fade" id="cancelled-docs"><div class="table-responsive table-container-scrollable"><table class="table table-hover"><thead><tr><th>User Name</th><th>File Name</th><th>Submitted</th><th>Actions</th></tr></thead><tbody id="cancelled-tbody"></tbody></table></div></div>
                     </div>
                 </div>
             </main>

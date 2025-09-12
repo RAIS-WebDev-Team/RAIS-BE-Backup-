@@ -118,6 +118,10 @@ $conn->close();
         .admin-table-image { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; }
         .admin-profile-image-preview { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 2px solid #dee2e6; }
         .authorization-card { max-width: 600px; margin: 50px auto; }
+        .table-container-scrollable {
+            max-height: 580px; /* Approx height for 10 users + header */
+            overflow-y: auto;
+        }
     </style>
 </head>
 
@@ -141,7 +145,7 @@ $conn->close();
                                 There are no pending access requests.
                             </div>
                         <?php else : ?>
-                            <div class="table-responsive">
+                            <div class="table-responsive table-container-scrollable">
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
@@ -184,7 +188,7 @@ $conn->close();
                                 <input type="text" class="form-control" placeholder="Search by name or email..." id="searchInput">
                             </div>
                         </div>
-                        <div class="table-responsive">
+                        <div class="table-responsive table-container-scrollable">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>

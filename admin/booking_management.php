@@ -93,6 +93,10 @@ $conn->close();
         body.dark-mode .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
         body.dark-mode .nav-tabs-custom .nav-link { color: #aaa; }
         body.dark-mode .nav-tabs-custom .nav-link.active { color: #4db6ac; border-bottom-color: #4db6ac; }
+        .table-container-scrollable {
+            max-height: 580px; /* Approx height for 10 rows + header */
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -113,13 +117,13 @@ $conn->close();
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane fade show active" id="consult-pending">
-                            <div class="table-responsive"><table class="table table-hover"><thead><tr><th>ID</th><th>Name</th><th>Service</th><th>Schedule</th><th>Actions</th></tr></thead><tbody id="consult-pending-tbody"></tbody></table></div>
+                            <div class="table-responsive table-container-scrollable"><table class="table table-hover"><thead><tr><th>ID</th><th>Name</th><th>Service</th><th>Schedule</th><th>Actions</th></tr></thead><tbody id="consult-pending-tbody"></tbody></table></div>
                         </div>
                         <div class="tab-pane fade" id="consult-approved">
-                            <div class="table-responsive"><table class="table table-hover"><thead><tr><th>ID</th><th>Name</th><th>Service</th><th>Schedule</th><th>Actions</th></tr></thead><tbody id="consult-approved-tbody"></tbody></table></div>
+                            <div class="table-responsive table-container-scrollable"><table class="table table-hover"><thead><tr><th>ID</th><th>Name</th><th>Service</th><th>Schedule</th><th>Actions</th></tr></thead><tbody id="consult-approved-tbody"></tbody></table></div>
                         </div>
                         <div class="tab-pane fade" id="consult-cancelled">
-                            <div class="table-responsive"><table class="table table-hover"><thead><tr><th>ID</th><th>Name</th><th>Service</th><th>Schedule</th><th>Actions</th></tr></thead><tbody id="consult-cancelled-tbody"></tbody></table></div>
+                            <div class="table-responsive table-container-scrollable"><table class="table table-hover"><thead><tr><th>ID</th><th>Name</th><th>Service</th><th>Schedule</th><th>Actions</th></tr></thead><tbody id="consult-cancelled-tbody"></tbody></table></div>
                         </div>
                     </div>
                 </div>
@@ -127,7 +131,7 @@ $conn->close();
                 <!-- Flight Bookings Card -->
                 <div class="content-card" id="flightCard">
                     <h2 class="mb-3">Planned Flights</h2>
-                    <div class="table-responsive"><table class="table table-hover"><thead><tr><th>ID</th><th>Name</th><th>Destination</th><th>Schedule</th><th>Actions</th></tr></thead><tbody id="flight-tbody"></tbody></table></div>
+                    <div class="table-responsive table-container-scrollable"><table class="table table-hover"><thead><tr><th>ID</th><th>Name</th><th>Destination</th><th>Schedule</th><th>Actions</th></tr></thead><tbody id="flight-tbody"></tbody></table></div>
                 </div>
             </main>
         </div>
