@@ -1,16 +1,49 @@
 <?php
-// This PHP script generates the entire HTML page for the Family Permit information.
-// It uses HEREDOC syntax for outputting large blocks of HTML.
+// fam.php
+require_once '../config.php'; // Adjust path if necessary
 
-// Output the head and main content of the HTML document.
-echo <<<HTML
+$service_key = 'family_permit';
+$service = null;
+$tabs = [];
+
+try {
+    // Fetch main service details
+    $stmt_service = $pdo->prepare("SELECT * FROM services WHERE service_key = ?");
+    $stmt_service->execute([$service_key]);
+    $service = $stmt_service->fetch(PDO::FETCH_ASSOC);
+
+    if ($service) {
+        // Fetch tab details for the service
+        $stmt_tabs = $pdo->prepare("SELECT * FROM service_tabs WHERE service_id = ? ORDER BY display_order ASC");
+        $stmt_tabs->execute([$service['id']]);
+        $tabs_data = $stmt_tabs->fetchAll(PDO::FETCH_ASSOC);
+
+        // Organize tabs data into an associative array for easy access by tab_key
+        foreach ($tabs_data as $tab) {
+            $tabs[$tab['tab_key']] = $tab;
+        }
+    } else {
+        // Fallback for when data isn't in the database yet
+        $service = [
+            'page_title' => 'Family Permit',
+            'hero_image_path' => 'img/Ffam.jpg',
+            'hero_title' => 'Family Permit',
+            'hero_description' => 'Family sponsorship allows individuals to bring their family members to live with them in another country, requiring proof of financial stability and support commitment. It helps reunite families and provides opportunities for a better life.'
+        ];
+    }
+} catch (PDOException $e) {
+    // Handle database connection error gracefully
+    die("Error: Could not connect to the database.");
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Family Permit</title>
+  <title><?php echo htmlspecialchars($service['page_title']); ?></title>
   <link rel="icon" href="../img/logoulit.png" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
@@ -62,7 +95,7 @@ echo <<<HTML
     header {
       position: relative;
       height: 100vh;
-      background: url('../img/Ffam.jpg') no-repeat center center/cover;
+      background: url('../<?php echo htmlspecialchars($service['hero_image_path']); ?>') no-repeat center center/cover;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -110,7 +143,7 @@ echo <<<HTML
       text-shadow: 2px 2px 5px #000;
     }
 
-    .hero-content p {
+    .hero-content .hero-description {
       font-size: 1.2rem;
       line-height: 1.7;
     }
@@ -175,12 +208,11 @@ echo <<<HTML
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-
-
-    .tab-content-text {
+    .text-content {
       font-size: 1.125rem;
       line-height: 1.7;
       text-align: justify;
+      white-space: pre-wrap; /* This will respect newlines and wrap text */
     }
 
     .fixed-container {
@@ -234,7 +266,7 @@ echo <<<HTML
         font-size: 2.5rem;
       }
 
-      .hero-content p {
+      .hero-content .hero-description {
         font-size: 1rem;
       }
 
@@ -285,75 +317,6 @@ echo <<<HTML
         font-size: 16px;
       }
     }
-    
-    /* Center container */
-    .button-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 10vh;
-      padding: 1rem;
-      box-sizing: border-box;
-      padding-top: 50px;
-    }
-
-    /* Button styling */
-    .backbutton {
-      font-size: 14px;
-      padding: 0.7em 1.5em;
-      font-weight: 500;
-      background: #0C470C;
-      color: white;
-      border: none;
-      position: relative;
-      overflow: hidden;
-      border-radius: 0.6em;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    /* Gradient overlay */
-    .gradient {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      left: 0;
-      top: 0;
-      border-radius: 0.6em;
-      margin-top: -0.25em;
-      background-image: linear-gradient(rgba(0, 0, 0, 0),
-          rgba(0, 0, 0, 0),
-          rgba(0, 0, 0, 0.3));
-    }
-
-    /* Label */
-    .label {
-      position: relative;
-      top: -1px;
-      z-index: 1;
-    }
-
-    .transition {
-      transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
-      transition-duration: 500ms;
-      background-color: rgba(51, 153, 51, 0.6);
-      border-radius: 9999px;
-      width: 0;
-      height: 0;
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    .backbutton:hover .transition {
-      width: 10em;
-      height: 10em;
-    }
-
-    .backbutton:active {
-      transform: scale(0.97);
-    }
   </style>
 </head>
 
@@ -366,10 +329,8 @@ echo <<<HTML
       </a>
     </div>
     <div class="hero-content text-white text-center">
-      <h1>Family Permit</h1>
-      <p>Family sponsorship allows individuals to bring their family members to live with them in another country,
-        requiring proof of financial stability and support commitment. It helps reunite families and provides
-        opportunities for a better life.</p>
+      <h1><?php echo htmlspecialchars($service['hero_title']); ?></h1>
+      <p class="hero-description"><?php echo nl2br(htmlspecialchars($service['hero_description'])); ?></p>
       <a href="../application-form.php" class="btn hero-btn">Apply Now</a>
     </div>
   </header>
@@ -379,20 +340,16 @@ echo <<<HTML
       <div class="container-fluid fixed-container px-4 px-md-5">
         <ul class="nav nav-tabs mb-5 justify-content-center border-0" id="tabMenu" role="tablist">
           <li class="nav-item" role="presentation">
-            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#about" type="button"
-              role="tab">About</button>
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#about" type="button" role="tab">About</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#criteria" type="button"
-              role="tab">Criteria</button>
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#criteria" type="button" role="tab">Criteria</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#process" type="button"
-              role="tab">Process</button>
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#process" type="button" role="tab">Process</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#documents" type="button"
-              role="tab">Documents</button>
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#documents" type="button" role="tab">Documents</button>
           </li>
           <li class="nav-item" role="presentation">
             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#faq" type="button" role="tab">FAQs</button>
@@ -403,17 +360,10 @@ echo <<<HTML
           <div class="tab-pane fade show active" id="about" role="tabpanel">
             <div class="row align-items-center g-4">
               <div class="col-lg-6 px-md-4">
-                <p class="lh-lg ps-4 text-content tab-content-text">
-                  Family Sponsorship is a Canadian immigration program designed to allow citizens and permanent
-                  residents to bring their close family members—such as spouses, partners, dependent children, parents,
-                  and grandparents—to live with them in Canada permanently. This initiative plays a crucial role in
-                  supporting family unity, offering sponsored individuals the opportunity to settle, thrive, and
-                  contribute to Canadian society. The ultimate goal of the program is to help families reunite, foster
-                  stronger social bonds, and build a stable life together in Canada.
-                </p>
+                <p class="text-content"><?php echo htmlspecialchars($tabs['about']['content'] ?? 'Content not available.'); ?></p>
               </div>
               <div class="col-lg-6 text-center">
-                <img src="../img/fam.png" alt="Family Image" class="img-fluid rounded tab-image" />
+                <img src="../<?php echo htmlspecialchars($tabs['about']['image_path']); ?>" alt="Family Image" class="img-fluid rounded tab-image" />
               </div>
             </div>
           </div>
@@ -421,104 +371,21 @@ echo <<<HTML
           <div class="tab-pane fade" id="criteria" role="tabpanel">
             <div class="row align-items-center g-4">
               <div class="col-lg-4 text-center">
-                <img src="../img/criteria.jpg" alt="Checklist" class="img-fluid rounded tab-image" />
+                <img src="../<?php echo htmlspecialchars($tabs['criteria']['image_path']); ?>" alt="Checklist" class="img-fluid rounded tab-image" />
               </div>
-              <div class="col-lg-8 px-md-4 text-content">
-                <h4 class="fw-bold mb-3">Criteria:</h4>
-                <div class="mb-4">
-                  <h5 class="fw-bold mb-2">Eligibility of the Sponsor:</h5>
-                  <ol class="px-3" style="list-style-type: decimal;">
-                    <li><strong>Canadian Citizenship or Permanent Residency:</strong>
-                      <ul style="list-style-type: circle; padding-left: 1.2rem;">
-                        <li>Must be a Canadian citizen or permanent resident.</li>
-                      </ul>
-                    </li>
-                    <li><strong>Age:</strong>
-                      <ul style="list-style-type: circle; padding-left: 1.2rem;">
-                        <li>At least 18 years old.</li>
-                      </ul>
-                    </li>
-                    <li><strong>Financial Support:</strong>
-                      <ul style="list-style-type: circle; padding-left: 1.2rem;">
-                        <li>Must demonstrate the ability to financially support their relative and provide basic needs
-                          (food, clothing, shelter).</li>
-                      </ul>
-                    </li>
-                    <li><strong>Not Receiving Social Assistance:</strong>
-                      <ul style="list-style-type: circle; padding-left: 1.2rem;">
-                        <li>Must not be receiving social assistance (except for reasons of disability).</li>
-                      </ul>
-                    </li>
-                  </ol>
-                </div>
-                <hr class="my-4" />
-                <div>
-                  <h5 class="fw-bold mb-2">Eligibility of the Sponsored Person:</h5>
-                  <ol class="px-3" style="list-style-type: decimal;">
-                    <li><strong>Spouse, Common-law Partner, or Conjugal Partner:</strong>
-                      <ul style="list-style-type: circle; padding-left: 1.2rem;">
-                        <li>They must be in a genuine relationship with the sponsor and meet the legal definition of
-                          spouse, common-law, or conjugal partner.</li>
-                      </ul>
-                    </li>
-                    <li><strong>Dependent Children:</strong>
-                      <ul style="list-style-type: circle; padding-left: 1.2rem;">
-                        <li>Must be under 22 years old and not married or in a common-law relationship. Children over 22
-                          may be eligible if they are financially dependent due to a physical or mental condition.</li>
-                      </ul>
-                    </li>
-                    <li><strong>Parents or Grandparents:</strong>
-                      <ul style="list-style-type: circle; padding-left: 1.2rem;">
-                        <li>Parents and grandparents can be sponsored, but they must meet specific eligibility criteria,
-                          including health and security requirements.</li>
-                      </ul>
-                    </li>
-                  </ol>
-                </div>
+              <div class="col-lg-8 px-md-4">
+                 <p class="text-content"><?php echo htmlspecialchars($tabs['criteria']['content'] ?? 'Content not available.'); ?></p>
               </div>
             </div>
           </div>
 
           <div class="tab-pane fade" id="process" role="tabpanel">
             <div class="row align-items-center g-4">
-              <div class="col-lg-8 px-md-4 ps-4 text-content">
-                <h4 class="fw-bold mb-3" style="padding-left: 2rem;">Process:</h4>
-                <ol class="lh-base" style="font-size: 18px; padding-left: 3rem;">
-                  <li class="mb-3"><strong>Determine eligibility:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem; margin-top: 0.3rem;">
-                      <li>Both the sponsor and the sponsored person need to meet eligibility requirements. The sponsor
-                        must ensure they can financially support the relative and provide the required documentation.
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="mb-3"><strong>Submit Sponsorship Application:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem; margin-top: 0.3rem;">
-                      <li>The sponsor must submit a complete sponsorship application to Immigration, Refugees and
-                        Citizenship Canada (IRCC), including both sponsorship and applicant forms.</li>
-                    </ul>
-                  </li>
-                  <li class="mb-3"><strong>IRCC Review:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem; margin-top: 0.3rem;">
-                      <li>The IRCC will assess the eligibility of both the sponsor and the sponsored person to ensure
-                        they meet all criteria.</li>
-                    </ul>
-                  </li>
-                  <li class="mb-3"><strong>Approval and Permanent Residency:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem; margin-top: 0.3rem;">
-                      <li>Once approved, the sponsored family member will receive permanent resident status, allowing
-                        them to live, work, and study in Canada.</li>
-                    </ul>
-                  </li>
-                  <li><strong>Arrival in Canada:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem; margin-top: 0.3rem;">
-                      <li>The sponsored person can then arrive in Canada and begin their life as a permanent resident.
-                      </li>
-                    </ul>
-                  </li>
-                </ol>
+              <div class="col-lg-8 px-md-4 ps-4">
+                <p class="text-content"><?php echo htmlspecialchars($tabs['process']['content'] ?? 'Content not available.'); ?></p>
               </div>
               <div class="col-lg-4 text-center">
-                <img src="../img/proc.png" alt="Process" class="img-fluid rounded tab-image" />
+                <img src="../<?php echo htmlspecialchars($tabs['process']['image_path']); ?>" alt="Process" class="img-fluid rounded tab-image" />
               </div>
             </div>
           </div>
@@ -526,94 +393,21 @@ echo <<<HTML
           <div class="tab-pane fade" id="documents" role="tabpanel">
             <div class="row align-items-center g-4">
               <div class="col-lg-4 text-center">
-                <img src="../img/documents.png" alt="Documents" class="img-fluid rounded tab-image" />
+                <img src="../<?php echo htmlspecialchars($tabs['documents']['image_path']); ?>" alt="Documents" class="img-fluid rounded tab-image" />
               </div>
-              <div class="col-lg-8 p-4 text-content">
-                <h4 class="fw-bold mb-3">To apply for Family Sponsorship, the following documents are typically
-                  required:</h4>
-                <ol class="px-3" style="font-size: 18px; line-height: 1.8;">
-                  <li><strong>For the Sponsor:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem;">
-                      <li>Proof of Canadian citizenship or permanent residency (e.g., passport, PR card).</li>
-                      <li><strong>Proof of income:</strong> Demonstrating the ability to financially support the
-                        sponsored person.</li>
-                      <li><strong>Application for sponsorship:</strong> Completed and signed.</li>
-                      <li><strong>Any previous relationships:</strong> Divorce certificates or death certificates if
-                        applicable (for spousal sponsorship).</li>
-                    </ul>
-                  </li>
-                  <li><strong>For the Sponsored Person:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem;">
-                      <li><strong>Proof of relationship:</strong> Evidence of marriage, common-law partnership, or proof
-                        of dependency (e.g., marriage certificate, joint financial records).</li>
-                      <li><strong>Proof of identity:</strong> Passport, national ID card, or birth certificate.</li>
-                      <li><strong>Medical exam results:</strong> To confirm they are medically admissible to Canada.
-                      </li>
-                      <li><strong>Police certificates:</strong> To show that they have no serious criminal history.</li>
-                      <li><strong>Proof of financial dependency:</strong> For children or dependent adults.</li>
-                    </ul>
-                  </li>
-                  <li><strong>For Both:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem;">
-                      <li><strong>Application fee:</strong> Payment for processing the sponsorship application.</li>
-                    </ul>
-                  </li>
-                </ol>
+              <div class="col-lg-8 p-4">
+                <p class="text-content"><?php echo htmlspecialchars($tabs['documents']['content'] ?? 'Content not available.'); ?></p>
               </div>
             </div>
           </div>
 
           <div class="tab-pane fade" id="faq" role="tabpanel">
             <div class="row align-items-center g-4">
-              <div class="col-lg-8 ps-4 text-content" style="font-size: 16px;">
-                <h4 class="fw-bold mb-3">Frequently Asked:</h4>
-                <div class="ps-4">
-                  <div class="faq-item">
-                    <p><strong>Q1:</strong> Can I sponsor someone if I live outside of Canada?</p>
-                    <p><strong>A:</strong> No, you must live in Canada to sponsor a relative. However, there are
-                      exceptions for Canadian citizens who are living abroad and have a clear intent to return to
-                      Canada.</p>
-                  </div>
-                  <hr class="my-3">
-                  <div class="faq-item">
-                    <p><strong>Q2:</strong> How long does the Family Sponsorship process take?</p>
-                    <p><strong>A:</strong> The processing time for family sponsorship applications can vary, but it
-                      generally takes 12 to 24 months. Processing times may vary depending on the specific relationship
-                      and whether the application is complete.</p>
-                  </div>
-                  <hr class="my-3">
-                  <div class="faq-item">
-                    <p><strong>Q3:</strong> Can I sponsor my siblings or other family members?</p>
-                    <p><strong>A:</strong> The Family Sponsorship program is generally limited to spouses, common-law
-                      partners, dependent children, parents, and grandparents. Other family members, such as siblings,
-                      cannot be sponsored under this program, but there may be other immigration pathways for them.</p>
-                  </div>
-                  <hr class="my-3">
-                  <div class="faq-item">
-                    <p><strong>Q4:</strong> What if the sponsored person is already in Canada?</p>
-                    <p><strong>A:</strong> If the sponsored person is already in Canada, they may be eligible for inland
-                      sponsorship. This allows them to stay in Canada while their sponsorship application is being
-                      processed.</p>
-                  </div>
-                  <hr class="my-3">
-                  <div class="faq-item">
-                    <p><strong>Q5:</strong> Can the sponsor be responsible for providing financial support indefinitely?
-                    </p>
-                    <p><strong>A:</strong> The sponsor’s obligation to financially support the sponsored person
-                      typically lasts for 3 years for a spouse, common-law partner, or dependent child, and 10 years or
-                      until the person becomes a Canadian citizen for parents or grandparents.</p>
-                  </div>
-                  <hr class="my-3">
-                  <div class="faq-item">
-                    <p><strong>Q6:</strong> What happens if the sponsor or the sponsored person’s application is
-                      refused?</p>
-                    <p><strong>A:</strong> If the application is refused, the sponsor can appeal the decision or
-                      reapply, depending on the reason for refusal.</p>
-                  </div>
-                </div>
+              <div class="col-lg-8 ps-4">
+                <p class="text-content"><?php echo htmlspecialchars($tabs['faq']['content'] ?? 'Content not available.'); ?></p>
               </div>
               <div class="col-lg-4 text-center">
-                <img src="../img/faq.jpg" alt="FAQs Image" class="img-fluid rounded tab-image" />
+                <img src="../<?php echo htmlspecialchars($tabs['faq']['image_path']); ?>" alt="FAQs Image" class="img-fluid rounded tab-image" />
               </div>
             </div>
           </div>
@@ -629,13 +423,7 @@ echo <<<HTML
       </div>
     </section>
   </main>
-HTML;
-
-// Include the footer file using a server-side PHP include.
-include '../footer.php';
-
-// Output the closing script tags and HTML structure.
-echo <<<HTML
+<?php include '../footer.php'; ?>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     // SCRIPT FOR TAB NAVIGATION
@@ -678,6 +466,4 @@ echo <<<HTML
 </body>
 
 </html>
-HTML;
 
-?>

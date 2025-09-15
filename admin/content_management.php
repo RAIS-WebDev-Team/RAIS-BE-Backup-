@@ -35,6 +35,7 @@ $footerData = [
     <link rel="icon" href="../img/logoulit.png" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+
     <!-- Custom styles for CMS enhancements -->
     <style>
         .table-responsive .table tr.selected {
@@ -62,24 +63,32 @@ $footerData = [
         }
 
         /* --- Dark Mode Styles for About Section --- */
-        body.dark-mode #about .card {
+        body.dark-mode #about .card,
+        body.dark-mode #services .card {
             background-color: #2b3035;
             color: #f8f9fa;
             border-color: #495057;
         }
-        body.dark-mode #about .form-control {
+        body.dark-mode #about .form-control,
+        body.dark-mode #services .form-control {
             background-color: #495057;
             color: #f8f9fa;
             border-color: #6c757d;
         }
-        body.dark-mode #about .form-control::placeholder {
+        body.dark-mode #about .form-control::placeholder,
+        body.dark-mode #services .form-control::placeholder {
             color: #adb5bd;
         }
         body.dark-mode #about h5.card-title,
         body.dark-mode #about .form-label,
         body.dark-mode #about p.text-muted,
         body.dark-mode #about .card-text,
-        body.dark-mode #about h6.text-muted {
+        body.dark-mode #about h6.text-muted,
+        body.dark-mode #services h5.card-title,
+        body.dark-mode #services .form-label,
+        body.dark-mode #services p.text-muted,
+        body.dark-mode #services .card-text,
+        body.dark-mode #services h6.text-muted {
             color: #f8f9fa !important;
         }
         body.dark-mode #about-edit-nav .nav-link {
@@ -91,11 +100,13 @@ $footerData = [
             color: #ffffff;
             border-color: #800000;
         }
-        body.dark-mode #about .btn-outline-primary {
+        body.dark-mode #about .btn-outline-primary,
+        body.dark-mode #services .btn-outline-primary {
             color: #f8f9fa;
             border-color: #0d6efd;
         }
-        body.dark-mode #about .btn-outline-primary:hover {
+        body.dark-mode #about .btn-outline-primary:hover,
+        body.dark-mode #services .btn-outline-primary:hover {
             background-color: #0d6efd;
         }
     </style>
@@ -168,12 +179,116 @@ $footerData = [
                                 <a class="nav-link" href="#" data-target="about-content-blocks">"Learn More" Paragraphs</a>
                                 <a class="nav-link" href="#" data-target="about-cards-section">"Learn More" Tabs (Mission/Vision)</a>
                             </nav>
-                            <div id="about-main-section" class="about-edit-pane active"><div class="card"><div class="card-body"><h5 class="card-title">Main Media, Title, and Description</h5><form id="about-main-form"><input type="hidden" id="clear-media-flag" name="clear_media" value="0"><div class="mb-3"><label for="about-hero-file" class="form-label">Hero Media (Photo or Video)</label><div class="input-group"><input type="file" class="form-control" id="about-hero-file" name="mediaFile" accept="image/*,video/*"><button class="btn btn-outline-danger" type="button" id="clear-hero-media-btn" title="Clear Media"><i class="bi bi-x-lg"></i></button></div><div id="about-hero-preview" class="mt-2 border rounded p-2" style="min-height: 100px;"></div></div><div class="mb-3"><label for="about-hero-title" class="form-label">Main Title</label><input type="text" class="form-control" id="about-hero-title" name="title"></div><div class="mb-3"><label for="about-hero-description" class="form-label">Main Description</label><textarea class="form-control" id="about-hero-description" name="description" rows="4"></textarea></div></form></div></div></div>
+                            <div id="about-main-section" class="about-edit-pane active">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Main Media, Title, and Description</h5>
+                                        <form id="about-main-form">
+                                            <input type="hidden" id="clear-media-flag" name="clear_media" value="0">
+                                            <div class="row">
+                                                <div class="col-md-5">
+                                                    <div class="mb-3">
+                                                        <label for="about-hero-file" class="form-label">Hero Media (Photo or Video)</label>
+                                                        <div class="input-group">
+                                                            <input type="file" class="form-control" id="about-hero-file" name="mediaFile" accept="image/*,video/mp4,video/mov,video/quicktime">
+                                                            <button class="btn btn-outline-danger" type="button" id="clear-hero-media-btn" title="Clear Media"><i class="bi bi-x-lg"></i></button>
+                                                        </div>
+                                                        <div id="about-hero-preview" class="mt-2 border rounded p-2" style="min-height: 350px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                                            <!-- Preview will be inserted here -->
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <div class="mb-3">
+                                                        <label for="about-hero-title" class="form-label">Main Title</label>
+                                                        <input type="text" class="form-control" id="about-hero-title" name="title">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="about-hero-description" class="form-label">Main Description</label>
+                                                        <textarea class="form-control" id="about-hero-description" name="description" rows="15"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
                             <div id="about-content-blocks" class="about-edit-pane" style="display: none;"><div class="card"><div class="card-body"><h5 class="card-title">"Learn More" Paragraphs</h5><p class="card-text text-muted">These paragraphs appear at the top of the expanded "Learn More" section.</p><div id="about-content-blocks-container"></div><hr><button class="btn btn-outline-primary" id="add-text-block-btn"><i class="bi bi-body-text me-2"></i>Add Text Paragraph</button></div></div></div>
                             <div id="about-cards-section" class="about-edit-pane" style="display: none;"><div class="card"><div class="card-body"><h5 class="card-title">"Learn More" Tabs (Mission, Vision, etc.)</h5><p class="card-text text-muted">These items will appear in the tabbed interface at the bottom of the "Learn More" section.</p><div id="about-cards-container"></div><hr><button class="btn btn-outline-primary" id="add-about-card-btn"><i class="bi bi-plus-square me-2"></i>Add New Card</button></div></div></div>
                              <div class="fab-container" style="display: none;">
                                 <button id="cancel-about-changes-btn" class="btn btn-secondary btn-lg rounded-circle" title="Reload and discard changes"><i class="bi bi-arrow-counterclockwise"></i></button>
                                 <button id="save-all-about-changes-btn" class="btn btn-success btn-lg rounded-circle" title="Save All Changes"><i class="bi bi-check-lg"></i></button>
+                            </div>
+                        </div>
+                         <!-- Services Section -->
+                        <div id="services" class="content-section">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3>Edit Service Pages</h3>
+                            </div>
+                            <p class="text-muted small">Manage content for the service pages.</p>
+                            
+                            <div class="mb-4">
+                                <label for="service-selector" class="form-label">Select a service page to edit:</label>
+                                <select class="form-select" id="service-selector">
+                                    <option selected disabled>Choose...</option>
+                                    <option value="caregiver">Caregiver Permit</option>
+                                    <option value="family_permit">Family Permit</option>
+                                    <option value="lmia">LMIA</option>
+                                    <option value="pr">Permanent Residency</option>
+                                    <option value="study_permit">Study Permit</option>
+                                    <option value="visit_permit">Visit Permit</option>
+                                    <option value="work_permit">Work Permit</option>
+                                </select>
+                            </div>
+
+                            <div id="service-editor-container" style="display: none;">
+                                <form id="service-editor-form">
+                                    <input type="hidden" id="service-id-field" name="service_id">
+                                    <input type="hidden" id="existing-hero-image-path" name="existing_hero_image_path">
+                                    
+                                    <!-- Main Hero Section Card -->
+                                    <div class="card mb-4">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Main Hero Section</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label for="service-hero-title" class="form-label">Hero Title</label>
+                                                <input type="text" class="form-control" id="service-hero-title" name="hero_title">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="service-hero-description" class="form-label">Hero Description</label>
+                                                <textarea class="form-control" id="service-hero-description" name="hero_description" rows="6"></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="service-hero-image-file" class="form-label">Hero Background Image</label>
+                                                <input type="file" class="form-control" id="service-hero-image-file" name="hero_image_file" accept="image/*">
+                                                <div id="service-hero-image-preview" class="mt-2 border rounded p-2" style="min-height: 100px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tabs Section Card -->
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Page Content Tabs</h5>
+                                        </div>
+                                        <div class="card-body">
+                                             <div class="accordion" id="service-tabs-accordion">
+                                                <!-- Accordion items will be injected here by JS -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div id="service-placeholder" class="text-center text-muted p-5">
+                                <p>Please select a service page above to begin editing.</p>
+                            </div>
+
+
+                            <div class="fab-container" style="display: none;">
+                                <button id="cancel-service-changes-btn" class="btn btn-secondary btn-lg rounded-circle" title="Reload and discard changes"><i class="bi bi-arrow-counterclockwise"></i></button>
+                                <button id="save-service-changes-btn" class="btn btn-success btn-lg rounded-circle" title="Save Changes"><i class="bi bi-check-lg"></i></button>
                             </div>
                         </div>
                         <!-- Other sections omitted for brevity -->
@@ -185,11 +300,33 @@ $footerData = [
 
     <!-- ALL MODALS AND TEMPLATES -->
     <div class="modal fade" id="uploadMediaModal" tabindex="-1" data-bs-backdrop="static"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="uploadMediaModalLabel">Add New Hero Media</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="upload-form" novalidate><input type="hidden" id="mediaId" name="id" value=""><div class="mb-3"><label for="mediaName" class="form-label">Media Name</label><input type="text" class="form-control" id="mediaName" name="mediaName" required></div><div class="mb-3"><label for="uploaderName" class="form-label">Uploader</label><input type="text" class="form-control" id="uploaderName" name="uploaderName" value="<?php echo htmlspecialchars($_SESSION['firstName'] . ' ' . $_SESSION['lastName']); ?>" required></div><div class="mb-3"><label for="mediaFile" class="form-label">Upload Video</label><input class="form-control" type="file" id="mediaFile" name="mediaFile" accept="video/*" required><div class="form-text" id="mediaFileHelp">Select a new video file to upload.</div></div></form></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-primary" id="save-media-btn">Save Media</button></div></div></div></div>
-    <div class="modal fade" id="landing-confirmation-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="landing-confirmation-title">Confirm Action</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="landing-confirmation-body"></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-primary" id="confirm-landing-action-btn">Confirm</button></div></div></div></div>
+    <div class="modal fade" id="confirmation-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="confirmation-title">Confirm Action</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="confirmation-body"></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-primary" id="confirm-action-btn">Confirm</button></div></div></div></div>
     <div class="modal fade" id="landing-preview-modal" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="landing-preview-title">Media Preview</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="landing-preview-body" class="text-center"></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div></div></div></div>
     
     <template id="about-text-block-template"><div class="p-3 border rounded mb-3 dynamic-about-block" data-type="text"><div class="d-flex justify-content-between align-items-center mb-2"><h6 class="mb-0 text-muted">Text Paragraph</h6><button type="button" class="btn-close remove-about-block-btn"></button></div><textarea class="form-control block-content" rows="5" placeholder="Enter paragraph text here..."></textarea></div></template>
     <template id="about-card-template"><div class="p-3 border rounded mb-3 dynamic-about-card"><div class="d-flex justify-content-between align-items-center mb-2"><h6 class="mb-0 text-muted">Tabbed Card</h6><button type="button" class="btn-close remove-about-card-btn"></button></div><div class="row"><div class="col-md-6 mb-2"><label class="form-label small">Tab Title</label><input type="text" class="form-control card-tab-title" placeholder="e.g., Mission"></div><div class="col-md-6 mb-2"><label class="form-label small">Card Title</label><input type="text" class="form-control card-title" placeholder="e.g., Mission Statement"></div></div><div class="mb-2"><label class="form-label small">Card Content</label><textarea class="form-control card-content" rows="4"></textarea></div></div></template>
+    <template id="service-tab-accordion-template">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading-template">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-template" aria-expanded="false" aria-controls="collapse-template"></button>
+            </h2>
+            <div id="collapse-template" class="accordion-collapse collapse" aria-labelledby="heading-template" data-bs-parent="#service-tabs-accordion">
+                <div class="accordion-body">
+                    <input type="hidden" class="tab-id-field" name="tab_id">
+                    <input type="hidden" class="existing-tab-image-path" name="existing_tab_image_path">
+                    <div class="mb-3">
+                         <label class="form-label">Tab Content</label>
+                         <textarea class="form-control tab-content-field" rows="15"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tab Image</label>
+                        <input type="file" class="form-control tab-image-file-field" accept="image/*">
+                        <div class="mt-2 border rounded p-2 tab-image-preview" style="min-height: 100px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
     <!-- Other Modals & Templates omitted for brevity -->
     
     <!-- SCRIPTS -->
@@ -216,11 +353,11 @@ $footerData = [
         navLinks.forEach(link => { link.addEventListener('click', function(e) { e.preventDefault(); const targetId = this.getAttribute('data-target'); setActiveNav(targetId); }); });
         (function handleDeepLink() { const hash = window.location.hash; const targetId = hash ? hash.substring(1) : null; const initialActiveLink = document.querySelector('.content-nav .nav-link.active'); if (targetId) { setActiveNav(targetId); } else if (initialActiveLink) { setActiveNav(initialActiveLink.getAttribute('data-target')); } })();
         
-        const confirmationModalEl = document.getElementById('landing-confirmation-modal');
+        const confirmationModalEl = document.getElementById('confirmation-modal');
         const confirmationModal = new bootstrap.Modal(confirmationModalEl);
-        const confirmationModalBody = document.getElementById('landing-confirmation-body');
-        const confirmActionBtn = document.getElementById('confirm-landing-action-btn');
-        const confirmationModalTitle = document.getElementById('landing-confirmation-title');
+        const confirmationModalBody = document.getElementById('confirmation-body');
+        const confirmActionBtn = document.getElementById('confirm-action-btn');
+        const confirmationModalTitle = document.getElementById('confirmation-title');
         
         // --- START: SCRIPT FOR LANDING PAGE MANAGEMENT ---
         (function() {
@@ -385,7 +522,15 @@ $footerData = [
                 document.getElementById('landing-preview-title').textContent = `Preview: ${media.media_name}`;
                 const previewBody = document.getElementById('landing-preview-body');
                 const previewPath = '../' + media.file_path;
-                previewBody.innerHTML = `<video src="${previewPath}" class="img-fluid rounded" controls autoplay muted loop></video>`;
+
+                let videoType = 'video/mp4'; // Default
+                let warningHTML = '';
+                if (previewPath.toLowerCase().endsWith('.mov')) {
+                    videoType = 'video/quicktime';
+                    warningHTML = `<p class="text-info small mt-2 mb-0"><i class="bi bi-info-circle-fill"></i> If this video doesn't play, consider using the MP4 format for better browser compatibility.</p>`;
+                }
+                
+                previewBody.innerHTML = `<video src="${previewPath}" type="${videoType}" class="img-fluid rounded" controls autoplay muted loop style="width: 100%; height: auto;"></video>${warningHTML}`;
                 previewModal.show();
             });
             setActiveLandingBtn.addEventListener('click', () => {
@@ -415,6 +560,8 @@ $footerData = [
             const cancelBtn = document.getElementById('cancel-about-changes-btn');
             const clearMediaBtn = document.getElementById('clear-hero-media-btn');
             const clearMediaFlag = document.getElementById('clear-media-flag');
+            const heroFileInput = document.getElementById('about-hero-file');
+            const heroPreviewContainer = document.getElementById('about-hero-preview');
 
             async function loadAboutData() {
                 try {
@@ -436,14 +583,25 @@ $footerData = [
                 if (data.main) {
                     document.getElementById('about-hero-title').value = data.main.title || '';
                     document.getElementById('about-hero-description').value = data.main.description || '';
-                    const previewContainer = document.getElementById('about-hero-preview');
                     if (data.main.media_path && data.main.media_path.length > 0) {
                         const mediaPath = '../' + data.main.media_path;
-                        previewContainer.innerHTML = data.main.media_type === 'video' 
-                            ? `<video src="${mediaPath}" class="img-fluid" controls autoplay muted loop></video>` 
-                            : `<img src="${mediaPath}" class="img-fluid" alt="Hero Preview">`;
+                        let previewHTML = '';
+                        let warningHTML = '';
+                        
+                        if (data.main.media_type === 'video') {
+                            let videoType = 'video/mp4'; // Default to mp4
+                            if (mediaPath.toLowerCase().endsWith('.mov')) {
+                                videoType = 'video/quicktime';
+                                warningHTML = `<p class="text-info small mt-1 mb-0 text-center"><i class="bi bi-info-circle-fill"></i> If this video doesn't display, consider using MP4 format.</p>`;
+                            }
+                            previewHTML = `<video src="${mediaPath}" type="${videoType}" class="img-fluid" controls autoplay muted loop style="max-height: 350px;"></video>`;
+                        } else {
+                            previewHTML = `<img src="${mediaPath}" class="img-fluid" alt="Hero Preview" style="max-height: 350px;">`;
+                        }
+                        
+                        heroPreviewContainer.innerHTML = previewHTML + warningHTML;
                     } else {
-                        previewContainer.innerHTML = `<p class="text-muted m-0">No media uploaded.</p>`;
+                        heroPreviewContainer.innerHTML = `<p class="text-muted m-0">No media uploaded.</p>`;
                     }
                 }
 
@@ -472,6 +630,23 @@ $footerData = [
                 }
             }
 
+            heroFileInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const objectURL = URL.createObjectURL(file);
+                    let previewHTML = '';
+                    if (file.type.startsWith('video/')) {
+                        previewHTML = `<video src="${objectURL}" class="img-fluid" controls autoplay muted loop style="max-height: 350px;"></video>`;
+                    } else if (file.type.startsWith('image/')) {
+                        previewHTML = `<img src="${objectURL}" class="img-fluid" alt="New Preview" style="max-height: 350px;">`;
+                    } else {
+                        previewHTML = `<p class="text-muted m-0">File type not supported for preview.</p>`;
+                    }
+                    heroPreviewContainer.innerHTML = previewHTML;
+                    clearMediaFlag.value = '0';
+                }
+            });
+
             saveBtn.addEventListener('click', async () => {
                 confirmationModalTitle.textContent = "Confirm Save";
                 confirmationModalBody.textContent = 'Are you sure you want to save all changes to the About page?';
@@ -495,7 +670,7 @@ $footerData = [
                         if(result.success) {
                             alert('About page saved successfully!');
                             clearMediaFlag.value = '0';
-                            document.getElementById('about-hero-file').value = '';
+                            heroFileInput.value = ''; // Clear the file input
                             loadAboutData();
                         } else {
                             alert('Error saving: ' + result.message);
@@ -520,8 +695,8 @@ $footerData = [
             });
             
             clearMediaBtn.addEventListener('click', () => {
-                document.getElementById('about-hero-file').value = '';
-                document.getElementById('about-hero-preview').innerHTML = `<p class="text-muted m-0">Media will be removed upon saving.</p>`;
+                heroFileInput.value = '';
+                heroPreviewContainer.innerHTML = `<p class="text-muted m-0">Media will be removed upon saving.</p>`;
                 clearMediaFlag.value = '1';
             });
 
@@ -559,6 +734,151 @@ $footerData = [
             });
 
             loadAboutData();
+        })();
+        
+        // --- START: SCRIPT FOR SERVICES PAGE MANAGEMENT ---
+        (function() {
+            const selector = document.getElementById('service-selector');
+            const editorContainer = document.getElementById('service-editor-container');
+            const placeholder = document.getElementById('service-placeholder');
+            const accordionContainer = document.getElementById('service-tabs-accordion');
+            const saveBtn = document.getElementById('save-service-changes-btn');
+            const cancelBtn = document.getElementById('cancel-service-changes-btn');
+            let currentServiceKey = null;
+
+            async function loadServiceData(serviceKey) {
+                currentServiceKey = serviceKey;
+                 if (!serviceKey) {
+                    editorContainer.style.display = 'none';
+                    placeholder.style.display = 'block';
+                    return;
+                }
+                editorContainer.style.display = 'block';
+                placeholder.style.display = 'none';
+
+                try {
+                    const response = await fetch(`api_services.php?action=fetch&service_key=${serviceKey}`);
+                    const result = await response.json();
+                    if(result.success) {
+                        populateServiceForm(result.data);
+                    } else {
+                        alert(`Error fetching data for ${serviceKey}: ${result.message}`);
+                    }
+                } catch(e) {
+                    console.error('Fetch error:', e);
+                    alert('A network error occurred.');
+                }
+            }
+
+            function populateServiceForm(data) {
+                // Populate main hero section
+                document.getElementById('service-id-field').value = data.id;
+                document.getElementById('service-hero-title').value = data.hero_title || '';
+                document.getElementById('service-hero-description').value = data.hero_description || '';
+                
+                const heroPreview = document.getElementById('service-hero-image-preview');
+                document.getElementById('existing-hero-image-path').value = data.hero_image_path || '';
+                if(data.hero_image_path) {
+                    heroPreview.innerHTML = `<img src="../${data.hero_image_path}" class="img-fluid rounded" alt="Hero Preview">`;
+                } else {
+                    heroPreview.innerHTML = '<p class="text-muted m-0">No hero image set.</p>';
+                }
+
+                // Populate tabs
+                accordionContainer.innerHTML = '';
+                const template = document.getElementById('service-tab-accordion-template');
+                
+                data.tabs.forEach((tab, index) => {
+                    const clone = template.content.cloneNode(true);
+                    const tabTitle = tab.tab_key.charAt(0).toUpperCase() + tab.tab_key.slice(1);
+                    
+                    clone.querySelector('.accordion-header').id = `heading-${tab.id}`;
+                    const button = clone.querySelector('.accordion-button');
+                    button.textContent = tabTitle;
+                    button.dataset.bsTarget = `#collapse-${tab.id}`;
+                    button.setAttribute('aria-controls', `collapse-${tab.id}`);
+                    
+                    const collapse = clone.querySelector('.accordion-collapse');
+                    collapse.id = `collapse-${tab.id}`;
+                    collapse.setAttribute('aria-labelledby', `heading-${tab.id}`);
+                    
+                    if (index === 0) { // Show first tab by default
+                        button.classList.remove('collapsed');
+                        collapse.classList.add('show');
+                    }
+
+                    clone.querySelector('.tab-content-field').value = tab.content || '';
+                    
+                    clone.querySelector('.tab-id-field').value = tab.id;
+                    clone.querySelector('.existing-tab-image-path').value = tab.image_path || '';
+                    
+                    const tabImagePreview = clone.querySelector('.tab-image-preview');
+                    if (tab.image_path) {
+                        tabImagePreview.innerHTML = `<img src="../${tab.image_path}" class="img-fluid rounded" alt="Tab Image Preview">`;
+                    } else {
+                        tabImagePreview.innerHTML = '<p class="text-muted m-0">No image for this tab.</p>';
+                    }
+                    
+                    // Add unique name to file input for backend processing
+                    clone.querySelector('.tab-image-file-field').name = `tab_image_file_${tab.id}`;
+
+                    accordionContainer.appendChild(clone);
+                });
+            }
+
+            selector.addEventListener('change', () => {
+                loadServiceData(selector.value);
+            });
+
+            cancelBtn.addEventListener('click', () => {
+                 if (currentServiceKey) {
+                    confirmationModalTitle.textContent = "Confirm Cancel";
+                    confirmationModalBody.textContent = 'Are you sure you want to discard changes? This will reload the last saved content.';
+                    confirmActionBtn.onclick = () => {
+                        loadServiceData(currentServiceKey);
+                        confirmationModal.hide();
+                    };
+                    confirmationModal.show();
+                }
+            });
+
+            saveBtn.addEventListener('click', () => {
+                confirmationModalTitle.textContent = "Confirm Save";
+                confirmationModalBody.textContent = 'Are you sure you want to save these changes?';
+                confirmActionBtn.onclick = async () => {
+                    const form = document.getElementById('service-editor-form');
+                    const formData = new FormData(form);
+                    formData.append('action', 'update');
+
+                    // Manually collect tab data from the textareas
+                    const tabsData = [];
+                    document.querySelectorAll('#service-tabs-accordion .accordion-item').forEach(item => {
+                        tabsData.push({
+                            id: item.querySelector('.tab-id-field').value,
+                            content: item.querySelector('.tab-content-field').value,
+                            existing_image_path: item.querySelector('.existing-tab-image-path').value
+                        });
+                    });
+                    formData.append('tabs', JSON.stringify(tabsData));
+                    
+                    try {
+                        const response = await fetch('api_services.php', { method: 'POST', body: formData });
+                        const result = await response.json();
+                        if (result.success) {
+                            alert('Service page updated successfully!');
+                            loadServiceData(currentServiceKey);
+                        } else {
+                            alert('Error updating service page: ' + result.message);
+                        }
+                    } catch (e) {
+                         alert('A critical error occurred while saving.');
+                         console.error(e);
+                    }
+                    confirmationModal.hide();
+                };
+                confirmationModal.show();
+            });
+
         })();
 
         function updateFabVisibility() {

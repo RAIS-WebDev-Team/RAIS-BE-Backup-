@@ -1,16 +1,48 @@
 <?php
-// This PHP script generates the entire HTML page for the Labor Market Impact Assessment (LMIA) information.
-// It uses HEREDOC syntax for outputting large blocks of HTML.
+// lmia.php
+require_once '../config.php'; // Adjust path if necessary
 
-// Output the head and main content of the HTML document.
-echo <<<HTML
+$service_key = 'lmia';
+$service = null;
+$tabs = [];
+
+try {
+    // Fetch main service details
+    $stmt_service = $pdo->prepare("SELECT * FROM services WHERE service_key = ?");
+    $stmt_service->execute([$service_key]);
+    $service = $stmt_service->fetch(PDO::FETCH_ASSOC);
+
+    if ($service) {
+        // Fetch tab details for the service
+        $stmt_tabs = $pdo->prepare("SELECT * FROM service_tabs WHERE service_id = ? ORDER BY display_order ASC");
+        $stmt_tabs->execute([$service['id']]);
+        $tabs_data = $stmt_tabs->fetchAll(PDO::FETCH_ASSOC);
+
+        // Organize tabs data into an associative array for easy access by tab_key
+        foreach ($tabs_data as $tab) {
+            $tabs[$tab['tab_key']] = $tab;
+        }
+    } else {
+        // Fallback for when data isn't in the database yet
+        $service = [
+            'page_title' => 'Labor Market Impact Assessment',
+            'hero_image_path' => 'img/Flmia.jpg',
+            'hero_title' => 'Labour Market Impact Assessment (LMIA)',
+            'hero_description' => 'An LMIA is a document in Canada that evaluates the effect of hiring a foreign worker on the local job market. A positive LMIA shows a need for a foreign worker because no local candidates are available.'
+        ];
+    }
+} catch (PDOException $e) {
+    // Handle database connection error gracefully
+    die("Error: Could not connect to the database.");
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Labor Market Impact Assesment</title>
+  <title><?php echo htmlspecialchars($service['page_title']); ?></title>
   <link rel="icon" href="../img/logoulit.png" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
@@ -66,7 +98,7 @@ echo <<<HTML
     header {
       position: relative;
       height: 100vh;
-      background: url('../img/Flmia.jpg')no-repeat center center/cover;
+      background: url('../<?php echo htmlspecialchars($service['hero_image_path']); ?>')no-repeat center center/cover;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -114,7 +146,7 @@ echo <<<HTML
       text-shadow: 2px 2px 5px #000;
     }
 
-    .hero-content p {
+    .hero-content .hero-description {
       font-size: 1.2rem;
       line-height: 1.7;
       margin-bottom: 30px;
@@ -178,7 +210,8 @@ echo <<<HTML
 
     .text-content {
       font-size: 1.125rem;
-      line-height: 1.3;
+      line-height: 1.6;
+      white-space: pre-wrap; /* This will respect newlines and wrap text */
     }
 
     .custom-list {
@@ -236,7 +269,7 @@ echo <<<HTML
         font-size: 30px;
       }
 
-      .hero-content p {
+      .hero-content .hero-description {
         font-size: 16px;
       }
 
@@ -284,76 +317,6 @@ echo <<<HTML
         font-size: 18px;
       }
     }
-
-
-    /* Center container */
-    .button-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 10vh;
-      padding: 1rem;
-      box-sizing: border-box;
-      padding-top: 50px;
-    }
-
-    /* Button styling */
-    .backbutton {
-      font-size: 14px;
-      padding: 0.7em 1.5em;
-      font-weight: 500;
-      background: #0C470C;
-      color: white;
-      border: none;
-      position: relative;
-      overflow: hidden;
-      border-radius: 0.6em;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    /* Gradient overlay */
-    .gradient {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      left: 0;
-      top: 0;
-      border-radius: 0.6em;
-      margin-top: -0.25em;
-      background-image: linear-gradient(rgba(0, 0, 0, 0),
-          rgba(0, 0, 0, 0),
-          rgba(0, 0, 0, 0.3));
-    }
-
-    /* Label */
-    .label {
-      position: relative;
-      top: -1px;
-      z-index: 1;
-    }
-
-    .transition {
-      transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
-      transition-duration: 500ms;
-      background-color: rgba(51, 153, 51, 0.6);
-      border-radius: 9999px;
-      width: 0;
-      height: 0;
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    .backbutton:hover .transition {
-      width: 10em;
-      height: 10em;
-    }
-
-    .backbutton:active {
-      transform: scale(0.97);
-    }
   </style>
 </head>
 
@@ -366,11 +329,8 @@ echo <<<HTML
       </a>
     </div>
     <div class="hero-content text-white text-center">
-      <h1>Labour Market Impact Assessment (LMIA)</h1>
-      <p>
-        An LMIA is a document in Canada that evaluates the effect of hiring a foreign worker on the local job
-        market. A positive LMIA shows a need for a foreign worker because no local candidates are available.
-      </p>
+      <h1><?php echo htmlspecialchars($service['hero_title']); ?></h1>
+      <p class="hero-description"><?php echo nl2br(htmlspecialchars($service['hero_description'])); ?></p>
       <a href="../application-form.php" class="btn hero-btn">Apply Now</a>
     </div>
   </header>
@@ -404,27 +364,10 @@ echo <<<HTML
           <div class="tab-pane fade show active" id="about" role="tabpanel">
             <div class="row align-items-center g-4">
               <div class="col-lg-6 px-md-4">
-                <p class="lh-lg ps-4 text-content" style="text-align: justify;">
-                  A <strong>Labour Market Impact Assessment (LMIA)</strong> is a crucial document that
-                  employers in
-                  Canada
-                  must obtain before hiring a temporary foreign worker (TFW). The LMIA process allows
-                  the
-                  Canadian government to assess whether hiring a foreign worker will have a positive
-                  or
-                  negative impact on the Canadian labor market. A positive LMIA means there is a
-                  demonstrated need for a foreign worker to fill the position and that no qualified
-                  Canadian citizens or permanent residents are available.
-                  <br><br>
-                  Additionally, there are high-wage and low-wage categories for LMIA applications,
-                  depending on the offered salary compared to the provincial or territorial median
-                  wage.
-                  Some work permit types are LMIA-exempt and fall under the International Mobility
-                  Program.
-                </p>
+                 <p class="text-content"><?php echo htmlspecialchars($tabs['about']['content'] ?? 'Content not available.'); ?></p>
               </div>
               <div class="col-lg-6 text-center">
-                <img src="../img/lmia1.png" alt="LMIA Image" class="img-fluid rounded tab-image" />
+                <img src="../<?php echo htmlspecialchars($tabs['about']['image_path']); ?>" alt="LMIA Image" class="img-fluid rounded tab-image" />
               </div>
             </div>
           </div>
@@ -432,107 +375,21 @@ echo <<<HTML
           <div class="tab-pane fade" id="criteria" role="tabpanel">
             <div class="row align-items-center g-4">
               <div class="col-lg-4 text-center">
-                <img src="../img/criteria.jpg" alt="Checklist" class="img-fluid rounded tab-image" />
+                <img src="../<?php echo htmlspecialchars($tabs['criteria']['image_path']); ?>" alt="Checklist" class="img-fluid rounded tab-image" />
               </div>
-              <div class="col-lg-8 px-md-4 text-content">
-                <h4 class="fw-bold mb-3">Criteria:</h4>
-                <div class="mb-4">
-                  <h5 class="fw-bold mb-2">Employer Eligibility:</h5>
-                  <ul class="ps-3" style="list-style-type: circle;">
-                    <li>The employer must be a legitimate Canadian business with the ability to meet
-                      the
-                      requirements of the LMIA process.</li>
-                    <li>The employer must be willing to hire a temporary foreign worker and provide
-                      employment conditions that comply with Canadian labor standards.</li>
-                  </ul>
-                </div>
-                <hr class="my-4" />
-                <div class="mb-4">
-                  <h5 class="fw-bold mb-2">Job Advertisement:</h5>
-                  <ul class="ps-3" style="list-style-type: circle;">
-                    <li>Employers are generally required to advertise the job position for at least
-                      four
-                      weeks using recognized platforms (e.g., job boards, newspapers) to prove
-                      that no
-                      qualified Canadian citizen or permanent resident was available for the job.
-                    </li>
-                  </ul>
-                </div>
-                <hr class="my-4" />
-                <div class="mb-4">
-                  <h5 class="fw-bold mb-2">Salary and Job Type:</h5>
-                  <ul class="ps-3" style="list-style-type: circle;">
-                    <li>Positions are classified as high-wage or low-wage based on the
-                      provincial/territorial median wage.</li>
-                  </ul>
-                </div>
-                <hr class="my-4" />
-                <div class="mb-4">
-                  <h5 class="fw-bold mb-2">Documentation:</h5>
-                  <ul class="ps-3" style="list-style-type: circle;">
-                    <li>Employers must provide comprehensive documentation detailing why Canadian
-                      applicants were not hired and must prove no qualified citizens or permanent
-                      residents applied.</li>
-                  </ul>
-                </div>
-                <div>
-                  <h5 class="fw-bold mb-2">Employer’s Ability to Support:</h5>
-                  <ul class="ps-3" style="list-style-type: circle;">
-                    <li>The employer must demonstrate the ability to support the foreign worker,
-                      including providing a safe work environment and complying with labor laws.
-                    </li>
-                  </ul>
-                </div>
+              <div class="col-lg-8 px-md-4">
+                <p class="text-content"><?php echo htmlspecialchars($tabs['criteria']['content'] ?? 'Content not available.'); ?></p>
               </div>
             </div>
           </div>
 
           <div class="tab-pane fade" id="process" role="tabpanel">
             <div class="row align-items-center g-4">
-              <div class="col-lg-8 px-md-4 ps-4 text-content">
-                <h4 class="fw-bold mb-3" style="padding-left: 2rem;">LMIA Process:</h4>
-                <ol class="lh-base" style="font-size: 18px; padding-left: 3rem;">
-                  <li class="mb-3">
-                    <strong>Determine the job category:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem; margin-top: 0.3rem;">
-                      <li>Identify if it’s a high-wage or low-wage position.</li>
-                    </ul>
-                  </li>
-                  <li class="mb-3">
-                    <strong>Advertise the job:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem; margin-top: 0.3rem;">
-                      <li>Publish the job ad for a minimum of four weeks using multiple platforms.
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="mb-3">
-                    <strong>Gather documentation:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem; margin-top: 0.3rem;">
-                      <li>Prepare business details, financials, and recruitment efforts.</li>
-                    </ul>
-                  </li>
-                  <li class="mb-3">
-                    <strong>Submit LMIA application:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem; margin-top: 0.3rem;">
-                      <li>Send the complete application to ESDC for review.</li>
-                    </ul>
-                  </li>
-                  <li class="mb-3">
-                    <strong>ESDC assessment:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem; margin-top: 0.3rem;">
-                      <li>Government assesses employer's legitimacy and labor market impact.</li>
-                    </ul>
-                  </li>
-                  <li>
-                    <strong>Receive decision:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem; margin-top: 0.3rem;">
-                      <li>Employer gets a positive or negative LMIA decision.</li>
-                    </ul>
-                  </li>
-                </ol>
+              <div class="col-lg-8 px-md-4 ps-4">
+                 <p class="text-content"><?php echo htmlspecialchars($tabs['process']['content'] ?? 'Content not available.'); ?></p>
               </div>
               <div class="col-lg-4 text-center">
-                <img src="../img/proc.png" alt="Process" class="img-fluid rounded tab-image" />
+                <img src="../<?php echo htmlspecialchars($tabs['process']['image_path']); ?>" alt="Process" class="img-fluid rounded tab-image" />
               </div>
             </div>
           </div>
@@ -540,144 +397,25 @@ echo <<<HTML
           <div class="tab-pane fade" id="documents" role="tabpanel">
             <div class="row align-items-center g-4">
               <div class="col-lg-4 text-center">
-                <img src="../img/documents.png" alt="Documents" class="img-fluid rounded tab-image" />
+                <img src="../<?php echo htmlspecialchars($tabs['documents']['image_path']); ?>" alt="Documents" class="img-fluid rounded tab-image" />
               </div>
-              <div class="col-lg-8 p-4 text-content">
-                <h4 class="fw-bold mb-3">To apply for an LMIA, employers typically need to submit the
-                  following documents:</h4>
-                <ol class="px-3" style="font-size: 18px; line-height: 1.8;">
-                  <li>
-                    <strong>Employer’s Information:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem;">
-                      <li>Business license or registration – Proof of the company’s legal status.
-                      </li>
-                      <li>Financial information or evidence that the business can financially
-                        support
-                        a foreign worker.</li>
-                    </ul>
-                  </li>
-                  <li>
-                    <strong>Job Advertisement Records:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem;">
-                      <li>Proof of the job advertisement for at least four weeks, including dates,
-                        platforms used, and a description of the recruitment efforts made.</li>
-                    </ul>
-                  </li>
-                  <li>
-                    <strong>Job Description:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem;">
-                      <li>Detailed job description outlining duties, responsibilities, salary, and
-                        working conditions.</li>
-                    </ul>
-                  </li>
-                  <li>
-                    <strong>Reasons for Not Hiring Canadians:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem;">
-                      <li>Documentation explaining why Canadian candidates were not suitable for
-                        the
-                        position (e.g., skills mismatch, lack of experience).</li>
-                    </ul>
-                  </li>
-                  <li>
-                    <strong>Employee Salary Information:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem;">
-                      <li>Proof of the salary offered to the foreign worker and its comparison to
-                        the
-                        provincial or territorial median wage.</li>
-                    </ul>
-                  </li>
-                  <li>
-                    <strong>Employer’s Statement:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem;">
-                      <li>A letter or statement from the employer explaining the need for a
-                        foreign
-                        worker and the terms of employment.</li>
-                    </ul>
-                  </li>
-                  <li>
-                    <strong>Additional Documents:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem;">
-                      <li>Any other documents requested by Employment and Social Development
-                        Canada
-                        (ESDC) based on the job type or wage category.</li>
-                    </ul>
-                  </li>
-                </ol>
+              <div class="col-lg-8 p-4">
+                <p class="text-content"><?php echo htmlspecialchars($tabs['documents']['content'] ?? 'Content not available.'); ?></p>
               </div>
             </div>
           </div>
 
           <div class="tab-pane fade" id="faq" role="tabpanel">
             <div class="row align-items-center g-4">
-              <div class="col-lg-8 ps-4 text-content">
-                <h4 class="fw-bold mb-3">Frequently Asked:</h4>
-                <div class="ps-4">
-                  <div class="faq-item">
-                    <p><strong>Q1:</strong> What is the difference between high-wage and low-wage
-                      LMIA
-                      applications?</p>
-                    <p><strong>A:</strong> High-wage LMIA applications are for positions that offer
-                      a
-                      salary at or above the provincial/territorial median wage, while low-wage
-                      applications are for positions paying below that threshold.</p>
-                  </div>
-                  <hr class="my-3">
-                  <div class="faq-item">
-                    <p><strong>Q2:</strong> Do I need an LMIA for every type of work permit?</p>
-                    <p><strong>A:</strong> No, not all work permits require an LMIA. Some workers
-                      may be
-                      exempt from needing an LMIA if their position falls under the International
-                      Mobility Program.</p>
-                  </div>
-                  <hr class="my-3">
-                  <div class="faq-item">
-                    <p><strong>Q3:</strong> How long does it take to get a positive LMIA?</p>
-                    <p><strong>A:</strong> The processing time for an LMIA application can take
-                      several
-                      weeks to a few months, depending on the complexity of the application and
-                      the
-                      volume of requests being processed.</p>
-                  </div>
-                  <hr class="my-3">
-                  <div class="faq-item">
-                    <p><strong>Q4:</strong> Can I hire a foreign worker without advertising the job
-                      for
-                      four weeks?</p>
-                    <p><strong>A:</strong> Generally, the advertisement period is required. However,
-                      there
-                      may be exceptions in certain cases. It’s essential to check if your specific
-                      situation qualifies for an exemption or expedited process.</p>
-                  </div>
-                  <hr class="my-3">
-                  <div class="faq-item">
-                    <p><strong>Q5:</strong> What happens if my LMIA is denied?</p>
-                    <p><strong>A:</strong> If your LMIA application is denied, you can either
-                      reapply with
-                      additional documentation or review the reasons for the refusal. You may also
-                      need
-                      to make adjustments to your recruitment process.</p>
-                  </div>
-                  <hr class="my-3">
-                  <div class="faq-item">
-                    <p><strong>Q6:</strong> Is there any way to speed up the LMIA process?</p>
-                    <p><strong>A:</strong> The LMIA process can take time, but ensuring your
-                      application is
-                      complete and well-documented can help avoid delays. Some employers may be
-                      eligible
-                      for expedited processing under certain circumstances, such as for
-                      high-demand jobs
-                      or workers in critical sectors.</p>
-                  </div>
-                </div>
+              <div class="col-lg-8 ps-4">
+                 <p class="text-content"><?php echo htmlspecialchars($tabs['faq']['content'] ?? 'Content not available.'); ?></p>
               </div>
               <div class="col-lg-4 text-center">
-                <img src="../img/faq.jpg" alt="FAQs Image" class="img-fluid rounded tab-image" />
+                <img src="../<?php echo htmlspecialchars($tabs['faq']['image_path']); ?>" alt="FAQs Image" class="img-fluid rounded tab-image" />
               </div>
             </div>
           </div>
         </div>
-
-       
 
         <div class="tab-navigation-buttons d-lg-none d-flex justify-content-center gap-3 mt-3">
           <button id="prevBtn" class="btn rounded-circle shadow-sm nav-btn">
@@ -690,13 +428,7 @@ echo <<<HTML
       </div>
     </section>
   </main>
-HTML;
-
-// Include the footer file using a server-side PHP include.
-include '../footer.php';
-
-// Output the closing script tags and HTML structure.
-echo <<<HTML
+<?php include '../footer.php'; ?>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -745,8 +477,4 @@ echo <<<HTML
     });
   </script>
 </body>
-
 </html>
-HTML;
-
-?>

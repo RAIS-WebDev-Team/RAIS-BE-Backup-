@@ -1,16 +1,49 @@
 <?php
-// This PHP script generates the entire HTML page for the Permanent Residency information.
-// It uses HEREDOC syntax for outputting large blocks of HTML.
+// PR.php
+require_once '../config.php'; // Adjust path if necessary
 
-// Output the head and main content of the HTML document.
-echo <<<HTML
+$service_key = 'pr';
+$service = null;
+$tabs = [];
+
+try {
+    // Fetch main service details
+    $stmt_service = $pdo->prepare("SELECT * FROM services WHERE service_key = ?");
+    $stmt_service->execute([$service_key]);
+    $service = $stmt_service->fetch(PDO::FETCH_ASSOC);
+
+    if ($service) {
+        // Fetch tab details for the service
+        $stmt_tabs = $pdo->prepare("SELECT * FROM service_tabs WHERE service_id = ? ORDER BY display_order ASC");
+        $stmt_tabs->execute([$service['id']]);
+        $tabs_data = $stmt_tabs->fetchAll(PDO::FETCH_ASSOC);
+
+        // Organize tabs data into an associative array for easy access by tab_key
+        foreach ($tabs_data as $tab) {
+            $tabs[$tab['tab_key']] = $tab;
+        }
+    } else {
+        // Fallback for when data isn't in the database yet
+        $service = [
+            'page_title' => 'Permanent Residency',
+            'hero_image_path' => 'img/Fpr.jpg',
+            'hero_title' => 'Permanent Residency',
+            'hero_description' => 'Permanent Residency allows foreign nationals to live, work, and study in Canada indefinitely, with access to most social benefits enjoyed by citizens. It is a step toward becoming a Canadian citizen and provides stability for you and your family.'
+        ];
+    }
+} catch (PDOException $e) {
+    // Handle database connection error gracefully
+    die("Error: Could not connect to the database.");
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PR</title>
+  <title><?php echo htmlspecialchars($service['page_title']); ?></title>
   <link rel="icon" href="../img/logoulit.png" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
@@ -55,7 +88,7 @@ echo <<<HTML
     header {
       position: relative;
       height: 100vh;
-      background: url('../img/Fpr.jpg')no-repeat center center/cover;
+      background: url('../<?php echo htmlspecialchars($service['hero_image_path']); ?>')no-repeat center center/cover;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -103,7 +136,7 @@ echo <<<HTML
       text-shadow: 2px 2px 5px #000;
     }
 
-    .hero-content p {
+    .hero-content .hero-description {
       font-size: 1.2rem;
       line-height: 1.7;
       margin-bottom: 30px;
@@ -168,7 +201,8 @@ echo <<<HTML
 
     .text-content {
       font-size: 1.125rem;
-      line-height: 1.3;
+      line-height: 1.6;
+      white-space: pre-wrap;
     }
 
 
@@ -227,7 +261,7 @@ echo <<<HTML
         font-size: 30px;
       }
 
-      .hero-content p {
+      .hero-content .hero-description {
         font-size: 16px;
       }
 
@@ -283,10 +317,8 @@ echo <<<HTML
       </a>
     </div>
     <div class="hero-content text-white text-center">
-      <h1>Permanent Residency</h1>
-      <p>Permanent Residency allows foreign nationals to live, work, and study in Canada indefinitely,
-        with access to most social benefits enjoyed by citizens. It is a step toward becoming a Canadian citizen
-        and provides stability for you and your family.</p>
+      <h1><?php echo htmlspecialchars($service['hero_title']); ?></h1>
+      <p class="hero-description"><?php echo nl2br(htmlspecialchars($service['hero_description'])); ?></p>
       <a href="../application-form.php" class="btn hero-btn">Apply Now</a>
     </div>
   </header>
@@ -321,45 +353,10 @@ echo <<<HTML
             <div class="tab-pane fade show active" id="about" role="tabpanel">
               <div class="row align-items-center g-4">
                 <div class="col-md-6">
-                  <p class="lh-lg px-md-4" style="text-align: justify; line-height: 1.5;">
-                    Permanent Residency (PR) in Canada grants foreign nationals the right to live,
-                    work,
-                    and
-                    study anywhere in the
-                    country without time limits. PR holders enjoy many of the same benefits as
-                    Canadian
-                    citizens, such as access to
-                    publicly funded healthcare, social services, and legal protections under
-                    Canadian
-                    law.
-                    They can freely move between
-                    provinces, work for almost any employer, and pursue educational opportunities at
-                    domestic tuition rates. PR status
-                    also allows individuals to sponsor eligible family members, making it a key step
-                    in
-                    reuniting loved ones in Canada.
-                  </p>
-                  <p class="lh-lg text-justify px-md-4">
-                    Obtaining PR is also a pathway to citizenship. After meeting residency
-                    requirements
-                    —
-                    typically living in Canada for
-                    at least 1,095 days within a five-year period — PR holders can apply for
-                    Canadian
-                    citizenship and enjoy full voting
-                    rights and passports. However, PR comes with responsibilities, such as
-                    maintaining
-                    residency obligations, paying
-                    taxes, and abiding by Canadian laws. For many, securing PR status represents not
-                    just
-                    legal stability but also the
-                    opportunity to thrive in one of the world’s most diverse, prosperous, and
-                    welcoming
-                    countries.
-                  </p>
+                  <p class="text-content"><?php echo htmlspecialchars($tabs['about']['content'] ?? 'Content not available.'); ?></p>
                 </div>
                 <div class="col-md-6 text-center">
-                  <img src="../img/pr.png" alt="About Permanent Residency" class="img-fluid rounded tab-image" />
+                  <img src="../<?php echo htmlspecialchars($tabs['about']['image_path']); ?>" alt="About Permanent Residency" class="img-fluid rounded tab-image" />
                 </div>
               </div>
             </div>
@@ -367,26 +364,10 @@ echo <<<HTML
             <div class="tab-pane fade" id="criteria" role="tabpanel">
               <div class="row align-items-center g-4">
                 <div class="col-md-3 text-center">
-                  <img src="../img/criteria.jpg" alt="Criteria" class="img-fluid rounded tab-image" />
+                  <img src="../<?php echo htmlspecialchars($tabs['criteria']['image_path']); ?>" alt="Criteria" class="img-fluid rounded tab-image" />
                 </div>
                 <div class="col-md-9 px-5">
-                  <h4 class="fw-bold mb-3" style="line-height: 1.8;">Criteria:</h4>
-                  <ul
-                    style="list-style-type: circle; padding-left: 1.5rem; line-height: 1.8; font-size: 18px;">
-                    <li>Meet eligibility requirements of one of the immigration programs (e.g.,
-                      Express
-                      Entry, Provincial Nominee Program, Family Sponsorship, or Refugee programs).
-                    </li>
-                    <li>Minimum language proficiency in English or French (CLB requirements vary by
-                      program).</li>
-                    <li>Proof of sufficient settlement funds (unless exempt).</li>
-                    <li>Relevant work experience or education credentials (Canadian equivalency may
-                      be
-                      required and assessed through an Educational Credential Assessment).</li>
-                    <li>Must not be inadmissible to Canada for reasons of security, criminal
-                      record, or
-                      health.</li>
-                  </ul>
+                   <p class="text-content"><?php echo htmlspecialchars($tabs['criteria']['content'] ?? 'Content not available.'); ?></p>
                 </div>
               </div>
             </div>
@@ -394,49 +375,10 @@ echo <<<HTML
             <div class="tab-pane fade" id="process" role="tabpanel">
               <div class="row align-items-center g-4">
                 <div class="col-md-9 px-5">
-                  <h4 class="fw-bold mb-3" style="line-height: 1.8;">Process:</h4>
-                  <ul
-                    style="list-style-type: decimal; padding-left: 1.5rem; line-height: 1.8; font-size: 18px;">
-                    <li>
-                      <strong>Choose the right program:</strong> Identify the immigration pathway
-                      that best fits your profile (e.g., Express Entry, PNP).
-                    </li>
-                    <li>
-                      <strong>Gather documents:</strong> Collect all required documents, including
-                      proof of language proficiency, educational assessments, and work experience
-                      letters.
-                    </li>
-                    <li>
-                      <strong>Submit application:</strong> Create a profile and submit your
-                      application to Immigration, Refugees and Citizenship Canada (IRCC) through
-                      the
-                      appropriate online portal.
-                    </li>
-                    <li>
-                      <strong>Receive invitation:</strong> If your profile meets the criteria, you
-                      may receive an Invitation to Apply (ITA) for permanent residence.
-                    </li>
-                    <li>
-                      <strong>Medical and security checks:</strong> Complete required medical
-                      exams
-                      and provide police certificates from every country you've lived in for more
-                      than six months since age 18.
-                    </li>
-                    <li>
-                      <strong>Confirmation of Permanent Residence:</strong> Once your application
-                      is approved, you will receive a Confirmation of Permanent Residence (COPR)
-                      and
-                      a permanent resident visa.
-                    </li>
-                    <li>
-                      <strong>Arrival in Canada:</strong> Upon arrival, your PR status is
-                      officially
-                      granted, and your PR card will be mailed to you.
-                    </li>
-                  </ul>
+                  <p class="text-content"><?php echo htmlspecialchars($tabs['process']['content'] ?? 'Content not available.'); ?></p>
                 </div>
                 <div class="col-md-3 text-center">
-                  <img src="../img/proc.png" alt="Permanent Residency Process"
+                  <img src="../<?php echo htmlspecialchars($tabs['process']['image_path']); ?>" alt="Permanent Residency Process"
                     class="img-fluid rounded tab-image" />
                 </div>
               </div>
@@ -445,23 +387,10 @@ echo <<<HTML
             <div class="tab-pane fade" id="documents" role="tabpanel">
               <div class="row align-items-center g-4">
                 <div class="col-md-4 text-center">
-                  <img src="../img/documents.png" alt="Documents" class="img-fluid rounded tab-image" />
+                  <img src="../<?php echo htmlspecialchars($tabs['documents']['image_path']); ?>" alt="Documents" class="img-fluid rounded tab-image" />
                 </div>
                 <div class="col-md-8 p-4">
-                  <h4 class="fw-bold mb-3">Required Documents:</h4>
-                  <ul
-                    style="list-style-type: circle; padding-left: 1.5rem; line-height: 1.8; font-size: 18px;">
-                    <li>Valid passport or travel document.</li>
-                    <li>Language test results (e.g., IELTS, CELPIP, TEF Canada).</li>
-                    <li>Educational Credential Assessment (ECA) report for foreign education.</li>
-                    <li>Proof of work experience (letters from employers, pay stubs).</li>
-                    <li>Proof of funds (bank statements or other financial documents).</li>
-                    <li>Police certificates from all countries where you have lived for more than
-                      six
-                      months since age 18.</li>
-                    <li>Medical examination results.</li>
-                    <li>Birth certificates and marriage certificates, if applicable.</li>
-                  </ul>
+                  <p class="text-content"><?php echo htmlspecialchars($tabs['documents']['content'] ?? 'Content not available.'); ?></p>
                 </div>
               </div>
             </div>
@@ -469,71 +398,10 @@ echo <<<HTML
             <div class="tab-pane fade" id="faq" role="tabpanel">
               <div class="row align-items-center g-4">
                 <div class="col-md-9 p-4">
-                  <h4 class="fw-bold mb-3">Frequently Asked:</h4>
-                  <div class="faq-container">
-                    <div class="faq-item">
-                      <p><strong>Q1:</strong> What is the difference between a permanent resident
-                        and a
-                        citizen?</p>
-                      <p><strong>A:</strong> A permanent resident is a foreign national who has
-                        been
-                        granted the right to live in Canada. They can live, work, and study
-                        anywhere in
-                        Canada. A citizen has the added benefits of holding a Canadian passport,
-                        the
-                        right to vote, and not being subject to removal from Canada.</p>
-                    </div>
-                    <hr class="my-3">
-                    <div class="faq-item">
-                      <p><strong>Q2:</strong> How do I maintain my permanent resident status?</p>
-                      <p><strong>A:</strong> To maintain your PR status, you must be physically
-                        present
-                        in Canada for at least 730 days within a five-year period. These 730
-                        days
-                        do
-                        not have to be continuous.</p>
-                    </div>
-                    <hr class="my-3">
-                    <div class="faq-item">
-                      <p><strong>Q3:</strong> Can a permanent resident lose their status?</p>
-                      <p><strong>A:</strong> Yes, a permanent resident can lose their status if
-                        they
-                        fail to meet the residency obligation, are found to be inadmissible for
-                        security or criminal reasons, or become a Canadian citizen.</p>
-                    </div>
-                    <hr class="my-3">
-                    <div class="faq-item">
-                      <p><strong>Q4:</strong> Can I travel outside Canada as a permanent
-                        resident?</p>
-                      <p><strong>A:</strong> Yes, you can travel outside of Canada, but you need a
-                        valid Permanent Resident Card to re-enter the country. It is important
-                        to
-                        meet the residency obligations to maintain your status.</p>
-                    </div>
-                    <hr class="my-3">
-                    <div class="faq-item">
-                      <p><strong>Q5:</strong> What is the Express Entry system?</p>
-                      <p><strong>A:</strong> Express Entry is an online system used to manage
-                        applications for permanent residence under three economic immigration
-                        programs: the Federal Skilled Worker Program, the Federal Skilled Trades
-                        Program, and the Canadian Experience Class.</p>
-                    </div>
-                    <hr class="my-3">
-                    <div class="faq-item">
-                      <p><strong>Q6:</strong> How much does it cost to apply for Permanent
-                        Residency?</p>
-                      <p><strong>A:</strong> The cost varies by program, but it typically includes
-                        processing fees for the principal applicant, spouse or partner, and any
-                        dependent children, as well as the right of permanent residence fee.
-                        Additional costs may include language tests, educational assessments,
-                        and
-                        medical exams.</p>
-                    </div>
-                    <hr class="my-3">
-                  </div>
+                   <p class="text-content"><?php echo htmlspecialchars($tabs['faq']['content'] ?? 'Content not available.'); ?></p>
                 </div>
                 <div class="col-md-3 text-center">
-                  <img src="../img/faq.jpg" alt="FAQs" class="img-fluid rounded tab-image" />
+                  <img src="../<?php echo htmlspecialchars($tabs['faq']['image_path']); ?>" alt="FAQs" class="img-fluid rounded tab-image" />
                 </div>
               </div>
             </div>
@@ -550,13 +418,7 @@ echo <<<HTML
       </div>
     </section>
   </main>
-HTML;
-
-// Include the footer file using a server-side PHP include.
-include '../footer.php';
-
-// Output the closing script tags and HTML structure.
-echo <<<HTML
+<?php include '../footer.php'; ?>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -607,6 +469,3 @@ echo <<<HTML
 </body>
 
 </html>
-HTML;
-
-?>

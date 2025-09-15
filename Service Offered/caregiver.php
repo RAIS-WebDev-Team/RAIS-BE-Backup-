@@ -1,16 +1,48 @@
 <?php
-// This PHP script generates the entire HTML page for the Caregiver Permit information.
-// It uses HEREDOC syntax for outputting large blocks of HTML.
+// caregiver.php
+require_once '../config.php'; // Adjust path if necessary
 
-// Output the head and main content of the HTML document.
-echo <<<HTML
+$service_key = 'caregiver';
+$service = null;
+$tabs = [];
+
+try {
+    // Fetch main service details
+    $stmt_service = $pdo->prepare("SELECT * FROM services WHERE service_key = ?");
+    $stmt_service->execute([$service_key]);
+    $service = $stmt_service->fetch(PDO::FETCH_ASSOC);
+
+    if ($service) {
+        // Fetch tab details for the service
+        $stmt_tabs = $pdo->prepare("SELECT * FROM service_tabs WHERE service_id = ? ORDER BY display_order ASC");
+        $stmt_tabs->execute([$service['id']]);
+        $tabs_data = $stmt_tabs->fetchAll(PDO::FETCH_ASSOC);
+
+        // Organize tabs data into an associative array for easy access by tab_key
+        foreach ($tabs_data as $tab) {
+            $tabs[$tab['tab_key']] = $tab;
+        }
+    } else {
+        // Fallback for when data isn't in the database yet
+        $service = [
+            'page_title' => 'Caregiver Permit',
+            'hero_image_path' => 'img/Fcaregiver.jpg',
+            'hero_title' => 'Caregiver Permit',
+            'hero_description' => 'A caregiver provides personal care and support to individuals in need, such as the elderly or those with disabilities. They assist with daily activities while promoting dignity and independence.'
+        ];
+    }
+} catch (PDOException $e) {
+    // Handle database connection error gracefully
+    die("Error: Could not connect to the database.");
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Caregiver Permit</title>
+  <title><?php echo htmlspecialchars($service['page_title']); ?></title>
   <link rel="icon" href="../img/logoulit.png" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
@@ -66,7 +98,7 @@ echo <<<HTML
     header {
       position: relative;
       height: 100vh;
-      background: url('../img/Fcaregiver.jpg') no-repeat center center/cover;
+      background: url('../<?php echo htmlspecialchars($service['hero_image_path']); ?>') no-repeat center center/cover;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -114,7 +146,7 @@ echo <<<HTML
       text-shadow: 2px 2px 5px #000;
     }
 
-    .hero-content p {
+    .hero-content .hero-description {
       font-size: 1.2rem;
       line-height: 1.7;
       margin-bottom: 30px;
@@ -179,7 +211,8 @@ echo <<<HTML
 
     .text-content {
       font-size: 1.125rem;
-      line-height: 1.3;
+      line-height: 1.6;
+      white-space: pre-wrap; /* This will respect newlines and wrap text */
     }
 
     .custom-list {
@@ -237,7 +270,7 @@ echo <<<HTML
         font-size: 30px;
       }
 
-      .hero-content p {
+      .hero-content .hero-description {
         font-size: 16px;
       }
 
@@ -284,75 +317,6 @@ echo <<<HTML
         font-size: 18px;
       }
     }
-
-    /* Center container */
-    .button-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 10vh;
-      padding: 1rem;
-      box-sizing: border-box;
-      padding-top: 50px;
-    }
-
-    /* Button styling */
-    .backbutton {
-      font-size: 14px;
-      padding: 0.7em 1.5em;
-      font-weight: 500;
-      background: #0C470C;
-      color: white;
-      border: none;
-      position: relative;
-      overflow: hidden;
-      border-radius: 0.6em;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    /* Gradient overlay */
-    .gradient {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      left: 0;
-      top: 0;
-      border-radius: 0.6em;
-      margin-top: -0.25em;
-      background-image: linear-gradient(rgba(0, 0, 0, 0),
-          rgba(0, 0, 0, 0),
-          rgba(0, 0, 0, 0.3));
-    }
-
-    /* Label */
-    .label {
-      position: relative;
-      top: -1px;
-      z-index: 1;
-    }
-
-    .transition {
-      transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
-      transition-duration: 500ms;
-      background-color: rgba(51, 153, 51, 0.6);
-      border-radius: 9999px;
-      width: 0;
-      height: 0;
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    .backbutton:hover .transition {
-      width: 10em;
-      height: 10em;
-    }
-
-    .backbutton:active {
-      transform: scale(0.97);
-    }
   </style>
 </head>
 
@@ -365,9 +329,8 @@ echo <<<HTML
       </a>
     </div>
     <div class="hero-content text-white text-center">
-      <h1>Caregiver Permit</h1>
-      <p>A caregiver provides personal care and support to individuals in need, such as the elderly or those with
-        disabilities. They assist with daily activities while promoting dignity and independence.</p>
+      <h1><?php echo htmlspecialchars($service['hero_title']); ?></h1>
+      <p class="hero-description"><?php echo nl2br(htmlspecialchars($service['hero_description'])); ?></p>
       <a href="../application-form.php" class="btn hero-btn">Apply Now</a>
     </div>
   </header>
@@ -378,20 +341,16 @@ echo <<<HTML
       <div class="container-fluid fixed-container px-4 px-md-5">
         <ul class="nav nav-tabs mb-5 justify-content-center border-0" id="tabMenu" role="tablist">
           <li class="nav-item" role="presentation">
-            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#about" type="button"
-              role="tab">About</button>
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#about" type="button" role="tab">About</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#criteria" type="button"
-              role="tab">Criteria</button>
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#criteria" type="button" role="tab">Criteria</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#process" type="button"
-              role="tab">Process</button>
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#process" type="button" role="tab">Process</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#documents" type="button"
-              role="tab">Documents</button>
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#documents" type="button" role="tab">Documents</button>
           </li>
           <li class="nav-item" role="presentation">
             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#faq" type="button" role="tab">FAQs</button>
@@ -402,29 +361,10 @@ echo <<<HTML
           <div class="tab-pane fade show active" id="about" role="tabpanel">
             <div class="row align-items-center g-4">
               <div class="col-lg-6 px-md-4">
-                <p class="lh-lg ps-4 text-content" style="text-align: justify;">
-                  The <strong>Caregiver Pilot Program</strong> is designed for individuals who wish to
-                  migrate to Canada
-                  and work as caregivers. This program provides two pathways for prospective
-                  applicants:
-                  the <strong>Home Child Care Provider Pilot (HCCP)</strong> and the <strong>Home
-                    Support Worker Pilot
-                    (HSWP)</strong>.
-                  <br><br>
-                  These programs were introduced in 2019 following the closure of the Interim Pathway
-                  for Caregivers,
-                  offering more flexibility and options for caregivers interested in immigrating to
-                  Canada.
-                  <br><br>
-                  Caregivers under this program must have a valid job offer from a Canadian employer,
-                  meet the standard
-                  criteria for economic immigration, and work in Canada to gain the required
-                  experience needed to apply
-                  for permanent residence.
-                </p>
+                <p class="text-content"><?php echo htmlspecialchars($tabs['about']['content'] ?? 'Content not available.'); ?></p>
               </div>
               <div class="col-lg-6 text-center">
-                <img src="../img/care.png" alt="Family Image" class="img-fluid rounded tab-image" />
+                <img src="../<?php echo htmlspecialchars($tabs['about']['image_path']); ?>" alt="About Image" class="img-fluid rounded tab-image" />
               </div>
             </div>
           </div>
@@ -432,87 +372,21 @@ echo <<<HTML
           <div class="tab-pane fade" id="criteria" role="tabpanel">
             <div class="row align-items-center g-4">
               <div class="col-lg-4 text-center">
-                <img src="../img/criteria.jpg" alt="Checklist" class="img-fluid rounded tab-image" />
+                <img src="../<?php echo htmlspecialchars($tabs['criteria']['image_path']); ?>" alt="Checklist" class="img-fluid rounded tab-image" />
               </div>
-              <div class="col-lg-8 px-md-4 text-content">
-                <h4 class="fw-bold mb-3">Criteria:</h4>
-                <ol class="lh-lg ps-0 custom-list">
-                  <li>
-                    <strong>Basic Immigration Criteria (for Employees):</strong>
-                    <ul class="ps-4 list-group-flush" style="list-style-type: circle;">
-                      <li><strong>Work Experience:</strong> Must have at least 2 years of experience
-                        in NOC 4411 (Home Child Care Provider) or NOC 4412 (Home Support Worker).
-                      </li>
-                      <li><strong>Job Offer:</strong> Must have a valid, genuine job offer from a
-                        Canadian employer.</li>
-                      <li><strong>Language Skills:</strong> Minimum CLB 5 in English or French.</li>
-                      <li><strong>Education:</strong> At least 1 year of post-secondary education
-                        or equivalent recognized in Canada.</li>
-                    </ul>
-                  </li>
-                  <hr class="my-3">
-                  <li>
-                    <strong>Job Offer Criteria (for Employers):</strong>
-                    <ul class="ps-4 list-group-flush" style="list-style-type: circle;">
-                      <li>Must use the Offer of Employment IMM 5983 form.</li>
-                      <li>Job must be full-time and located outside Quebec.</li>
-                      <li>Must fall under NOC 4411 or 4412 categories.</li>
-                      <li>Employer must prove no Canadian/permanent resident was available for the
-                        job.</li>
-                    </ul>
-                  </li>
-                </ol>
+              <div class="col-lg-8 px-md-4">
+                <p class="text-content"><?php echo htmlspecialchars($tabs['criteria']['content'] ?? 'Content not available.'); ?></p>
               </div>
             </div>
           </div>
 
           <div class="tab-pane fade" id="process" role="tabpanel">
             <div class="row align-items-center g-4">
-              <div class="col-lg-8 px-md-4 ps-4 text-content">
-                <h4 class="fw-bold mb-3" style="padding-left: 2rem;">Process:</h4>
-                <ol class="lh-base" style="font-size: 16px; padding-left: 3rem;">
-                  <li class="mb-3">
-                    <strong>Employer Extends a Job Offer:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem; margin-top: 0.3rem;">
-                      <li>The employer must provide a genuine, full-time job offer to the
-                        caregiver.</li>
-                      <li>The offer must meet criteria for NOC 4411 or 4412 and use form IMM 5983.
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="mb-3">
-                    <strong>Employee Applies for a Work Permit:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem; margin-top: 0.3rem;">
-                      <li>After receiving the job offer, the caregiver applies online for a work
-                        permit.</li>
-                    </ul>
-                  </li>
-                  <li class="mb-3">
-                    <strong>Work Permit Approval:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem; margin-top: 0.3rem;">
-                      <li>Once approved, the caregiver is authorized to work in Canada.</li>
-                    </ul>
-                  </li>
-                  <li class="mb-3">
-                    <strong>Gaining Work Experience:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem; margin-top: 0.3rem;">
-                      <li>The caregiver must work for at least 2 years in their designated role.
-                      </li>
-                    </ul>
-                  </li>
-                  <li>
-                    <strong>Apply for Permanent Residence:</strong>
-                    <ul style="list-style-type: circle; padding-left: 1.2rem; margin-top: 0.3rem;">
-                      <li>Once 2 years of Canadian experience is completed, the caregiver can apply
-                        for PR.</li>
-                      <li>Applications may be submitted through Express Entry or other immigration
-                        pathways.</li>
-                    </ul>
-                  </li>
-                </ol>
+              <div class="col-lg-8 px-md-4 ps-4">
+                 <p class="text-content"><?php echo htmlspecialchars($tabs['process']['content'] ?? 'Content not available.'); ?></p>
               </div>
               <div class="col-lg-4 text-center">
-                <img src="../img/proc.png" alt="Process" class="img-fluid rounded tab-image" />
+                <img src="../<?php echo htmlspecialchars($tabs['process']['image_path']); ?>" alt="Process" class="img-fluid rounded tab-image" />
               </div>
             </div>
           </div>
@@ -520,96 +394,25 @@ echo <<<HTML
           <div class="tab-pane fade" id="documents" role="tabpanel">
             <div class="row align-items-center g-4">
               <div class="col-lg-4 text-center">
-                <img src="../img/documents.png" alt="Documents" class="img-fluid rounded tab-image" />
+                <img src="../<?php echo htmlspecialchars($tabs['documents']['image_path']); ?>" alt="Documents" class="img-fluid rounded tab-image" />
               </div>
-              <div class="col-lg-8 p-4 text-content">
-                <h4 class="fw-bold mb-3">Documents:</h4>
-                <div style="font-size: 16px; line-height: 1.8;">
-                  <p class="fw-bold mb-1">For Employees:</p>
-                  <ul class="lh-lg" style="list-style-type: circle; padding-left: 20px;">
-                    <li><strong>Valid Job Offer:</strong> A full-time, permanent job offer from a Canadian employer.
-                    </li>
-                    <li><strong>Work Experience:</strong> Evidence of at least 2 years of experience as a Home Child
-                      Care
-                      Provider (NOC 4411) or Home Support Worker (NOC 4412).</li>
-                    <li><strong>Language Proficiency:</strong> Proof of language skills (CLB 5) in English or French.
-                    </li>
-                    <li><strong>Education:</strong> Educational credentials or proof of post-secondary education
-                      equivalent to Canadian standards.</li>
-                    <li><strong>Passport:</strong> Valid passport and other travel documents.</li>
-                    <li><strong>Proof of Relationship (if applicable):</strong> For spouses or dependents who may
-                      accompany the applicant.</li>
-                  </ul>
-                  <hr class="my-3">
-                  <p class="fw-bold mb-1">For Employers:</p>
-                  <ul class="lh-lg" style="list-style-type: circle; padding-left: 20px;">
-                    <li><strong>Offer of Employment IMM 5983:</strong> This form must be used to extend the job offer to
-                      the caregiver.</li>
-                    <li><strong>Employer’s Evidence:</strong> Proof that the employer was unable to fill the position
-                      with
-                      a Canadian citizen or permanent resident.</li>
-                    <li><strong>Job Description:</strong> The job description must match the relevant NOC (4411 or
-                      4412).</li>
-                  </ul>
-                </div>
+              <div class="col-lg-8 p-4">
+                <p class="text-content"><?php echo htmlspecialchars($tabs['documents']['content'] ?? 'Content not available.'); ?></p>
               </div>
             </div>
           </div>
 
           <div class="tab-pane fade" id="faq" role="tabpanel">
             <div class="row align-items-center g-4">
-              <div class="col-lg-8 ps-4 pt-4 text-content">
-                <h4 class="fw-bold mb-3">Frequently Asked:</h4>
-                <div class="faq ps-4" style="font-size: 16px">
-                  <div class="faq-item">
-                    <p><strong>Q1:</strong> What is the difference between the Home Child Care Provider Pilot (HCCP) and
-                      the Home Support Worker Pilot (HSWP)?</p>
-                    <p><strong>A:</strong> HCCP is for individuals who provide child care in a private home, while HSWP
-                      is for individuals providing support services to individuals with disabilities, elderly people, or
-                      others requiring assistance.</p>
-                  </div>
-                  <hr class="my-3">
-                  <div class="faq-item">
-                    <p><strong>Q2:</strong> Can I apply if I don’t have a job offer yet?</p>
-                    <p><strong>A:</strong> No, you must have a valid job offer from a Canadian employer before applying
-                      for the work permit under this program.</p>
-                  </div>
-                  <hr class="my-3">
-                  <div class="faq-item">
-                    <p><strong>Q3:</strong> How can my employer prove they were unable to hire a Canadian citizen or
-                      permanent resident?</p>
-                    <p><strong>A:</strong> The employer must provide evidence of recruitment efforts to hire a Canadian
-                      citizen or permanent resident, showing that they were unable to find a suitable candidate for the
-                      position.</p>
-                  </div>
-                  <hr class="my-3">
-                  <div class="faq-item">
-                    <p><strong>Q4:</strong> Is there a minimum duration for my job offer?</p>
-                    <p><strong>A:</strong> Yes, the job offer must be full-time and permanent, not temporary.</p>
-                  </div>
-                  <hr class="my-3">
-                  <div class="faq-item">
-                    <p><strong>Q5:</strong> How long do I need to work in Canada before applying for Permanent
-                      Residency?</p>
-                    <p><strong>A:</strong> You must work for at least 2 years in your designated role in Canada to
-                      qualify for permanent residency.</p>
-                  </div>
-                  <hr class="my-3">
-                  <div class="faq-item">
-                    <p><strong>Q6:</strong> Can my family come with me?</p>
-                    <p><strong>A:</strong> Yes, under the Caregiver Pilot Program, your spouse and dependent children
-                      may be eligible to join you in Canada during your stay.</p>
-                  </div>
-                </div>
+              <div class="col-lg-8 ps-4 pt-4">
+                 <p class="text-content"><?php echo htmlspecialchars($tabs['faq']['content'] ?? 'Content not available.'); ?></p>
               </div>
               <div class="col-lg-4 text-center">
-                <img src="../img/faq.jpg" alt="FAQs Image" class="img-fluid rounded tab-image" />
+                <img src="../<?php echo htmlspecialchars($tabs['faq']['image_path']); ?>" alt="FAQs Image" class="img-fluid rounded tab-image" />
               </div>
             </div>
           </div>
         </div>
-
-    
 
         <div class="tab-navigation-buttons d-lg-none d-flex justify-content-center gap-3 mt-3">
           <button id="prevBtn" class="btn rounded-circle shadow-sm nav-btn">
@@ -622,14 +425,7 @@ echo <<<HTML
       </div>
     </section>
   </main>
-HTML;
-
-// Include the footer file using a server-side PHP include.
-include '../footer.php';
-
-// Output the closing script tags and HTML structure.
-echo <<<HTML
-
+<?php include '../footer.php'; ?>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -678,8 +474,5 @@ echo <<<HTML
     });
   </script>
 </body>
-
 </html>
-HTML;
 
-?>
