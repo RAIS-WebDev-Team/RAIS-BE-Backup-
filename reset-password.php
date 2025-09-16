@@ -15,19 +15,17 @@ if ($token === null) {
 // --- Hash the token from the URL to match the one in the database ---
 $token_hash = hash("sha256", $token);
 
-// --- Include database connection ---
-require_once 'db_connect.php';
+// --- Include the consistent database connection from config.php ---
+require_once 'config.php';
 
-// --- Find the user record associated with this token hash ---
+// --- Find the user record associated with this token hash using PDO ---
 $sql = "SELECT * FROM users WHERE reset_token_hash = ?";
-$stmt = $mysqli->prepare($sql);
-$stmt->bind_param("s", $token_hash);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
+$stmt = $pdo->prepare($sql);
+$stmt->execute([$token_hash]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // --- If no user is found, the token is invalid ---
-if ($user === null) {
+if ($user === false) {
     die("Token not found or invalid. It may have already been used.");
 }
 

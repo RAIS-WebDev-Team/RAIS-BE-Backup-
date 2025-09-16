@@ -1,6 +1,35 @@
 <?php
+require_once '../config.php'; // Provides $pdo
+
+$page_key = 'minifair';
+$page = null;
+$sections = [];
+
+try {
+    // Fetch main page data
+    $stmt = $pdo->prepare("SELECT * FROM blog_pages WHERE page_key = ?");
+    $stmt->execute([$page_key]);
+    $page = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($page) {
+        // Fetch sections for this page
+        $stmt = $pdo->prepare("SELECT * FROM blog_page_sections WHERE page_id = ? ORDER BY sort_order ASC");
+        $stmt->execute([$page['id']]);
+        $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+} catch (Exception $e) {
+    // Handle database errors gracefully
+    $page = null; 
+}
+
 // Page title
-$page_title = "RCIS Blog | IELTS Mini Fair";
+$page_title = $page ? htmlspecialchars($page['title']) : "RCIS Blog | IELTS Mini Fair";
+
+function get_image_path($db_path) {
+    // The path in DB is 'blog/img/image.png'.
+    // From a file in the /blog folder, we need the relative path to be 'img/image.png'
+    return $db_path ? htmlspecialchars(str_replace('blog/', '', $db_path)) : '';
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -8,7 +37,7 @@ $page_title = "RCIS Blog | IELTS Mini Fair";
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><?php echo htmlspecialchars($page_title); ?></title>
+  <title><?php echo $page_title; ?></title>
   <link rel="icon" href="../img/logoulit.png" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
@@ -258,7 +287,6 @@ $page_title = "RCIS Blog | IELTS Mini Fair";
 </head>
 
 <body>
-
   <a href="../blogs.php" class="btn-back">
     <i class="fas fa-arrow-left"></i>
   </a>
@@ -278,54 +306,45 @@ $page_title = "RCIS Blog | IELTS Mini Fair";
   </header>
 
   <main>
+    <?php if ($page): ?>
     <article class="blog-post">
       <div class="blog-header">
-        <h1 class="blog-title">RCIS at the IELTS Mini Fair</h1>
-        <p class="author">Written By: Imnil Benmarc A. Jolo</p>
+        <h1 class="blog-title"><?php echo htmlspecialchars($page['title']); ?></h1>
+        <p class="author"><?php echo htmlspecialchars($page['author']); ?></p>
       </div>
-
-      <img class="main-image" src="img/minifair2.png" alt="A promotional banner for the IELTS Mini Fair">
+      
+      <?php if (!empty($page['main_image_path'])): ?>
+      <img class="main-image" src="<?php echo get_image_path($page['main_image_path']); ?>" alt="Main blog image">
+      <?php endif; ?>
 
       <section id="about">
-        <p>On the 29th of March 2025, Roman Canadian Immigration Services (RCIS) proudly became one of the
-          participating partners for the IELTS Mini Fair, organized by the British Council. This mini fair
-          provided valuable insights for those looking to enhance their English language skills, particularly
-          in speaking and writing, through the IELTS exam. The event offered participants an exciting
-          opportunity to delve into the nuances of the IELTS test, from tips for achieving higher scores and
-          understanding test formats to boosting confidence in their English language abilities.</p>
-        <p>What made RCIS's participation even more significant was that the company was present at two
-          locations: Calamba and Tacloban. The company’s involvement in both fairs highlighted its commitment
-          to supporting individuals who aim to pursue international education, work, or migration
-          opportunities. At both venues, RCIS engaged with attendees, offering expert advice on how to prepare
-          for the IELTS exam, as well as guidance on immigration pathways, ensuring that participants left
-          with a comprehensive understanding of both language proficiency and the broader steps required for a
-          successful international journey.</p>
+        <p><?php echo nl2br($page['main_content']); ?></p>
       </section>
 
+      <?php if (!empty($sections)): ?>
       <section id="events">
         <h2>Event Highlights</h2>
+        <?php foreach ($sections as $section): ?>
         <div class="event-card">
-          <h3>MAUPAY NGA ADLAW, LEYTE</h3>
-          <img src="img/leyte.png" alt="RCIS team at the English Language Academy in Tacloban">
-          <p>In Tacloban City, Leyte, the largest city in the Eastern Visayas region, the RCIS team visited
-            the English Language Academy. This visit was an opportunity to connect with aspiring students
-            and offer them guidance on both language proficiency and the pathways available for studying or
-            working abroad. The team provided valuable insights into how enhancing English skills through
-            the IELTS exam can open doors to global opportunities, especially in Canada.</p>
+          <?php if (!empty($section['title'])): ?>
+          <h3><?php echo htmlspecialchars($section['title']); ?></h3>
+          <?php endif; ?>
+          <?php if (!empty($section['image_path'])): ?>
+          <img src="<?php echo get_image_path($section['image_path']); ?>" alt="Section image">
+          <?php endif; ?>
+          <p><?php echo nl2br($section['content']); ?></p>
         </div>
-
-        <div class="event-card">
-          <h3>LAGUNA ALL THE WAY</h3>
-          <img src="img/laguna.png" alt="RCIS team at the Niner Review Center in Calamba">
-          <p>In Calamba, Laguna, the regional center of the CALABARZON region, the team visited the branch of
-            the Niner Review and Testing Center. There, they had the chance to engage with students
-            preparing for their exams, discussing strategies for success in the IELTS test and how achieving
-            higher scores can help them unlock greater opportunities in education and immigration. This
-            visit also highlighted the importance of continuous learning for students aiming to pursue their
-            dreams in Canada.</p>
-        </div>
+        <?php endforeach; ?>
       </section>
+      <?php endif; ?>
+
     </article>
+    <?php else: ?>
+    <div class="alert alert-danger text-center">
+        <h4 class="alert-heading">Content Not Found</h4>
+        <p>The content for this blog post could not be loaded. Please try again later or contact support.</p>
+    </div>
+    <?php endif; ?>
   </main>
    <div id="footer-placeholder">
        <?php include '../footer.php'; ?>
@@ -343,3 +362,4 @@ $page_title = "RCIS Blog | IELTS Mini Fair";
 </body>
 
 </html>
+

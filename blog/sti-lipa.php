@@ -1,6 +1,36 @@
 <?php
+require_once '../config.php'; // Provides $pdo
+
+$page_key = 'sti-lipa';
+$page = null;
+$sections = [];
+
+try {
+    // Fetch main page data
+    $stmt = $pdo->prepare("SELECT * FROM blog_pages WHERE page_key = ?");
+    $stmt->execute([$page_key]);
+    $page = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($page) {
+        // Fetch sections for this page (if any)
+        $stmt = $pdo->prepare("SELECT * FROM blog_page_sections WHERE page_id = ? ORDER BY sort_order ASC");
+        $stmt->execute([$page['id']]);
+        $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+} catch (Exception $e) {
+    // Handle database errors gracefully
+    $page = null; 
+}
+
 // Page title
-$page_title = "RAIS Blog | STI College Lipa Visit";
+$page_title = $page ? htmlspecialchars($page['title']) : "RAIS Blog | STI College Lipa Visit";
+
+// Function to correct image paths
+function get_image_path($db_path) {
+    // The path in DB is 'blog/img/image.png'.
+    // From a file in the /blog folder, we need the relative path to be 'img/image.png'
+    return $db_path ? htmlspecialchars(str_replace('blog/', '', $db_path)) : '';
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -8,7 +38,7 @@ $page_title = "RAIS Blog | STI College Lipa Visit";
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?php echo htmlspecialchars($page_title); ?></title>
+    <title><?php echo $page_title; ?></title>
     <link rel="icon" href="../img/logoulit.png" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
@@ -247,38 +277,28 @@ $page_title = "RAIS Blog | STI College Lipa Visit";
     </header>
 
     <main>
+        <?php if ($page): ?>
         <article class="blog-post">
             <div class="blog-header">
-                <h1 class="blog-title">Bridging Education and Industry</h1>
-                <p class="author">Published on February 28, 2025</p>
+                <h1 class="blog-title"><?php echo htmlspecialchars($page['title']); ?></h1>
+                <p class="author"><?php echo htmlspecialchars($page['author']); ?></p>
             </div>
 
-            <img class="main-image" src="img/Sti.png"
-                alt="Ms. Aboilo from STI College Lipa visits interns at Roman & Associates Immigration Services">
+            <?php if (!empty($page['main_image_path'])): ?>
+            <img class="main-image" src="<?php echo get_image_path($page['main_image_path']); ?>" alt="Main blog image">
+            <?php endif; ?>
 
             <section id="about">
                 <h2>STI College Lipa and Roman & Associates: A Partnership for Student Success</h2>
-                <p>
-                    On the 28th of February 2025, Roman & Associates Immigration Services was pleased to welcome <span
-                        class="highlight-text">Ms. Annie Rose Aboilo</span>, the internship adviser from STI College Lipa. Her visit
-                    was an important opportunity for her to check in on her students currently interning at the company.
-                </p>
-                <p>
-                    Ms. Aboilo took the time to engage with the interns, asking them about their experiences and how they’ve been
-                    applying their academic knowledge in a real-world setting. This hands-on approach ensured that the students
-                    were gaining valuable insights and contributing meaningfully to the company’s operations.
-                </p>
-                <p>
-                    During her time at the office, Ms. Aboilo also met with key personnel to discuss the objectives and
-                    expectations of the internship program. The meeting provided an opportunity to explore how students from STI
-                    College Lipa could benefit from exposure to the field of immigration consultancy and deepen their
-                    understanding of the industry. The visit not only reaffirmed the shared commitment between Roman & Associates
-                    and STI College Lipa to provide students with practical, hands-on training experiences but also laid the
-                    groundwork for potential future collaborations between the two institutions, further enriching the learning
-                    experience for students.
-                </p>
+                <p><?php echo nl2br($page['main_content']); ?></p>
             </section>
         </article>
+        <?php else: ?>
+        <div class="alert alert-danger text-center">
+            <h4 class="alert-heading">Content Not Found</h4>
+            <p>The content for this blog post could not be loaded. Please try again later or contact support.</p>
+        </div>
+        <?php endif; ?>
     </main>
     
     <div id="footer-placeholder">
@@ -298,3 +318,4 @@ $page_title = "RAIS Blog | STI College Lipa Visit";
 </body>
 
 </html>
+

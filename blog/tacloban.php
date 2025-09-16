@@ -1,6 +1,35 @@
 <?php
+require_once '../config.php'; // Provides $pdo
+
+$page_key = 'tacloban';
+$page = null;
+$sections = [];
+
+try {
+    // Fetch main page data
+    $stmt = $pdo->prepare("SELECT * FROM blog_pages WHERE page_key = ?");
+    $stmt->execute([$page_key]);
+    $page = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($page) {
+        // Fetch sections for this page (if any)
+        $stmt = $pdo->prepare("SELECT * FROM blog_page_sections WHERE page_id = ? ORDER BY sort_order ASC");
+        $stmt->execute([$page['id']]);
+        $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+} catch (Exception $e) {
+    // Handle database errors gracefully
+    $page = null; 
+}
+
 // Page title
-$page_title = "RAIS Blog | Visit to Tacloban";
+$page_title = $page ? htmlspecialchars($page['title']) : "RAIS Blog | Visit to Tacloban";
+
+function get_image_path($db_path) {
+    // The path in DB is 'blog/img/image.png'.
+    // From a file in the /blog folder, we need the relative path to be 'img/image.png'
+    return $db_path ? htmlspecialchars(str_replace('blog/', '', $db_path)) : '';
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -8,7 +37,7 @@ $page_title = "RAIS Blog | Visit to Tacloban";
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><?php echo htmlspecialchars($page_title); ?></title>
+  <title><?php echo $page_title; ?></title>
   <link rel="icon" href="../img/logoulit.png" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
@@ -247,29 +276,28 @@ $page_title = "RAIS Blog | Visit to Tacloban";
   </header>
 
   <main>
+    <?php if ($page): ?>
     <article class="blog-post">
       <div class="blog-header">
-        <h1 class="blog-title">MAUPAY NGA ADLAW, LEYTE</h1>
-        <p class="author">Written By: Imnil Benmarc A. Jolo</p>
+        <h1 class="blog-title"><?php echo htmlspecialchars($page['title']); ?></h1>
+        <p class="author"><?php echo htmlspecialchars($page['author']); ?></p>
       </div>
 
-      <img class="main-image" src="img/leyte.png" alt="RCIS team at the English Language Academy in Tacloban City">
+      <?php if (!empty($page['main_image_path'])): ?>
+      <img class="main-image" src="<?php echo get_image_path($page['main_image_path']); ?>" alt="Main blog image">
+      <?php endif; ?>
 
       <section id="about">
         <h2>A Visit to the English Language Academy</h2>
-        <p>
-          In Tacloban City, Leyte, the largest city in the Eastern Visayas region, the RCIS team visited the
-          <span class="highlight-text">English Language Academy</span>. This visit was an opportunity to
-          connect with aspiring students and offer them guidance on both language proficiency and the pathways
-          available for studying or working abroad.
-        </p>
-        <p>
-          The team provided valuable insights into how enhancing English skills through the IELTS exam can
-          open doors to global opportunities, especially in Canada, where language proficiency plays a key
-          role in immigration processes.
-        </p>
+        <p><?php echo nl2br($page['main_content']); ?></p>
       </section>
     </article>
+    <?php else: ?>
+    <div class="alert alert-danger text-center">
+        <h4 class="alert-heading">Content Not Found</h4>
+        <p>The content for this blog post could not be loaded. Please try again later or contact support.</p>
+    </div>
+    <?php endif; ?>
   </main>
   
   <div id="footer-placeholder">
@@ -289,3 +317,4 @@ $page_title = "RAIS Blog | Visit to Tacloban";
 </body>
 
 </html>
+

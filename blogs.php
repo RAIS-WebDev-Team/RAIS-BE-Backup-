@@ -11,11 +11,7 @@ $events = [
         "image" => "blog/img/minifair2.png",
         "alt" => "IELTS Mini Fair",
         "url" => "blog/mini-fair.php",
-        "mapInfo" => [
-            "title" => "IELTS Prep at 9.0 Niner Calamba",
-            "summary" => "Reviewing English with proven techniques.",
-            "coordinates" => [14.2133, 121.1658]
-        ]
+         "mapInfo" => null 
     ],
     [
         "id" => "event2",
@@ -24,11 +20,7 @@ $events = [
         "image" => "blog/img/lasalle.png",
         "alt" => "Visitation from academic partners",
         "url" => "blog/visitation.php",
-        "mapInfo" => [
-            "title" => "Student Life at La Salle Lipa",
-            "summary" => "Experience education and values at La Salle.",
-            "coordinates" => [13.9412, 121.1621]
-        ]
+         "mapInfo" => null 
     ],
     [
         "id" => "event3",
@@ -46,7 +38,11 @@ $events = [
         "image" => "blog/img/calamba.png",
         "alt" => "Laguna event",
         "url" => "blog/calamba.php",
-        "mapInfo" => null // You can add map info if needed
+        "mapInfo" => [
+            "title" => "IELTS Prep at 9.0 Niner Calamba",
+            "summary" => "Reviewing English with proven techniques.",
+            "coordinates" => [14.2133, 121.1658]
+        ]
     ],
     [
         "id" => "event5",
@@ -81,7 +77,11 @@ $events = [
         "image" => "blog/img/dlsl.jpg",
         "alt" => "DLSL Lipa event",
         "url" => "blog/la-salle.php",
-        "mapInfo" => null // Already covered by event2's map point
+       "mapInfo" => [
+            "title" => "Student Life at La Salle Lipa",
+            "summary" => "Experience education and values at La Salle.",
+            "coordinates" => [13.9412, 121.1621]
+        ]
     ]
 ];
 

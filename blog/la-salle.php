@@ -1,6 +1,36 @@
 <?php
+require_once '../config.php'; // Provides $pdo
+
+$page_key = 'la-salle';
+$page = null;
+$sections = [];
+
+try {
+    // Fetch main page data
+    $stmt = $pdo->prepare("SELECT * FROM blog_pages WHERE page_key = ?");
+    $stmt->execute([$page_key]);
+    $page = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($page) {
+        // Fetch sections for this page (if any)
+        $stmt = $pdo->prepare("SELECT * FROM blog_page_sections WHERE page_id = ? ORDER BY sort_order ASC");
+        $stmt->execute([$page['id']]);
+        $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+} catch (Exception $e) {
+    // Handle database errors gracefully
+    $page = null; 
+}
+
 // Page title
-$page_title = "De La Salle Lipa Advisers Visit Roman & Associates";
+$page_title = $page ? htmlspecialchars($page['title']) : "De La Salle Lipa Advisers Visit Roman & Associates";
+
+// Function to correct image paths
+function get_image_path($db_path) {
+    // The path in DB is 'blog/img/image.png'.
+    // From a file in the /blog folder, we need the relative path to be 'img/image.png'
+    return $db_path ? htmlspecialchars(str_replace('blog/', '', $db_path)) : '';
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -10,7 +40,7 @@ $page_title = "De La Salle Lipa Advisers Visit Roman & Associates";
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description"
         content="A visit from De La Salle Lipa's Financial Management program advisers to Roman & Associates Immigration Services to strengthen their partnership and check on student interns.">
-    <title><?php echo htmlspecialchars($page_title); ?></title>
+    <title><?php echo $page_title; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -249,35 +279,28 @@ $page_title = "De La Salle Lipa Advisers Visit Roman & Associates";
     </header>
 
     <main>
+        <?php if ($page): ?>
         <article class="blog-post">
             <div class="blog-header">
-                <h1 class="blog-title">Fostering Future Leaders</h1>
-                <p class="author">Published on March 27, 2025</p>
+                <h1 class="blog-title"><?php echo htmlspecialchars($page['title']); ?></h1>
+                <p class="author"><?php echo htmlspecialchars($page['author']); ?></p>
             </div>
-
-            <img class="main-image" src="img/lasalle.png"
-                alt="Advisers from De La Salle Lipa with the team at Roman & Associates Immigration Services">
+            
+            <?php if (!empty($page['main_image_path'])): ?>
+            <img class="main-image" src="<?php echo get_image_path($page['main_image_path']); ?>" alt="Main blog image">
+            <?php endif; ?>
 
             <section id="about">
                 <h2>De La Salle Lipa and Roman & Associates: A Partnership in Excellence</h2>
-                <p>
-                    On March 27, 2025, Roman & Associates Immigration Services (RAIS) was honored to host two distinguished
-                    advisers from De La Salle Lipa’s Financial Management program: <span class="highlight-text">Ms. Maria Delia
-                        Miraña Poot, PhD</span>, and <span class="highlight-text">Ms. Dorie G. Gatus, MBA</span>. This visit marks a
-                    significant milestone in strengthening the partnership between our two institutions.
-                </p>
-                <p>
-                    During their visit, Dr. Miraña Poot and Ms. Gatus checked in on their students currently undertaking
-                    internships at RAIS. Their focus was to ensure that the interns are immersed in a practical learning
-                    environment where they can gain invaluable hands-on experience and develop essential industry skills.
-                </p>
-                <p>
-                    This commitment to student growth showcases the profound connection between academia and industry leadership.
-                    The visit has further solidified our collaboration, reinforcing a shared dedication to nurturing the next
-                    generation of financial professionals.
-                </p>
+                <p><?php echo nl2br($page['main_content']); ?></p>
             </section>
         </article>
+        <?php else: ?>
+        <div class="alert alert-danger text-center">
+            <h4 class="alert-heading">Content Not Found</h4>
+            <p>The content for this blog post could not be loaded. Please try again later or contact support.</p>
+        </div>
+        <?php endif; ?>
     </main>
 
     <div id="footer-placeholder">
@@ -297,3 +320,4 @@ $page_title = "De La Salle Lipa Advisers Visit Roman & Associates";
 </body>
 
 </html>
+

@@ -31,18 +31,16 @@ $password_hash = password_hash($_POST["password"], PASSWORD_DEFAULT);
 $token = $_POST["token"];
 $token_hash = hash("sha256", $token);
 
-// --- Include database connection ---
-require_once 'db_connect.php';
+// --- Include the consistent database connection from config.php ---
+require_once 'config.php';
 
-// --- Find the user by the token hash again for final verification ---
+// --- Find the user by the token hash again for final verification using PDO ---
 $sql = "SELECT * FROM users WHERE reset_token_hash = ?";
-$stmt = $mysqli->prepare($sql);
-$stmt->bind_param("s", $token_hash);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
+$stmt = $pdo->prepare($sql);
+$stmt->execute([$token_hash]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if ($user === null) {
+if ($user === false) {
     die("Token not found or invalid.");
 }
 
@@ -59,9 +57,8 @@ $sql = "UPDATE users
             reset_token_expires_at = NULL
         WHERE id = ?";
 
-$stmt = $mysqli->prepare($sql);
-$stmt->bind_param("si", $password_hash, $user["id"]);
-$stmt->execute();
+$stmt = $pdo->prepare($sql);
+$stmt->execute([$password_hash, $user["id"]]);
 
 ?>
 <!DOCTYPE html>
@@ -75,19 +72,34 @@ $stmt->execute();
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
       
-          body { font-family: 'Poppins', sans-serif; }
+        body { font-family: 'Poppins', sans-serif; }
         .video-bg { position: fixed; top: 0; left: 0; min-width: 100%; min-height: 100%; object-fit: cover; z-index: -2; filter: blur(2px) brightness(0.8); }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: -1; }
-        .card { max-width: 400px; margin: 5rem auto; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        .btn-primary { background-color: #0C470C; border-color: #0C470C; }
-        .btn-primary:hover { background-color: #106210; border-color: #106210; }
+        .card { 
+            background: rgba(0, 4, 4, 0.25);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            max-width: 500px;
+            padding: 3rem;
+            color: white;
+        }
+        .btn-custom { background-color: #0C470C; border-radius: 25px; padding: 10px 25px; border: none; }
+        .btn-custom:hover { background-color: #106210; }
     </style>
 </head>
-<body class="d-flex align-items-center justify-content-center vh-100">
+<body class="d-flex align-items-center justify-content-center vh-100 p-3">
+    <video autoplay muted loop class="video-bg">
+        <source src="vids/canadaaa.mp4" type="video/mp4">
+    </video>
+    <div class="overlay"></div>
+
     <div class="card text-center">
         <h2 class="mb-3">Password Updated!</h2>
         <p>Your password has been reset successfully. You can now log in with your new password.</p>
-        <a href="login.php" class="btn btn-primary mt-3">Go to Login</a>
+        <a href="login.php" class="btn btn-custom text-white mt-3 fw-bold">Go to Login</a>
     </div>
 </body>
 </html>
+

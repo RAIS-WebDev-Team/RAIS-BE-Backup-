@@ -64,6 +64,22 @@ try {
     error_log("About section fetch failed: " . $e->getMessage());
 }
 
+// --- FETCH PARTNERS DATA ---
+$partners = [];
+try {
+    $stmt_partners = $pdo->query("SELECT name, website_link AS url, logo_path AS logo, background_image_path AS backgroundImage FROM partners ORDER BY id ASC");
+    if ($stmt_partners) {
+        $partners = $stmt_partners->fetchAll(PDO::FETCH_ASSOC);
+    }
+} catch (PDOException $e) {
+    error_log("Partners fetch failed: " . $e->getMessage());
+    // Use fallback static data on error
+    $partners = [
+        [ "name" => "Default Partner 1", "logo" => "img/niner.png", "backgroundImage" => "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070&auto-format&fit=crop", "url" => "#" ],
+        [ "name" => "Default Partner 2", "logo" => "img/partner2.png", "backgroundImage" => "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=2069&auto-format&fit=crop", "url" => "#" ]
+    ];
+}
+
 
 // Static data (can be converted to DB later if needed)
 $services = [
@@ -80,20 +96,6 @@ $locations = [
     ["title" => "Tech & Training at STI Lipa", "summary" => "A look into STI Lipa’s modern curriculum.", "coordinates" => [13.9416, 121.1628], "url" => "blog/sti-lipa.php"],
     ["title" => "IELTS Prep at 9.0 Niner Calamba", "summary" => "Reviewing English with proven techniques.", "coordinates" => [14.2133, 121.1658], "url" => "blog/calamba.php"],
     ["title" => "Learning English in Tacloban", "summary" => "ELA helps students master the language.", "coordinates" => [11.2410, 125.0016], "url" => "blog/tacloban.php"]
-];
-$partners = [
-    [
-        "name" => "9.0 Niner IELTS Review and Tutorial",
-        "logo" => "img/niner.png",
-        "backgroundImage" => "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070&auto-format&fit=crop",
-        "url" => "https://www.nineronlinereview.com/"
-    ],
-    [
-        "name" => "British Council IELTS",
-        "logo" => "img/partner2.png",
-        "backgroundImage" => "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=2069&auto-format&fit=crop",
-        "url" => "https://takeielts.britishcouncil.org/"
-    ]
 ];
 $exams = [
     [
@@ -273,10 +275,11 @@ $exams = [
         }
         .nav-container-desktop .nav-link {
             text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
-            transition: transform 0.3s ease;
-        }
+            transition: transform 0.3s ease, text-shadow 0.3s ease;
+        }   
         .nav-container-desktop .nav-link:hover {
             transform: translateY(-2px);
+            text-shadow: 0 0 15px rgba(16, 69, 17, 0.9), 0 0 5px rgba(69, 255, 2, 1);
         }
         .login-icon-wrapper {
             width: 60px;
@@ -326,6 +329,16 @@ $exams = [
             }
             .hero .fs-3 {
                 font-size: 1.25rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            #skip-animation-btn {
+                width: 50px;
+                height: 50px;
+                bottom: 20px;
+                right: 20px;
+                font-size: 1.2rem;
             }
         }
 
@@ -734,10 +747,9 @@ $exams = [
 
             #services .card-stack {
                 position: static;
-                height: 320px;
-                overflow-y: scroll;
-                scroll-snap-type: y mandatory;
-                -webkit-overflow-scrolling: touch;
+                height: auto;
+                overflow-y: visible;
+                scroll-snap-type: none;
             }
 
             #services .card-link {
@@ -1187,7 +1199,7 @@ $exams = [
             }
 
             function slidePartner(direction) {
-                if (!partnerImageContent) return;
+                if (!partnerImageContent || !partners || partners.length === 0) return;
                 partnerImageContent.style.opacity = 0;
                 setTimeout(() => {
                     if (direction === 'next') {

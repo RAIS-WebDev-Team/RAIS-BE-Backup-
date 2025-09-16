@@ -1,6 +1,35 @@
 <?php
+require_once '../config.php'; // Provides $pdo
+
+$page_key = 'visitation';
+$page = null;
+$sections = [];
+
+try {
+    // Fetch main page data
+    $stmt = $pdo->prepare("SELECT * FROM blog_pages WHERE page_key = ?");
+    $stmt->execute([$page_key]);
+    $page = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($page) {
+        // Fetch sections for this page
+        $stmt = $pdo->prepare("SELECT * FROM blog_page_sections WHERE page_id = ? ORDER BY sort_order ASC");
+        $stmt->execute([$page['id']]);
+        $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+} catch (Exception $e) {
+    // Handle database errors gracefully
+    $page = null; 
+}
+
 // Page title
-$page_title = "RAIS Blog | The Visitation";
+$page_title = $page ? htmlspecialchars($page['title']) : "RAIS Blog | The Visitation";
+
+function get_image_path($db_path) {
+    // The path in DB is 'blog/img/image.png'.
+    // From a file in the /blog folder, we need the relative path to be 'img/image.png'
+    return $db_path ? htmlspecialchars(str_replace('blog/', '', $db_path)) : '';
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -8,7 +37,7 @@ $page_title = "RAIS Blog | The Visitation";
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><?php echo htmlspecialchars($page_title); ?></title>
+  <title><?php echo $page_title; ?></title>
   <link rel="icon" href="../img/logoulit.png" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
@@ -279,66 +308,47 @@ $page_title = "RAIS Blog | The Visitation";
   </header>
 
   <main>
+    <?php if ($page): ?>
     <article class="blog-post">
       <div class="blog-header">
-        <h1 class="blog-title">Bridging Education and Industry</h1>
-        <p class="author">Written By: Imnil Benmarc A. Jolo</p>
+        <h1 class="blog-title"><?php echo htmlspecialchars($page['title']); ?></h1>
+        <p class="author"><?php echo htmlspecialchars($page['author']); ?></p>
       </div>
-
-      <img class="main-image" src="img/Sti.png"
-        alt="Ms. Aboilo from STI College Lipa visits interns at Roman & Associates Immigration Services">
+      
+      <?php if (!empty($page['main_image_path'])): ?>
+      <img class="main-image" src="<?php echo get_image_path($page['main_image_path']); ?>" alt="Main blog image">
+      <?php endif; ?>
 
       <section id="introduction">
         <div class="event-card">
-          <p>
-            On February 28, 2025, Ms. Annie Rose Aboilo, internship adviser from <span class="highlight-text">STI
-              College Lipa</span>,
-            visited Roman & Associates Immigration Services to check on her students and ensure they
-            were gaining practical, real-world experience. Her visit, along with that of Dr. Maria
-            Delia Miraña Poot and Ms. Dorie G. Gatus from <span class="highlight-text">De La Salle
-              Lipa</span> on March 27, highlighted
-            the strong collaboration between academic institutions and RAIS in supporting student
-            development through meaningful internships.
-          </p>
+          <p><?php echo nl2br($page['main_content']); ?></p>
         </div>
       </section>
 
+      <?php if (!empty($sections)): ?>
       <section id="events">
         <h2>Academic Partner Visits</h2>
+        <?php foreach ($sections as $section): ?>
         <div class="event-card">
-          <h3>MISS ABOILO OF STI LIPA GOES TO RAIS</h3>
-          <img src="img/Sti.png" alt="STI College Lipa Campus">
-          <p>On the 28th of February 2025, Ms. Annie Rose Aboilo, the internship adviser from STI College
-            Lipa, paid a meaningful visit to the office of Roman & Associates Immigration Services. Her
-            visit was an important opportunity for her to check in on her students currently interning at
-            the company. Ms. Aboilo took the time to engage with the interns, asking them about their
-            experiences and how they’ve been applying their academic knowledge in a real-world setting. This
-            hands-on approach ensured that the students were gaining valuable insights and contributing
-            meaningfully to the company’s operations.</p>
+          <?php if (!empty($section['title'])): ?>
+          <h3><?php echo htmlspecialchars($section['title']); ?></h3>
+          <?php endif; ?>
+          <?php if (!empty($section['image_path'])): ?>
+          <img src="<?php echo get_image_path($section['image_path']); ?>" alt="Section image">
+          <?php endif; ?>
+          <p><?php echo nl2br($section['content']); ?></p>
         </div>
-
-        <div class="event-card">
-          <h3>THE TWO LIPASALYANO ADVISERS PAY A VISIT</h3>
-          <img src="img/lasalle.png" alt="De La Salle Lipa Campus facade">
-          <p>On the 27th of March 2025, Roman & Associates Immigration Services also had the pleasure of
-            welcoming two distinguished guests from De La Salle Lipa’s Financial Management program—Ms.
-            Maria Delia Miraña Poot, PhD, and Ms. Dorie G. Gatus, MBA. Their visit marked an important step
-            in strengthening the partnership between RAIS and De La Salle Lipa, further solidifying the
-            collaboration between the institution and the company.</p>
-        </div>
-
-        <div class="event-card">
-          <h3>Conclusion</h3>
-          <img src="img/conclusion.png" alt="Students and advisers in a collaborative meeting">
-          <p>As we reflect on these enriching visits, we look forward to future collaborations with De La
-            Salle Lipa, STI College Lipa, and other esteemed educational institutions. These partnerships
-            serve as a cornerstone for bridging the gap between academic learning and real-world
-            professional experience. By fostering these connections, we not only contribute to the personal
-            growth of students but also support the development of skilled professionals who will excel in
-            their future careers.</p>
-        </div>
+        <?php endforeach; ?>
       </section>
+      <?php endif; ?>
+
     </article>
+    <?php else: ?>
+    <div class="alert alert-danger text-center">
+        <h4 class="alert-heading">Content Not Found</h4>
+        <p>The content for this blog post could not be loaded. Please try again later or contact support.</p>
+    </div>
+    <?php endif; ?>
   </main>
   <div id="footer-placeholder">
       <?php include '../footer.php'; ?>
@@ -357,3 +367,4 @@ $page_title = "RAIS Blog | The Visitation";
 </body>
 
 </html>
+

@@ -1,6 +1,37 @@
 <?php
+require_once '../config.php'; // Provides $pdo
+
+$page_key = 'canada';
+$page = null;
+$sections = [];
+
+try {
+    // Fetch main page data
+    $stmt = $pdo->prepare("SELECT * FROM blog_pages WHERE page_key = ?");
+    $stmt->execute([$page_key]);
+    $page = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($page) {
+        // Fetch sections for this page
+        $stmt = $pdo->prepare("SELECT * FROM blog_page_sections WHERE page_id = ? ORDER BY sort_order ASC");
+        $stmt->execute([$page['id']]);
+        $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+} catch (Exception $e) {
+    // Handle database errors gracefully
+    $page = null; 
+}
+
 // Page title
-$page_title = "RAIS Blog | A Calling to Canada";
+$page_title = $page ? htmlspecialchars($page['title']) : "RAIS Blog | A Calling to Canada";
+
+// Function to correct image paths
+function get_image_path($db_path) {
+    // The path in DB is 'blog/img/image.png'.
+    // From this file (in /blog), we need to go up one level ('../')
+    // and then into the full path.
+    return $db_path ? '../' . htmlspecialchars($db_path) : '';
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -8,7 +39,7 @@ $page_title = "RAIS Blog | A Calling to Canada";
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><?php echo htmlspecialchars($page_title); ?></title>
+  <title><?php echo $page_title; ?></title>
   <link rel="icon" href="../img/logoulit.png" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
@@ -281,52 +312,48 @@ $page_title = "RAIS Blog | A Calling to Canada";
   </header>
 
   <main>
+    <?php if ($page): ?>
     <article class="blog-post">
       <div class="blog-header">
-        <h1 class="blog-title">A Long Road for "A Calling to Canada"</h1>
-        <p class="author">Written By: Imnil Benmarc A. Jolo</p>
+        <h1 class="blog-title"><?php echo htmlspecialchars($page['title']); ?></h1>
+        <p class="author"><?php echo htmlspecialchars($page['author']); ?></p>
       </div>
 
-      <img class="main-image" src="img/assistance.png" alt="Promotional banner for A Calling to Canada event">
+      <?php if (!empty($page['main_image_path'])): ?>
+      <img class="main-image" src="<?php echo get_image_path($page['main_image_path']); ?>" alt="Main blog image">
+      <?php endif; ?>
 
       <section id="about">
         <h2>About the Event</h2>
         <div class="event-card">
-          <p>
-            On Saturday, the 12th of April 2025, <span class="highlight-text">Roman & Associates Immigration
-              Services</span> will host a highly anticipated event entitled “A Calling to Canada.” This special
-            gathering is for individuals aspiring to study, work, or visit Canada and seeking the right guidance. The
-            event promises valuable insights into immigration pathways, eligibility requirements, and the practical
-            steps for making their Canadian dream a reality.
-          </p>
+          <p><?php echo nl2br(htmlspecialchars_decode($page['main_content'])); ?></p>
         </div>
       </section>
 
+      <?php if (!empty($sections)): ?>
       <section id="events">
         <h2>Behind the Scenes</h2>
+        <?php foreach ($sections as $section): ?>
         <div class="event-card">
-          <h3>COLLABORATION IS ALL AROUND</h3>
-          <img src="img/collaboration.png" alt="The RCIS teams collaborating on the event">
-          <p>
-            In the lead-up to this event, the marketing, finance, and IT teams have worked tirelessly. The marketing
-            team crafted a compelling narrative and promotional materials. The finance team planned and allocated
-            resources efficiently, ensuring every aspect was supported. The IT team developed secure systems for
-            registration and communication. Together, these teams transformed a vision into reality.
-          </p>
+          <?php if (!empty($section['title'])): ?>
+          <h3><?php echo htmlspecialchars($section['title']); ?></h3>
+          <?php endif; ?>
+          <?php if (!empty($section['image_path'])): ?>
+          <img src="<?php echo get_image_path($section['image_path']); ?>" alt="Section image">
+          <?php endif; ?>
+          <p><?php echo nl2br(htmlspecialchars($section['content'])); ?></p>
         </div>
-
-        <div class="event-card">
-          <h3>ASSISTANCE IS ALWAYS THERE</h3>
-          <img src="img/all around.png" alt="The RCIS team providing dedicated assistance">
-          <p>
-            As the event draws near, some tasks remain, but the IT and finance teams continue to work diligently. The
-            collaborative spirit and dedication of each team member keep everything moving forward. From finalizing
-            promotional materials to securing logistics, everyone involved is contributing their expertise and time to
-            ensure the success of "A Calling to Canada."
-          </p>
-        </div>
+        <?php endforeach; ?>
       </section>
+      <?php endif; ?>
+
     </article>
+    <?php else: ?>
+    <div class="alert alert-danger text-center">
+        <h4 class="alert-heading">Content Not Found</h4>
+        <p>The content for this blog post could not be loaded. Please try again later or contact support.</p>
+    </div>
+    <?php endif; ?>
   </main>
 
    <div id="footer-placeholder">

@@ -4,14 +4,19 @@
 // This file displays the form and handles the request to send a reset link.
 // -----------------------------------------------------------------
 
-// --- Load Composer's autoloader to use PHPMailer ---
-// Using a simpler relative path to rule out issues with __DIR__
-require_once 'vendor/autoload.php';
-
 // --- Use PHPMailer classes for sending email ---
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
+
+// --- Include the PHPMailer files manually ---
+// This assumes the PHPMailer folder is inside the 'admin' directory
+require 'admin/PHPMailer/Exception.php';
+require 'admin/PHPMailer/PHPMailer.php';
+require 'admin/PHPMailer/SMTP.php';
+
+// --- IMPORTANT: CONFIGURE YOUR WEBSITE'S URL ---
+// Replace 'http://your-domain.com' with the actual URL of your live website.
+define('BASE_URL', 'http://your-domain.com');
 
 // --- Page title and user feedback variables ---
 $page_title = "RAIS Create - Forgot Password";
@@ -21,11 +26,11 @@ $message_type = ""; // To control alert color ("success" or "danger")
 // --- Check if the form was submitted via POST method ---
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    // --- Include database connection script ---
-    require_once 'db_connect.php';
+    // --- Include the consistent database connection from config.php ---
+    require_once 'config.php';
 
-    // --- Sanitize the user's email input ---
-    $email = $mysqli->real_escape_string($_POST["email"]);
+    // --- Get the user's email input ---
+    $email = $_POST["email"];
 
     // --- Generate a cryptographically secure random token ---
     $token = bin2hex(random_bytes(16));
@@ -36,46 +41,39 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // --- Set an expiration date for the token (e.g., 30 minutes from now) ---
     $expiry = date("Y-m-d H:i:s", time() + 60 * 30);
 
-    // --- Prepare SQL statement to update the user's record ---
-    // Using prepared statements prevents SQL injection attacks.
+    // --- Prepare SQL statement to update the user's record using PDO ---
     $sql = "UPDATE users
             SET reset_token_hash = ?,
                 reset_token_expires_at = ?
             WHERE email = ?";
 
-    $stmt = $mysqli->prepare($sql);
-    $stmt->bind_param("sss", $token_hash, $expiry, $email);
-    $stmt->execute();
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$token_hash, $expiry, $email]);
 
     // --- Check if a database row was actually updated ---
-    if ($mysqli->affected_rows) {
+    if ($stmt->rowCount()) {
 
         // --- Create a new PHPMailer instance ---
         $mail = new PHPMailer(true);
 
         try {
-            // --- SMTP Server settings ---
-            // IMPORTANT: Configure these with your email provider's details.
-            // For Gmail, you'll need to generate an "App Password".
+            // --- SMTP Server settings - REPLACE WITH YOUR CREDENTIALS ---
             $mail->isSMTP();
-            $mail->Host       = 'smtp.gmail.com'; // Example for Gmail
+            $mail->Host       = 'smtp.example.com'; // Your SMTP server (e.g., mail.yourdomain.com)
             $mail->SMTPAuth   = true;
-            $mail->Username   = 'godoyjp443@gmail.com'; // Your SMTP username
-            $mail->Password   = 'cejd ffsj igyt jtar';    // Your SMTP app password
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = 587;
+            $mail->Username   = 'your_email@example.com'; // Your SMTP username (e.g., no-reply@yourdomain.com)
+            $mail->Password   = 'your_email_password';    // Your SMTP password
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Use ENCRYPTION_SMTPS for SSL
+            $mail->Port       = 587; // 587 for TLS, 465 for SSL
 
             // --- Email Recipients ---
-            $mail->setFrom('no-reply@raiscreate.com', 'RAIS Create');
+            $mail->setFrom('no-reply@yourdomain.com', 'RAIS Create'); // The "from" address and name
             $mail->addAddress($email); // Add a recipient
 
             // --- Email Content ---
             $mail->isHTML(true);
             $mail->Subject = 'Password Reset Request';
-            // Construct the full reset link
-            // NOTE: You need to define BASE_URL somewhere in your project for this to work.
-            // For example: define('BASE_URL', 'http://localhost/sep11');
-            $reset_link = "http://localhost/sep11/reset-password.php?token=$token";
+            $reset_link = BASE_URL . "/reset-password.php?token=$token";
             $mail->Body    = "Click <a href='{$reset_link}'>here</a> to reset your password.";
             $mail->AltBody = "Copy and paste this link into your browser to reset your password: {$reset_link}";
 
@@ -85,7 +83,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         } catch (Exception $e) {
             // If the email fails to send, provide an error message
-            $message = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+            $message = "Message could not be sent. Please contact support.";
+            error_log("Mailer Error: {$mail->ErrorInfo}"); // Log the detailed error for you to see
             $message_type = 'danger';
         }
     } else {
@@ -101,7 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale-1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><?php echo htmlspecialchars($page_title); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -168,4 +167,3 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </body>
 
 </html>
-

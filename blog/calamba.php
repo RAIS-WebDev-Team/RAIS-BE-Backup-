@@ -1,6 +1,36 @@
 <?php
+require_once '../config.php'; // Provides $pdo
+
+$page_key = 'calamba';
+$page = null;
+$sections = [];
+
+try {
+    // Fetch main page data
+    $stmt = $pdo->prepare("SELECT * FROM blog_pages WHERE page_key = ?");
+    $stmt->execute([$page_key]);
+    $page = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($page) {
+        // Fetch sections for this page (if any)
+        $stmt = $pdo->prepare("SELECT * FROM blog_page_sections WHERE page_id = ? ORDER BY sort_order ASC");
+        $stmt->execute([$page['id']]);
+        $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+} catch (Exception $e) {
+    // Handle database errors gracefully
+    $page = null; 
+}
+
 // Page title
-$page_title = "RAIS Blog | Visit to Laguna";
+$page_title = $page ? htmlspecialchars($page['title']) : "RAIS Blog | Visit to Laguna";
+
+// Function to correct image paths
+function get_image_path($db_path) {
+    // The path in DB is 'blog/img/image.png'.
+    // From a file in the /blog folder, we need the relative path to be 'img/image.png'
+    return $db_path ? htmlspecialchars(str_replace('blog/', '', $db_path)) : '';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -8,7 +38,7 @@ $page_title = "RAIS Blog | Visit to Laguna";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($page_title); ?></title>
+    <title><?php echo $page_title; ?></title>
     <link rel="icon" href="../img/logoulit.png" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
@@ -215,25 +245,28 @@ $page_title = "RAIS Blog | Visit to Laguna";
     </header>
 
     <main>
+        <?php if ($page): ?>
         <article class="blog-post">
             <div class="blog-header">
-                <h1 class="blog-title">LAGUNA ALL THE WAY</h1>
-                <p class="author">Written By: Imnil Benmarc A. Jolo</p>
+                <h1 class="blog-title"><?php echo htmlspecialchars($page['title']); ?></h1>
+                <p class="author"><?php echo htmlspecialchars($page['author']); ?></p>
             </div>
-
-            <img class="main-image" src="img/laguna.png"
-                alt="RCIS team at the Niner Review and Testing Center in Calamba, Laguna">
+            
+            <?php if (!empty($page['main_image_path'])): ?>
+            <img class="main-image" src="<?php echo get_image_path($page['main_image_path']); ?>" alt="Main blog image">
+            <?php endif; ?>
 
             <section id="visit">
                 <h2>Connecting with Students in Calamba</h2>
-                <p>In Calamba, Laguna, the regional center of the CALABARZON region, the team visited the branch of the Niner
-                    Review and Testing Center. There, they had the chance to engage with students preparing for their exams,
-                    discussing strategies for success in the IELTS test and how achieving higher scores can help them unlock
-                    greater opportunities in education and immigration. This visit also highlighted the importance of continuous
-                    learning and preparation for students aiming to pursue their dreams of studying, working, or living in Canada.
-                </p>
+                <p><?php echo nl2br(htmlspecialchars($page['main_content'])); ?></p>
             </section>
         </article>
+        <?php else: ?>
+        <div class="alert alert-danger text-center">
+            <h4 class="alert-heading">Content Not Found</h4>
+            <p>The content for this blog post could not be loaded. Please try again later or contact support.</p>
+        </div>
+        <?php endif; ?>
     </main>
     
     <div id="footer-placeholder">
@@ -252,3 +285,4 @@ $page_title = "RAIS Blog | Visit to Laguna";
 </body>
 
 </html>
+

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 15, 2025 at 09:34 PM
+-- Generation Time: Sep 16, 2025 at 10:20 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -151,52 +151,58 @@ INSERT INTO `admin_activity_log` (`id`, `admin_id`, `action`, `target_id`, `targ
 -- --------------------------------------------------------
 
 --
--- Table structure for table `blogs`
+-- Table structure for table `blog_pages`
 --
 
-CREATE TABLE `blogs` (
+CREATE TABLE `blog_pages` (
   `id` int(11) NOT NULL,
+  `page_key` varchar(50) NOT NULL,
   `title` varchar(255) NOT NULL,
-  `summary` text DEFAULT NULL,
   `author` varchar(255) DEFAULT NULL,
-  `publish_date` date DEFAULT NULL,
-  `hero_media_path` varchar(255) DEFAULT NULL,
-  `file_path` varchar(255) DEFAULT NULL,
-  `map_title` varchar(255) DEFAULT NULL,
-  `map_summary` varchar(255) DEFAULT NULL,
-  `map_address` text DEFAULT NULL,
-  `map_latitude` decimal(10,8) DEFAULT NULL,
-  `map_longitude` decimal(11,8) DEFAULT NULL
+  `main_content` text DEFAULT NULL,
+  `main_image_path` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `blogs`
+-- Dumping data for table `blog_pages`
 --
 
-INSERT INTO `blogs` (`id`, `title`, `summary`, `author`, `publish_date`, `hero_media_path`, `file_path`, `map_title`, `map_summary`, `map_address`, `map_latitude`, `map_longitude`) VALUES
-(1, 'Ulgo Shipji Anha', 'Gwenchana', 'By Seventeen', '2025-09-08', 'uploads/blog/68be6726f0798-ieltsHero.png', 'blog/ulgo-shipji-anha.php', 'Calamba', 'This is the latest event', 'San Pedro, Santo tomas, Batangas', 14.08511300, 121.17705570);
+INSERT INTO `blog_pages` (`id`, `page_key`, `title`, `author`, `main_content`, `main_image_path`) VALUES
+(1, 'canada', 'A Long Road for \"A Calling to Canada\"', 'Written By: Imnil Benmarc A. Jolo', 'On Saturday, the 12th of April 2025, <span class=\"highlight-text\">Roman & Associates Immigration Services</span> will host a highly anticipated event entitled “A Calling to Canada.” This special gathering is for individuals aspiring to study, work, or visit Canada and seeking the right guidance. The event promises valuable insights into immigration pathways, eligibility requirements, and the practical steps for making their Canadian dream a reality.', 'blog/img/assistance.png'),
+(2, 'minifair', 'RCIS at the IELTS Mini Fair', 'Written By: Imnil Benmarc A. Jolo', 'On the 29th of March 2025, Roman Canadian Immigration Services (RCIS) proudly became one of the participating partners for the IELTS Mini Fair, organized by the British Council. This mini fair provided valuable insights for those looking to enhance their English language skills, particularly in speaking and writing, through the IELTS exam. The event offered participants an exciting opportunity to delve into the nuances of the IELTS test, from tips for achieving higher scores and understanding test formats to boosting confidence in their English language abilities.\n\nWhat made RCIS\'s participation even more significant was that the company was present at two locations: Calamba and Tacloban. The company’s involvement in both fairs highlighted its commitment to supporting individuals who aim to pursue international education, work, or migration opportunities. At both venues, RCIS engaged with attendees, offering expert advice on how to prepare for the IELTS exam, as well as guidance on immigration pathways, ensuring that participants left with a comprehensive understanding of both language proficiency and the broader steps required for a successful international journey.', 'blog/img/minifair2.png'),
+(3, 'visitation', 'Bridging Education and Industry', 'Written By: Imnil Benmarc A. Jolo', 'On February 28, 2025, Ms. Annie Rose Aboilo, internship adviser from <span class=\"highlight-text\">STI College Lipa</span>, visited Roman & Associates Immigration Services to check on her students and ensure they were gaining practical, real-world experience. Her visit, along with that of Dr. Maria Delia Miraña Poot and Ms. Dorie G. Gatus from <span class=\"highlight-text\">De La Salle Lipa</span> on March 27, highlighted the strong collaboration between academic institutions and RAIS in supporting student development through meaningful internships.', 'blog/img/Sti.png'),
+(4, 'calamba', 'LAGUNA ALL THE WAY', 'Written By: Imnil Benmarc A. Jolo', 'In Calamba, Laguna, the regional center of the CALABARZON region, the team visited the branch of the Niner Review and Testing Center. There, they had the chance to engage with students preparing for their exams, discussing strategies for success in the IELTS test and how achieving higher scores can help them unlock greater opportunities in education and immigration. This visit also highlighted the importance of continuous learning and preparation for students aiming to pursue their dreams of studying, working, or living in Canada.', 'blog/img/laguna.png'),
+(5, 'la-salle', 'Fostering Future Leaders', 'Published on March 27, 2025', 'On March 27, 2025, Roman & Associates Immigration Services (RAIS) was honored to host two distinguished advisers from De La Salle Lipa’s Financial Management program: <span class=\"highlight-text\">Ms. Maria Delia Miraña Poot, PhD</span>, and <span class=\"highlight-text\">Ms. Dorie G. Gatus, MBA</span>. This visit marks a significant milestone in strengthening the partnership between our two institutions. During their visit, Dr. Miraña Poot and Ms. Gatus checked in on their students currently undertaking internships at RAIS. Their focus was to ensure that the interns are immersed in a practical learning environment where they can gain invaluable hands-on experience and develop essential industry skills. This commitment to student growth showcases the profound connection between academia and industry leadership. The visit has further solidified our collaboration, reinforcing a shared dedication to nurturing the next generation of financial professionals.', 'blog/img/lasalle.png'),
+(6, 'sti-lipa', 'Bridging Education and Industry', 'Published on February 28, 2025', 'On the 28th of February 2025, Roman & Associates Immigration Services was pleased to welcome <span class=\"highlight-text\">Ms. Annie Rose Aboilo</span>, the internship adviser from STI College Lipa. Her visit was an important opportunity for her to check in on her students currently interning at the company. Ms. Aboilo took the time to engage with the interns, asking them about their experiences and how they’ve been applying their academic knowledge in a real-world setting. This hands-on approach ensured that the students were gaining valuable insights and contributing meaningfully to the company’s operations. During her time at the office, Ms. Aboilo also met with key personnel to discuss the objectives and expectations of the internship program. The meeting provided an opportunity to explore how students from STI College Lipa could benefit from exposure to the field of immigration consultancy and deepen their understanding of the industry. The visit not only reaffirmed the shared commitment between Roman & Associates and STI College Lipa to provide students with practical, hands-on training experiences but also laid the groundwork for potential future collaborations between the two institutions, further enriching the learning experience for students.', 'blog/img/Sti.png'),
+(7, 'tacloban', 'MAUPAY NGA ADLAW, LEYTE', 'Written By: Imnil Benmarc A. Jolo', 'In Tacloban City, Leyte, the largest city in the Eastern Visayas region, the RCIS team visited the <span class=\"highlight-text\">English Language Academy</span>. This visit was an opportunity to connect with aspiring students and offer them guidance on both language proficiency and the pathways available for studying or working abroad. The team provided valuable insights into how enhancing English skills through the IELTS exam can open doors to global opportunities, especially in Canada, where language proficiency plays a key role in immigration processes.', 'blog/img/leyte.png');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `blog_sections`
+-- Table structure for table `blog_page_sections`
 --
 
-CREATE TABLE `blog_sections` (
+CREATE TABLE `blog_page_sections` (
   `id` int(11) NOT NULL,
-  `blog_id` int(11) NOT NULL,
+  `page_id` int(11) NOT NULL,
   `title` varchar(255) DEFAULT NULL,
   `content` text DEFAULT NULL,
-  `media_path` varchar(255) DEFAULT NULL,
-  `display_order` int(11) NOT NULL
+  `image_path` varchar(255) DEFAULT NULL,
+  `sort_order` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `blog_sections`
+-- Dumping data for table `blog_page_sections`
 --
 
-INSERT INTO `blog_sections` (`id`, `blog_id`, `title`, `content`, `media_path`, `display_order`) VALUES
-(9, 1, 'Okay po', 'Hello this is real this is me', 'uploads/blog/68be6726f1ad8-fam.png', 0);
+INSERT INTO `blog_page_sections` (`id`, `page_id`, `title`, `content`, `image_path`, `sort_order`) VALUES
+(1, 1, 'COLLABORATION IS ALL AROUND', 'In the lead-up to this event, the marketing, finance, and IT teams have worked tirelessly. The marketing team crafted a compelling narrative and promotional materials. The finance team planned and allocated resources efficiently, ensuring every aspect was supported. The IT team developed secure systems for registration and communication. Together, these teams transformed a vision into reality.', 'blog/img/collaboration.png', 1),
+(2, 1, 'ASSISTANCE IS ALWAYS THERE', 'As the event draws near, some tasks remain, but the IT and finance teams continue to work diligently. The collaborative spirit and dedication of each team member keep everything moving forward. From finalizing promotional materials to securing logistics, everyone involved is contributing their expertise and time to ensure the success of \"A Calling to Canada.\"', 'blog/img/all around.png', 2),
+(3, 2, 'MAUPAY NGA ADLAW, LEYTE', 'In Tacloban City, Leyte, the largest city in the Eastern Visayas region, the RCIS team visited the English Language Academy. This visit was an opportunity to connect with aspiring students and offer them guidance on both language proficiency and the pathways available for studying or working abroad. The team provided valuable insights into how enhancing English skills through the IELTS exam can open doors to global opportunities, especially in Canada.', 'blog/img/leyte.png', 1),
+(4, 2, 'LAGUNA ALL THE WAY', 'In Calamba, Laguna, the regional center of the CALABARZON region, the team visited the branch of the Niner Review and Testing Center. There, they had the chance to engage with students preparing for their exams, discussing strategies for success in the IELTS test and how achieving higher scores can help them unlock greater opportunities in education and immigration. This visit also highlighted the importance of continuous learning for students aiming to pursue their dreams in Canada.', 'blog/img/laguna.png', 2),
+(5, 3, 'MISS ABOILO OF STI LIPA GOES TO RAIS', 'On the 28th of February 2025, Ms. Annie Rose Aboilo, the internship adviser from STI College Lipa, paid a meaningful visit to the office of Roman & Associates Immigration Services. Her visit was an important opportunity for her to check in on her students currently interning at the company. Ms. Aboilo took the time to engage with the interns, asking them about their experiences and how they’ve been applying their academic knowledge in a real-world setting. This hands-on approach ensured that the students were gaining valuable insights and contributing meaningfully to the company’s operations.', 'blog/img/Sti.png', 1),
+(6, 3, 'THE TWO LIPASALYANO ADVISERS PAY A VISIT', 'On the 27th of March 2025, Roman & Associates Immigration Services also had the pleasure of welcoming two distinguished guests from De La Salle Lipa’s Financial Management program—Ms. Maria Delia Miraña Poot, PhD, and Ms. Dorie G. Gatus, MBA. Their visit marked an important step in strengthening the partnership between RAIS and De La Salle Lipa, further solidifying the collaboration between the institution and the company.', 'blog/img/lasalle.png', 2),
+(7, 3, 'Conclusion', 'As we reflect on these enriching visits, we look forward to future collaborations with De La Salle Lipa, STI College Lipa, and other esteemed educational institutions. These partnerships serve as a cornerstone for bridging the gap between academic learning and real-world professional experience. By fostering these connections, we not only contribute to the personal growth of students but also support the development of skilled professionals who will excel in their future careers.', 'blog/img/conclusion.png', 3);
 
 -- --------------------------------------------------------
 
@@ -309,69 +315,19 @@ CREATE TABLE `exams` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `description` text NOT NULL,
-  `hero_media_path` varchar(255) DEFAULT NULL,
-  `about_content` text DEFAULT NULL,
-  `about_media_path` varchar(255) DEFAULT NULL,
-  `file_path` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `exam_choice_cards`
---
-
-CREATE TABLE `exam_choice_cards` (
-  `id` int(11) NOT NULL,
-  `exam_id` int(11) NOT NULL,
   `image_path` varchar(255) DEFAULT NULL,
-  `title` varchar(255) NOT NULL,
-  `description` text DEFAULT NULL,
-  `display_order` int(11) NOT NULL
+  `logo_path` varchar(255) DEFAULT NULL,
+  `alt_text` varchar(255) DEFAULT NULL,
+  `url` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
 --
--- Table structure for table `exam_faqs`
+-- Dumping data for table `exams`
 --
 
-CREATE TABLE `exam_faqs` (
-  `id` int(11) NOT NULL,
-  `exam_id` int(11) NOT NULL,
-  `question` text NOT NULL,
-  `answer` text NOT NULL,
-  `display_order` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `exam_formats`
---
-
-CREATE TABLE `exam_formats` (
-  `id` int(11) NOT NULL,
-  `exam_id` int(11) NOT NULL,
-  `icon_class` varchar(100) DEFAULT NULL,
-  `title` varchar(255) NOT NULL,
-  `description` text DEFAULT NULL,
-  `display_order` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `exam_infocards`
---
-
-CREATE TABLE `exam_infocards` (
-  `id` int(11) NOT NULL,
-  `exam_id` int(11) NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `description` text NOT NULL,
-  `display_order` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+INSERT INTO `exams` (`id`, `name`, `description`, `image_path`, `logo_path`, `alt_text`, `url`) VALUES
+(1, 'IELTS', 'The International English Language Testing System is the world\'s most popular English language proficiency test for higher education and global migration.', 'img/ielts.png', NULL, 'People taking the IELTS Exam', 'ielts.php'),
+(2, 'OET', 'The Occupational English Test (OET) evaluates the English language and communication skills essential for safe and effective patient care for healthcare professionals.', 'img/OET.jpg', NULL, 'Healthcare professionals in a discussion', 'oet.php');
 
 -- --------------------------------------------------------
 
@@ -399,6 +355,36 @@ INSERT INTO `flights` (`id`, `user_id`, `departure_date`, `departureLocation`, `
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `footer_content`
+--
+
+CREATE TABLE `footer_content` (
+  `id` int(11) NOT NULL,
+  `content_key` varchar(50) NOT NULL,
+  `content_value` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `footer_content`
+--
+
+INSERT INTO `footer_content` (`id`, `content_key`, `content_value`) VALUES
+(1, 'newsletter_title', 'Wanna Subscribe to our Newsletter?'),
+(2, 'newsletter_text', 'Get the latest updates and tips straight to your inbox.'),
+(3, 'contact_email', 'assessment@romancis.ca'),
+(4, 'contact_phone', '+63 917 185 7247 | (250) 667-0565'),
+(5, 'contact_address', 'City Sleep Inn Hotel and Events Centre, Barangay Sico, Lipa City, Batangas'),
+(6, 'facebook_url', 'https://www.facebook.com/RomansandAssociatesImmigrationServices'),
+(7, 'twitter_url', 'https://x.com/RCIS2022'),
+(8, 'instagram_url', 'https://www.instagram.com/romancis.ca/'),
+(9, 'linkedin_url', 'https://www.linkedin.com/company/roman-associates-immigration-services-ltd/'),
+(10, 'tiktok_url', 'https://www.tiktok.com/@romancanadianimmigration'),
+(11, 'credits_text', 'Roman & Associates Immigration Services LTD'),
+(12, 'credits_year', '2025');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `hero_media`
 --
 
@@ -418,6 +404,18 @@ CREATE TABLE `hero_media` (
 INSERT INTO `hero_media` (`id`, `media_name`, `uploader`, `upload_date`, `file_path`, `is_active`) VALUES
 (1, 'Niagara Falls View', 'Admin', '2025-09-14 18:00:00', 'vids/niagarapoh.mp4', 1),
 (2, 'Try', 'Jp Godoy', '2025-09-14 21:31:15', 'uploads/hero/hero_68c6c3a38cf36.mp4', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `newsletter_subscriptions`
+--
+
+CREATE TABLE `newsletter_subscriptions` (
+  `id` int(11) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `subscription_date` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -460,6 +458,14 @@ CREATE TABLE `partners` (
   `logo_path` varchar(255) DEFAULT NULL,
   `background_image_path` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `partners`
+--
+
+INSERT INTO `partners` (`id`, `name`, `website_link`, `logo_path`, `background_image_path`) VALUES
+(1, '9.0 Niner IELTS Review and Tutorial', 'https://www.nineronlinereview.com/', 'uploads/partners/logo_1_1758053169.png', 'uploads/partners/bg_1_1758053169.jpg'),
+(2, 'British Council IELTS', 'https://takeielts.britishcouncil.org/', 'uploads/partners/logo_2_1758053185.png', 'uploads/partners/bg_2_1758053185.jpg');
 
 -- --------------------------------------------------------
 
@@ -601,7 +607,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `firstName`, `lastName`, `address`, `phone`, `email`, `password`, `profileImage`, `location`, `birthday`, `facebook`, `instagram`, `gmail`, `email_notifications`, `dark_mode`, `documents_uploaded`, `profile_picture_uploaded`, `birthday_added`, `social_links_added`, `has_seen_tour`, `role`, `status`, `last_login`, `last_activity`, `reset_token_hash`, `reset_token_expires_at`) VALUES
-(1, 'John Paul', 'Godoy', 'Darasa, Tanauan City Batangas', '09359306521', 'godoyjp443@gmail.com', '$2y$10$LxDGp8XROe201KZCttcLSOUlAqajOp5/TqhlZk89ReZwLbMjpzFf.', 'uploads/68b15e9bb7f37-cha.jpg', NULL, '2005-02-04', 'https://www.facebook.com/chaepi04', '', '', 1, 1, 0, 1, 1, 1, 1, 'client', 'Inactive', '2025-09-15 21:52:02', NULL, '5db0547617249f92d9b1561185299303a79e9a45e6d9e539ed29525e545d353f', '2025-09-12 11:28:44'),
+(1, 'John Paul', 'Godoy', 'Darasa, Tanauan City Batangas', '09359306521', 'godoyjp443@gmail.com', '$2y$10$LxDGp8XROe201KZCttcLSOUlAqajOp5/TqhlZk89ReZwLbMjpzFf.', 'uploads/68b15e9bb7f37-cha.jpg', NULL, '2005-02-04', 'https://www.facebook.com/chaepi04', '', '', 1, 1, 0, 1, 1, 1, 1, 'client', 'Inactive', '2025-09-15 21:52:02', NULL, '975ee6668988796f30b30da3198dd69cde20f47f65d8a34dfe20f9e48b8ad4d0', '2025-09-16 22:44:00'),
 (2, 'Kim', 'Chaewon', 'Darasa, Tanauan City Batangas', '09359306521', 'kimchae1chi@gmail.com', '$2y$10$YzarQtmz8o0nxRxl5vASierqYIj5.pGSSZ1yNhkgHQ/2gnW4N9vqC', 'uploads/68aea7cdd0f67-cha.jpg', NULL, '2005-08-18', 'https://www.facebook.com/chaepi04', '', 'godoyjp443@gmail.com', 1, 0, 0, 1, 1, 1, 1, 'client', 'Inactive', '2025-09-11 17:39:27', NULL, NULL, NULL),
 (3, 'Kim', 'Yooyeon', 'Darasa', '09359306521', 'jp04@gmail.com', '$2y$10$hCC3xNl8HBw99lN/6gi5Z.etwr0OC79hXywGdIC5nrq2BfR6m3NQm', 'uploads/68ae93c2840bb-chaewon.jpg', NULL, '2005-02-04', 'https://www.facebook.com/chaepi04', '', '', 1, 1, 0, 1, 1, 1, 1, 'client', 'Inactive', '2025-09-12 14:31:29', NULL, NULL, NULL),
 (4, 'Jisoo', 'Hong', 'San Pedro, Santo Tomas, Batangas', '09618225084', 'hongjisoo@gmail.com', '$2y$10$JdXfhvws62So9kLTaB5Q7uyznoRFIbsVKdawmKKGea44eZZlTMUGu', NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 0, 0, 0, 1, 'client', 'Inactive', NULL, '2025-08-28 16:53:00', NULL, NULL),
@@ -611,7 +617,7 @@ INSERT INTO `users` (`id`, `firstName`, `lastName`, `address`, `phone`, `email`,
 (8, 'Josu', 'Higa', 'Darasa', '09359306521', 'akizashibal@gmail.com', '$2y$10$XlySF0CzDJqAtqCx6IU2Tu30xcZLbxAQkOo1TTYm0ZxWLsgP4QMcm', 'uploads/68c3df1d3308a-josu.jpg', NULL, '2025-09-03', '', '', '', 1, 0, 0, 1, 1, 0, 1, 'client', 'Inactive', '2025-09-12 16:51:25', NULL, NULL, NULL),
 (10, 'Kim', 'Chaewon', '123 Admin Lane', '09000000000', 'aimiyuji180@gmail.com', '$2y$10$nZ8W.X7V.y6U.z5T.a4S.b3R.c2Q.d1P.e0O.f9N.g8M.h7L', NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 0, 0, 0, 1, 'Super Admin', 'Active', NULL, NULL, NULL, NULL),
 (11, 'Jessica ', 'Sotto', 'Darasa', '09359306521', 'jessica@gmail.com', '$2y$10$RkkQMzIgZhwQLWXYLh6yeubpeeLzPE/dBZr6rE1ZCU.0aCLh8IViK', 'uploads/68b7eaa2dcf40-8e0bab69-56d5-4a7b-a7cd-78e25b8da0ef.jpg', NULL, '2025-09-26', 'https://www.facebook.com/chaepi04', 'https://www.facebook.com/chaepi04', 'godoyjp443@gmail.com', 1, 0, 0, 1, 1, 1, 1, 'client', 'Inactive', '2025-09-12 14:36:29', NULL, NULL, NULL),
-(12, 'Jp', 'Godoy', 'Darasa, Tanauan City, Batangas', '09359306521', 'adminjp@gmail.com', '$2y$10$Zfy6I02.fIJ5/JFykVrTbOzz6RpdbdVKMpBrfE.h.mzYK25LJrt1u', 'uploads/profiles/68c16e01912ae-chae1.jpg', NULL, '0000-00-00', 'https://www.facebook.com/chaepi04', 'https://www.facebook.com/chaepi04', 'godoyjp443@gmail.com', 1, 0, 0, 0, 0, 1, 1, 'Super Admin', 'Active', '2025-09-16 01:37:16', '2025-09-16 01:39:31', NULL, NULL),
+(12, 'Jp', 'Godoy', 'Darasa, Tanauan City, Batangas', '09359306521', 'adminjp@gmail.com', '$2y$10$Zfy6I02.fIJ5/JFykVrTbOzz6RpdbdVKMpBrfE.h.mzYK25LJrt1u', 'uploads/profiles/68c16e01912ae-chae1.jpg', NULL, '0000-00-00', 'https://www.facebook.com/chaepi04', 'https://www.facebook.com/chaepi04', 'godoyjp443@gmail.com', 1, 0, 0, 0, 0, 1, 1, 'Super Admin', 'Active', '2025-09-17 02:13:32', '2025-09-17 02:13:32', NULL, NULL),
 (13, 'Chae', 'Won', '', '', 'chaewon@gmail.com', 'chaewon04.', 'uploads/profiles/68c18a975561d-cha.jpg', NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 0, 0, 0, 0, 'Super Admin', 'Active', '2025-09-11 16:12:19', '2025-09-11 16:12:19', NULL, NULL),
 (14, 'Marga', 'Dela Rosa', '', '', 'marga@gmail.com', 'itsmarga', NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 0, 0, 0, 0, 'Super Admin', 'Inactive', NULL, NULL, NULL, NULL),
 (15, 'Triples', 'Yooyeon', 'Seoul, Korea', '09359306521', 'yooyeon@gmail.com', '$2y$10$Ogi5m0tCHA1x/ayhRg6WGu12KQTfR0snXUcVz8qwqlzgbBoOkZ8t.', 'uploads/profiles/68c29c73c242f-yooyeon.jpg', NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 0, 0, 0, 0, 'Admin', 'Inactive', '2025-09-15 20:54:40', NULL, NULL, NULL);
@@ -697,17 +703,18 @@ ALTER TABLE `admin_activity_log`
   ADD KEY `admin_id` (`admin_id`);
 
 --
--- Indexes for table `blogs`
+-- Indexes for table `blog_pages`
 --
-ALTER TABLE `blogs`
-  ADD PRIMARY KEY (`id`);
+ALTER TABLE `blog_pages`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `page_key` (`page_key`);
 
 --
--- Indexes for table `blog_sections`
+-- Indexes for table `blog_page_sections`
 --
-ALTER TABLE `blog_sections`
+ALTER TABLE `blog_page_sections`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `blog_id` (`blog_id`);
+  ADD KEY `page_id` (`page_id`);
 
 --
 -- Indexes for table `chat_messages`
@@ -744,34 +751,6 @@ ALTER TABLE `exams`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `exam_choice_cards`
---
-ALTER TABLE `exam_choice_cards`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `exam_id` (`exam_id`);
-
---
--- Indexes for table `exam_faqs`
---
-ALTER TABLE `exam_faqs`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `exam_id` (`exam_id`);
-
---
--- Indexes for table `exam_formats`
---
-ALTER TABLE `exam_formats`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `exam_id` (`exam_id`);
-
---
--- Indexes for table `exam_infocards`
---
-ALTER TABLE `exam_infocards`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `exam_id` (`exam_id`);
-
---
 -- Indexes for table `flights`
 --
 ALTER TABLE `flights`
@@ -779,10 +758,24 @@ ALTER TABLE `flights`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `footer_content`
+--
+ALTER TABLE `footer_content`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `content_key` (`content_key`);
+
+--
 -- Indexes for table `hero_media`
 --
 ALTER TABLE `hero_media`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `newsletter_subscriptions`
+--
+ALTER TABLE `newsletter_subscriptions`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- Indexes for table `notifications`
@@ -868,16 +861,16 @@ ALTER TABLE `admin_activity_log`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
--- AUTO_INCREMENT for table `blogs`
+-- AUTO_INCREMENT for table `blog_pages`
 --
-ALTER TABLE `blogs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+ALTER TABLE `blog_pages`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
--- AUTO_INCREMENT for table `blog_sections`
+-- AUTO_INCREMENT for table `blog_page_sections`
 --
-ALTER TABLE `blog_sections`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+ALTER TABLE `blog_page_sections`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `chat_messages`
@@ -907,31 +900,7 @@ ALTER TABLE `documents`
 -- AUTO_INCREMENT for table `exams`
 --
 ALTER TABLE `exams`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `exam_choice_cards`
---
-ALTER TABLE `exam_choice_cards`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `exam_faqs`
---
-ALTER TABLE `exam_faqs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `exam_formats`
---
-ALTER TABLE `exam_formats`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `exam_infocards`
---
-ALTER TABLE `exam_infocards`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `flights`
@@ -940,10 +909,22 @@ ALTER TABLE `flights`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT for table `footer_content`
+--
+ALTER TABLE `footer_content`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
 -- AUTO_INCREMENT for table `hero_media`
 --
 ALTER TABLE `hero_media`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `newsletter_subscriptions`
+--
+ALTER TABLE `newsletter_subscriptions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `notifications`
@@ -955,7 +936,7 @@ ALTER TABLE `notifications`
 -- AUTO_INCREMENT for table `partners`
 --
 ALTER TABLE `partners`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `services`
@@ -1005,10 +986,10 @@ ALTER TABLE `admin_activity_log`
   ADD CONSTRAINT `admin_activity_log_ibfk_1` FOREIGN KEY (`admin_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `blog_sections`
+-- Constraints for table `blog_page_sections`
 --
-ALTER TABLE `blog_sections`
-  ADD CONSTRAINT `blog_sections_ibfk_1` FOREIGN KEY (`blog_id`) REFERENCES `blogs` (`id`) ON DELETE CASCADE;
+ALTER TABLE `blog_page_sections`
+  ADD CONSTRAINT `blog_page_sections_ibfk_1` FOREIGN KEY (`page_id`) REFERENCES `blog_pages` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `consultations`
@@ -1021,30 +1002,6 @@ ALTER TABLE `consultations`
 --
 ALTER TABLE `documents`
   ADD CONSTRAINT `documents_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `exam_choice_cards`
---
-ALTER TABLE `exam_choice_cards`
-  ADD CONSTRAINT `exam_choice_cards_ibfk_1` FOREIGN KEY (`exam_id`) REFERENCES `exams` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `exam_faqs`
---
-ALTER TABLE `exam_faqs`
-  ADD CONSTRAINT `exam_faqs_ibfk_1` FOREIGN KEY (`exam_id`) REFERENCES `exams` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `exam_formats`
---
-ALTER TABLE `exam_formats`
-  ADD CONSTRAINT `exam_formats_ibfk_1` FOREIGN KEY (`exam_id`) REFERENCES `exams` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `exam_infocards`
---
-ALTER TABLE `exam_infocards`
-  ADD CONSTRAINT `exam_infocards_ibfk_1` FOREIGN KEY (`exam_id`) REFERENCES `exams` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `flights`
