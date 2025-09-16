@@ -157,6 +157,57 @@ $conn->close();
             max-height: 580px; /* Approx height for 10 users + header */
             overflow-y: auto;
         }
+        
+        /* Mini CMS Styles */
+        .cms-shortcut-card {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            text-decoration: none;
+            color: #212529;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            height: 100%;
+        }
+
+        .cms-shortcut-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            color: #600000; /* Darker maroon on hover */
+        }
+
+        .cms-shortcut-card .icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+            color: #800000; /* Maroon color for icon */
+        }
+
+        .cms-shortcut-card .title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .cms-shortcut-card .description {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        body.dark-mode .cms-shortcut-card {
+            background-color: #343a40;
+            border-color: #495057;
+            color: #f8f9fa;
+        }
+         body.dark-mode .cms-shortcut-card:hover {
+            color: #ffb3b3; /* Lighter maroon for dark mode hover */
+        }
+        body.dark-mode .cms-shortcut-card .description {
+            color: #dee2e6; /* Lighter text for dark mode */
+        }
+        body.dark-mode .cms-shortcut-card .icon {
+            color: #6be660ff; /* Green color for dark mode */
+        }
     </style>
 </head>
 <body>
@@ -287,9 +338,73 @@ $conn->close();
                         <a href="chat_management.php" class="btn btn-outline-dark" role="button"><i class="bi bi-chat-left-text me-2"></i>Manage Chats</a>
                     </div>
                 </div>
-                <div class="content-card my-3">
-                    <h2>Content Management</h2>
+                <div class="content-card my-4">
+                    <h2>Content Management Shortcuts</h2>
+                    <p class="text-muted">Quickly jump to a specific section to edit its content.</p>
+                    
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-6 col-lg-4">
+                            <a href="content_management.php#landing-page" class="cms-shortcut-card">
+                                <i class="bi bi-camera-reels-fill icon"></i>
+                                <div>
+                                    <div class="title">Landing Page</div>
+                                    <div class="description">Manage hero videos and initial content.</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <a href="content_management.php#about" class="cms-shortcut-card">
+                                <i class="bi bi-info-circle-fill icon"></i>
+                                <div>
+                                    <div class="title">About Page</div>
+                                    <div class="description">Edit mission, vision, and team info.</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <a href="content_management.php#services" class="cms-shortcut-card">
+                                <i class="bi bi-briefcase-fill icon"></i>
+                                <div>
+                                    <div class="title">Services</div>
+                                    <div class="description">Update details for all service pages.</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <a href="content_management.php#blogs" class="cms-shortcut-card">
+                                <i class="bi bi-pencil-fill icon"></i>
+                                <div>
+                                    <div class="title">Blogs</div>
+                                    <div class="description">Manage and edit all blog entries.</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <a href="content_management.php#partners" class="cms-shortcut-card">
+                                <i class="bi bi-people-fill icon"></i>
+                                <div>
+                                    <div class="title">Partners</div>
+                                    <div class="description">Add or update partner information.</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <a href="content_management.php#footer" class="cms-shortcut-card">
+                                <i class="bi bi-c-square-fill icon"></i>
+                                <div>
+                                    <div class="title">Footer</div>
+                                    <div class="description">Edit contact info and social links.</div>
+                                </div>
+                            </a>
+                        </div>
                     </div>
+
+                    <div class="d-flex justify-content-start mt-4">
+                        <a href="content_management.php" class="btn btn-outline-dark" role="button">
+                            <i class="bi bi-pencil-square me-2"></i>Manage Contents
+                        </a>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
