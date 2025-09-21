@@ -14,7 +14,8 @@ $active_page = "profile";
 
 // --- FETCH USER'S DATA ---
 $user_id = $_SESSION['id'];
-$stmt = $conn->prepare("SELECT firstName, lastName, role, email, phone, profileImage, address, dark_mode, facebook, instagram FROM users WHERE id = ?");
+// Added 'birthday' to the SELECT statement
+$stmt = $conn->prepare("SELECT firstName, lastName, role, email, phone, profileImage, address, dark_mode, facebook, instagram, birthday FROM users WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -45,8 +46,20 @@ if($stmt_notifications = $conn->prepare($sql_notifications)) {
 }
 $conn->close(); // Close connection after all queries are done
 
-// Sanitize the profile image path to ensure it's displayed correctly.
+// Sanitize the profile image path
 $profileImagePath = $dbUserData['profileImage'];
+
+// Format the birthday for display
+$birthdayDisplay = 'Birthday not set';
+if (!empty($dbUserData['birthday'])) {
+    try {
+        $birthDate = new DateTime($dbUserData['birthday']);
+        $birthdayDisplay = $birthDate->format('F j, Y'); // e.g., "September 21, 1990"
+    } catch (Exception $e) {
+        $birthdayDisplay = 'Invalid date'; // Fallback for invalid date format in DB
+    }
+}
+
 
 // Format the data for the frontend, ensuring all output is sanitized
 $userProfileData = [
@@ -60,6 +73,8 @@ $userProfileData = [
     "picture" => !empty($profileImagePath) ? '../' . $profileImagePath : null, // Prepend ../ for display
     "facebook" => htmlspecialchars($dbUserData['facebook'] ?? ''),
     "instagram" => htmlspecialchars($dbUserData['instagram'] ?? ''),
+    "birthday" => $birthdayDisplay, // Formatted for display
+    "birthday_raw" => $dbUserData['birthday'] ?? '', // Raw 'YYYY-MM-DD' for the input field
 ];
 
 
@@ -346,6 +361,7 @@ function getNotificationInfo($message) {
                                 <li id="profileLocation"></li>
                                 <li id="profileEmail"></li>
                                 <li id="profilePhone"></li>
+                                <li id="profileBirthday"></li>
                             </ul>
                             <div id="socialLinksContainer" class="social-links d-flex justify-content-center gap-3">
                                 <!-- Social links will be rendered here by JS -->
@@ -437,6 +453,10 @@ function getNotificationInfo($message) {
                         <div class="mb-3">
                             <label for="inputPhone" class="form-label">Phone</label>
                             <input type="tel" class="form-control" id="inputPhone" name="phone">
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputBirthday" class="form-label">Birthday</label>
+                            <input type="date" class="form-control" id="inputBirthday" name="birthday">
                         </div>
                         <hr>
                          <h6 class="mb-3">Social Links</h6>
@@ -564,6 +584,8 @@ function getNotificationInfo($message) {
                 document.getElementById('profileLocation').innerHTML = `<i class="bi bi-geo-alt-fill"></i> ${userProfile.location}`;
                 document.getElementById('profileEmail').innerHTML = `<i class="bi bi-envelope-fill"></i> ${userProfile.email}`;
                 document.getElementById('profilePhone').innerHTML = `<i class="bi bi-telephone-fill"></i> ${userProfile.phone}`;
+                document.getElementById('profileBirthday').innerHTML = `<i class="bi bi-calendar-heart-fill"></i> ${userProfile.birthday}`;
+
                 
                 const profilePictureContainer = document.getElementById('profilePictureContainer');
                 profilePictureContainer.innerHTML = ''; // Clear previous content
@@ -596,6 +618,8 @@ function getNotificationInfo($message) {
                 document.getElementById('inputLocation').value = userProfile.location.startsWith('Lives in') ? userProfile.location.replace('Lives in ', '') : '';
                 document.getElementById('inputEmail').value = userProfile.email;
                 document.getElementById('inputPhone').value = userProfile.phone.startsWith('Phone not set') ? '' : userProfile.phone;
+                document.getElementById('inputBirthday').value = userProfile.birthday_raw; // Set raw YYYY-MM-DD value
+
                 
                 // Populate social links
                 document.getElementById('inputFacebook').value = userProfile.facebook;
@@ -803,3 +827,4 @@ function getNotificationInfo($message) {
     </script>
 </body>
 </html>
+
