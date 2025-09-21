@@ -225,7 +225,7 @@ $page_title = "Application Form";
 
       <div class="form-section mb-4">
         <label for="email" class="form-label">Email <span class="required-indicator">*</span></label>
-        <input type="email" id="email" name="email" placeholder="Your email" class="form-control" required>
+        <input type="email" id="email" name="email" placeholder="youremail@gmail.com" class="form-control" required>
       </div>
 
       <div class="form-section mb-4">
@@ -275,7 +275,7 @@ $page_title = "Application Form";
         </div>
         <div class="form-check">
             <input class="form-check-input" type="checkbox" value="Home & Inst-Caregiver Services Profile Creation" id="caregiverProfile" name="interestPathway[]">
-            <label class="form-check-label" for="caregiverProfile">Home & Inst-Caregiver Services Profile Creation</label>
+            <label class="form-check-label" for="caregiverProfile">Home is Best Caregiver Services Profile Creation</label>
         </div>
       </div>
 
