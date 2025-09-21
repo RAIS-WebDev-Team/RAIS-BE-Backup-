@@ -4,35 +4,49 @@
 session_start();
 include_once '../config.php';
 
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header("location: ../login.php");
+// Set header for JSON response, as the frontend expects it
+header('Content-Type: application/json');
+
+// Helper function to standardize JSON responses
+function send_json_response($status, $message) {
+    echo json_encode(['status' => $status, 'message' => $message]);
     exit;
+}
+
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    http_response_code(401); // Unauthorized
+    send_json_response('error', 'Authentication required.');
 }
 
 $userId = $_SESSION['id'];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // --- Retrieve all form data ---
-    $firstName = $_POST['firstName'];
-    $lastName = $_POST['lastName'];
-    $phone = $_POST['phone'];
-    $address = $_POST['address'];
-    $birthday = $_POST['birthday'];
-    $facebook = $_POST['facebook'];
-    $instagram = $_POST['instagram'];
-    $gmail = $_POST['gmail'];
+    // --- Retrieve all form data safely ---
+    $firstName = $_POST['firstName'] ?? null;
+    $lastName = $_POST['lastName'] ?? null;
+    $phone = $_POST['phone'] ?? null;
+    $address = $_POST['address'] ?? null;
+    $birthday = $_POST['birthday'] ?? null; // Field from your script
+    $facebook = $_POST['facebook'] ?? null;
+    $instagram = $_POST['instagram'] ?? null;
+    // --- FIX: Changed 'gmail' to 'email' to match the database and form ---
+    $email = $_POST['email'] ?? null; 
 
     // --- Logic to determine progress ---
     $profilePictureUploaded = false;
     $birthdayAdded = !empty($birthday);
-    $socialLinksAdded = !empty($facebook) || !empty($instagram) || !empty($gmail);
+    // Corrected to check for email, facebook, or instagram for social links
+    $socialLinksAdded = !empty($facebook) || !empty($instagram) || !empty($email);
 
     // --- Handle file upload ---
     $profileImagePath = null;
     if (isset($_FILES['profileImage']) && $_FILES['profileImage']['error'] == 0) {
         $targetDir = "../uploads/";
         if (!file_exists($targetDir)) {
-            mkdir($targetDir, 0777, true);
+            // Added error handling for directory creation
+            if (!mkdir($targetDir, 0777, true)) {
+                send_json_response('error', 'Failed to create upload directory.');
+            }
         }
         $fileName = uniqid() . '-' . basename($_FILES["profileImage"]["name"]);
         $targetFilePath = $targetDir . $fileName;
@@ -43,16 +57,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (move_uploaded_file($_FILES["profileImage"]["tmp_name"], $targetFilePath)) {
                 $profileImagePath = "uploads/" . $fileName;
                 $profilePictureUploaded = true; // Set flag on successful upload
+            } else {
+                send_json_response('error', 'Failed to move uploaded file.');
             }
+        } else {
+             send_json_response('error', 'Invalid file type. Only JPG, PNG, JPEG, GIF are allowed.');
         }
     }
 
     // --- Prepare SQL statement to update the database ---
     $sqlParts = [
         "firstName = ?", "lastName = ?", "phone = ?", "address = ?", 
-        "birthday = ?", "facebook = ?", "instagram = ?", "gmail = ?"
+        "birthday = ?", "facebook = ?", "instagram = ?", "email = ?" // FIX: Using email column
     ];
-    $params = [$firstName, $lastName, $phone, $address, $birthday, $facebook, $instagram, $gmail];
+    $params = [$firstName, $lastName, $phone, $address, $birthday, $facebook, $instagram, $email];
     $types = "ssssssss";
 
     // Fetch current flags to ensure we don't unset a completed step
@@ -63,13 +81,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt_check->close();
 
     // Set flags to 1 if the action was just completed OR if it was already complete
-    if ($profilePictureUploaded || $currentUserFlags['profile_picture_uploaded']) {
+    if ($profilePictureUploaded || ($currentUserFlags && $currentUserFlags['profile_picture_uploaded'])) {
         $sqlParts[] = "profile_picture_uploaded = 1";
     }
-    if ($birthdayAdded || $currentUserFlags['birthday_added']) {
+    if ($birthdayAdded || ($currentUserFlags && $currentUserFlags['birthday_added'])) {
         $sqlParts[] = "birthday_added = 1";
     }
-    if ($socialLinksAdded || $currentUserFlags['social_links_added']) {
+    if ($socialLinksAdded || ($currentUserFlags && $currentUserFlags['social_links_added'])) {
         $sqlParts[] = "social_links_added = 1";
     }
 
@@ -84,17 +102,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $sql = "UPDATE users SET " . implode(', ', $sqlParts) . " WHERE id = ?";
     $stmt = $conn->prepare($sql);
+
+    // Check if the SQL statement was prepared successfully
+    if ($stmt === false) {
+        send_json_response('error', 'Database statement preparation failed: ' . $conn->error);
+    }
+    
     $stmt->bind_param($types, ...$params);
 
-    // Execute the statement and redirect
+    // Execute the statement and return a JSON response instead of redirecting
     if ($stmt->execute()) {
-        header("location: profile.php"); 
+        send_json_response('success', 'Profile updated successfully.');
     } else {
-        echo "Error updating record: " . $conn->error;
+        send_json_response('error', 'Error updating record: ' . $stmt->error);
     }
 
     $stmt->close();
+} else {
+    http_response_code(405); // Method Not Allowed
+    send_json_response('error', 'Invalid request method.');
 }
 
 $conn->close();
 ?>
+

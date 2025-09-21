@@ -45,25 +45,21 @@ if($stmt_notifications = $conn->prepare($sql_notifications)) {
 }
 $conn->close(); // Close connection after all queries are done
 
-// Sanitize the profile image path to prevent incorrect paths
+// Sanitize the profile image path to ensure it's displayed correctly.
 $profileImagePath = $dbUserData['profileImage'];
-if (!empty($profileImagePath) && strpos($profileImagePath, '../') === 0) {
-    // If the path from the DB already contains '../', remove it to avoid duplication.
-    $profileImagePath = substr($profileImagePath, 3);
-}
 
-// Format the data for the frontend
+// Format the data for the frontend, ensuring all output is sanitized
 $userProfileData = [
-    "firstName" => $dbUserData['firstName'],
-    "lastName" => $dbUserData['lastName'],
-    "title" => $dbUserData['role'],
+    "firstName" => htmlspecialchars($dbUserData['firstName']),
+    "lastName" => htmlspecialchars($dbUserData['lastName']),
+    "title" => htmlspecialchars($dbUserData['role']),
     "work" => "Client of RAIS", // Static value for users
     "location" => $dbUserData['address'] ? 'Lives in ' . htmlspecialchars($dbUserData['address']) : 'Location not set',
-    "email" => $dbUserData['email'],
-    "phone" => $dbUserData['phone'] ?? 'Phone not set',
-    "picture" => !empty($profileImagePath) ? '../' . $profileImagePath : null,
-    "facebook" => $dbUserData['facebook'] ?? '',
-    "instagram" => $dbUserData['instagram'] ?? '',
+    "email" => htmlspecialchars($dbUserData['email']),
+    "phone" => $dbUserData['phone'] ? htmlspecialchars($dbUserData['phone']) : 'Phone not set',
+    "picture" => !empty($profileImagePath) ? '../' . $profileImagePath : null, // Prepend ../ for display
+    "facebook" => htmlspecialchars($dbUserData['facebook'] ?? ''),
+    "instagram" => htmlspecialchars($dbUserData['instagram'] ?? ''),
 ];
 
 
@@ -314,17 +310,17 @@ function getNotificationInfo($message) {
         <div class="content-area">
              <!-- Header -->
              <div class="header">
-                <div class="header-brand d-flex align-items-center">
-                    <img src="../img/logo.png" alt="RAIS Logo" class="header-logo-img light-mode-logo">
-                    <img src="../img/logo1.png" alt="RAIS Logo Dark" class="header-logo-img dark-mode-logo" onerror="this.style.display='none'">
-                    <span class="header-title">Roman & Associates Immigration Services</span>
-                </div>
-                <div class="user-status d-flex align-items-center gap-2">
-                    <div id="headerDate" class="me-3" style="font-weight: 500;"></div>
-                    <a href="#" class="btn btn-link power-btn" data-bs-toggle="modal" data-bs-target="#logoutModal"><i class="bi bi-power"></i></a>
-                    <span class="badge"><?php echo htmlspecialchars($dbUserData['firstName']); ?></span>
-                </div>
-            </div>
+                 <div class="header-brand d-flex align-items-center">
+                     <img src="../img/logo.png" alt="RAIS Logo" class="header-logo-img light-mode-logo">
+                     <img src="../img/logo1.png" alt="RAIS Logo Dark" class="header-logo-img dark-mode-logo" onerror="this.style.display='none'">
+                     <span class="header-title">Roman & Associates Immigration Services</span>
+                 </div>
+                 <div class="user-status d-flex align-items-center gap-2">
+                     <div id="headerDate" class="me-3" style="font-weight: 500;"></div>
+                     <a href="#" class="btn btn-link power-btn" data-bs-toggle="modal" data-bs-target="#logoutModal"><i class="bi bi-power"></i></a>
+                     <span class="badge"><?php echo $userProfileData['firstName']; ?></span>
+                 </div>
+             </div>
 
             <main class="main-content">
                 <div class="profile-header">
@@ -340,8 +336,7 @@ function getNotificationInfo($message) {
                         <button class="btn btn-outline-secondary edit-profile-btn" data-bs-toggle="modal" data-bs-target="#editProfileModal"><i class="bi bi-pencil-fill"></i> Edit Profile</button>
                     </div>
                 </div>
-                <input type="file" id="profilePictureInput" style="display: none;" accept="image/*">
-
+                
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="content-card">
@@ -402,7 +397,8 @@ function getNotificationInfo($message) {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editProfileForm">
+                    <form id="editProfileForm" enctype="multipart/form-data">
+                         <input type="file" id="profilePictureInput" name="profileImage" style="display: none;" accept="image/*">
                         <div class="mb-4 text-center">
                             <div id="modalProfilePicturePreviewContainer" class="rounded-circle mx-auto mb-3" style="width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; border: 2px solid #dee2e6; background-color: #f8f9fa; font-size: 5rem; color: #6c757d; overflow: hidden;">
                                 <!-- Profile picture preview or icon will be rendered here by JS -->
@@ -572,7 +568,7 @@ function getNotificationInfo($message) {
                 const profilePictureContainer = document.getElementById('profilePictureContainer');
                 profilePictureContainer.innerHTML = ''; // Clear previous content
                 if (userProfile.picture) {
-                    profilePictureContainer.innerHTML = `<img src="${userProfile.picture}" alt="Profile Picture">`;
+                    profilePictureContainer.innerHTML = `<img src="${userProfile.picture}?t=${new Date().getTime()}" alt="Profile Picture">`;
                 } else {
                     profilePictureContainer.innerHTML = `<i class="bi bi-person-circle"></i>`;
                 }
@@ -608,7 +604,7 @@ function getNotificationInfo($message) {
                 const modalPreviewContainer = document.getElementById('modalProfilePicturePreviewContainer');
                 modalPreviewContainer.innerHTML = ''; // Clear previous
                 if (userProfile.picture) {
-                     modalPreviewContainer.innerHTML = `<img src="${userProfile.picture}" alt="Profile Preview" style="width: 100%; height: 100%; object-fit: cover;">`;
+                     modalPreviewContainer.innerHTML = `<img src="${userProfile.picture}?t=${new Date().getTime()}" alt="Profile Preview" style="width: 100%; height: 100%; object-fit: cover;">`;
                 } else {
                      modalPreviewContainer.innerHTML = '<i class="bi bi-person-circle"></i>';
                 }
@@ -637,33 +633,41 @@ function getNotificationInfo($message) {
             document.getElementById('confirmSaveChangesBtn').addEventListener('click', async function() {
                 const form = document.getElementById('editProfileForm');
                 const formData = new FormData(form);
-                formData.append('action', 'update_profile');
-
-                if (newPictureFile) {
-                    formData.append('profileImage', newPictureFile);
-                }
                 
                 confirmSaveModal.hide();
                 
                 try {
-                    const response = await fetch('profile_handler.php', {
+                    const response = await fetch('update-profile.php', {
                         method: 'POST',
                         body: formData
                     });
+
+                    // Check if the response is valid JSON
+                    const contentType = response.headers.get("content-type");
+                    if (!contentType || !contentType.includes("application/json")) {
+                        const textResponse = await response.text();
+                        throw new Error("Server did not return JSON. Response: " + textResponse);
+                    }
+                    
                     const result = await response.json();
 
                     if (result.status === 'success') {
+                        // Use a success alert for better user feedback
+                        alert('Profile updated successfully!');
+                        
+                        // Hide the modal, and once it's hidden, reload the page.
                         editProfileModal.hide();
                         document.getElementById('editProfileModal').addEventListener('hidden.bs.modal', function () {
                            window.location.reload();
                         }, { once: true });
+
                     } else {
                         console.error('Error updating profile:', result.message);
                         alert('Error: ' + result.message);
                     }
                 } catch (error) {
                     console.error('Error submitting form:', error);
-                    alert('An error occurred while submitting the form.');
+                    alert('An error occurred while submitting the form. Please check the console for details.');
                 }
             });
 
@@ -799,4 +803,3 @@ function getNotificationInfo($message) {
     </script>
 </body>
 </html>
-
